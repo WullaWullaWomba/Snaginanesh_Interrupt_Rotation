@@ -64,7 +64,7 @@ local defaultOptions = {
 		-- Druid
 		[11] = false, -- Balance Feral Guardian Restoration
 		-- Demon Hunter
-		[12] = true, -- Havoc Vengeance 
+		[12] = true, -- Havoc Vengeance
 	},
 	["SPECENABLEOPTIONS"] = {
 		--Warrior
@@ -127,8 +127,8 @@ local defaultOptions = {
 		[577] = true, -- Havoc
 		[581] = true, -- Vengeance
 	},
-	["TRACKROTATION"] = false,
-	["TRACKALL"] = true,
+	["TRACKROTATIONCHECKED"] = false,
+	["TRACKALLCHECKED"] = true,
 	["TRACKROTATIONFROM"] = 0,
 	["TRACKROTATIONTO"] = 40,
 	["TRACKALLFROM"] = 2,
@@ -170,7 +170,9 @@ frames.container.COMBAT_LOG_EVENT_UNFILTERED = function()
 	local _, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
 	if subEvent == "SPELL_CAST_SUCCESS" then
 		if not cds[spellID] or sourceFlags%16 > 4 then return end
-		updateOrAddBar(sourceGUID, spellID, true)
+		--todooo
+		IsInGroup(sourceGUID)
+		--updateOrAddBar(sourceGUID, spellID, true)
 	end
 end
 frames.container.PLAYER_SPECIALIZATION_CHANGED = function()
@@ -192,6 +194,7 @@ C_ChatInfo.RegisterAddonMessagePrefix("SnagiIntRotaSend")
 C_ChatInfo.RegisterAddonMessagePrefix("SnagiIntRotaReq")
 
 local OriginalSetHyperlink = ItemRefTooltip.SetHyperlink
+	local titles = {}-- todo remove titles
 function ItemRefTooltip:SetHyperlink(link, ...)
 	if(link and link:sub(1, 14) == "SnagiIntRota: ") then
 		local text = link:sub(15)
@@ -258,6 +261,10 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", filterFunc)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", filterFunc)
 
 frames.transmissionOkayButton:SetScript("OnClick", function(self)
+	local rotations = {} -- todo remove rotations
+	local tabButtons = {} -- todo remove tabButtons
+	rotations[1] = tabButtons[1]
+	tabButtons = rotations
 	local text = UIDropDownMenu_GetText(frames.transmissionDropdownMenu)
 	if not text then
 		return
@@ -375,7 +382,27 @@ func.removeRotationMember = function(GUID)
 		end
 	end
 end
-------------------------------------------------------------------------------------------------------------------------
+func.updateTrackMode = function (tab)
+	-- todo get other groupnum?
+	local tab = tab or activeTab
+	if rotationTabOptions[tab]["TRACKALLCHECKED"] and rotationTabOptions[tab]["TRACKALLFROM"]<= numGroup 
+		<= rotationTabOptions[tab]["TRACKALLTO"] then
+	--set track mode to "ALL"
+	elseif rotationTabOptions[tab]["TRACKROTATIONCHECKED"] and rotationTabOptions[tab]["TRACKROTATIONFROM"]<= numGroup 
+		<= rotationTabOptions[tab]["TRACKROTATIONTO"] then
+	-- set track mode to "ROTATION"
+	else
+	-- set track mode to "NONE"
+	end
+	-- todo
+	-- compare to old mode
+	-- new: "NONE" remove all bars
+	-- new ALL old "NONE" setup all bars
+	-- new ALL old "ROTATION" add missing bars
+	-- new ROTATION old "ALL" remove non rotation bars
+	-- new ROTATION old "NONE" add rotation bars
+end
+	------------------------------------------------------------------------------------------------------------------------
 
 -- FRAME SCRIPTS
 
@@ -451,21 +478,11 @@ func.enableGroupInstanceButtonOnClick = function(self)
 	self:LockHighlight()
 end
 func.groupEnableOptionCheckboxOnClick = function(self, option)
-	local trackTable
-	if self.value == "ALL" then
-		trackTable = trackAlls
-	elseif self.value == "ROTATION" then
-		trackTable = trackRotations
-	end
 	local toggle = self:GetChecked()
-	updateTable(trackTable, toggle)
 	option.fromSlider:SetEnabled(toggle)
 	option.fromEditbox:SetEnabled(toggle)
 	option.toSlider:SetEnabled(toggle)
 	option.toEditbox:SetEnabled(toggle)
-	if activeTabKey == "GENERAL" then
-		self:SetNormalTexture("Interface\\Buttons\\UI-CheckBox-Up")
-	end
 	if toggle then
 		option.fromFontString:SetTextColor(0.98, 0.82, 0)
 		option.toFontString:SetTextColor(0.98, 0.82, 0)
@@ -476,13 +493,7 @@ func.groupEnableOptionCheckboxOnClick = function(self, option)
 		option.toFontString:SetTextColor(0.3, 0.3, 0.3)
 		option.fromEditbox:SetTextColor(0.3, 0.3, 0.3)
 		option.toEditbox:SetTextColor(0.3, 0.3, 0.3)
-	end
-	if activeTabKey ~= "GENERAL" then
-		updateTrackMode(activeTabKey)
-	else
-		for i=1, numTabs do
-			updateTrackMode(i)
-		end
+		func.updateTrackMode()
 	end
 end
 func.groupEnableOptionFromSliderOnMouseWheel = function(self, delta, option)
