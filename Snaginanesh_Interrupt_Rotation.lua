@@ -32,7 +32,7 @@ local numTabs = 0
 local activeTab = "GENERAL"
 local playerGUID
 local colouredPlayerName
-
+local trackModes = {}
 local defaultOptions = {
 	["TITLE"] = "COOKIE",
 	["ROTATION"] = {},
@@ -382,27 +382,45 @@ func.removeRotationMember = function(GUID)
 		end
 	end
 end
-func.updateTrackMode = function (tab)
+func.updateTrackMode = function (tabb)
 	-- todo get other groupnum?
-	local tab = tab or activeTab
-	if rotationTabOptions[tab]["TRACKALLCHECKED"] and rotationTabOptions[tab]["TRACKALLFROM"]<= numGroup 
-		<= rotationTabOptions[tab]["TRACKALLTO"] then
-	--set track mode to "ALL"
-	elseif rotationTabOptions[tab]["TRACKROTATIONCHECKED"] and rotationTabOptions[tab]["TRACKROTATIONFROM"]<= numGroup 
-		<= rotationTabOptions[tab]["TRACKROTATIONTO"] then
-	-- set track mode to "ROTATION"
+	local tab = tabb or activeTab
+	local old = trackModes[tab]
+	if rotationTabOptions[tab]["TRACKALLCHECKED"] and rotationTabOptions[tab]["TRACKALLFROM"]<= numGroup
+			<= rotationTabOptions[tab]["TRACKALLTO"] then
+		trackModes[tab] = "ALL"
+	elseif rotationTabOptions[tab]["TRACKROTATIONCHECKED"] and rotationTabOptions[tab]["TRACKROTATIONFROM"]<= numGroup
+			<= rotationTabOptions[tab]["TRACKROTATIONTO"] then
+		trackModes[tab] = "ROTATION"
 	else
-	-- set track mode to "NONE"
+		trackModes[tab] = "NONE"
+	end
+	if old == trackModes[tab] then
+		return
 	end
 	-- todo
-	-- compare to old mode
-	-- new: "NONE" remove all bars
-	-- new ALL old "NONE" setup all bars
-	-- new ALL old "ROTATION" add missing bars
-	-- new ROTATION old "ALL" remove non rotation bars
-	-- new ROTATION old "NONE" add rotation bars
+	if trackModes[tab] == "NONE" then
+		--remove all bars for tab todo
+	elseif old == "NONE" then
+		if trackModes[tab] == "ROTATION" then
+			-- add rotation
+		elseif trackModes[tab] == "ALL" then
+			-- add all players
+		end
+	elseif old == "ROTATION" then
+			-- trackModes[tab] == "ALL" unless more modes added
+
+			-- add all that havent been added yet
+	else
+		-- old == "ALL" unless more modes added
+		-- trackModes[tab] == "ROTATION" unless more modes added
+
+		-- remove players that arent part of the rotation
+
+	end
 end
-	------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------
 
 -- FRAME SCRIPTS
 
@@ -477,6 +495,17 @@ func.enableGroupInstanceButtonOnClick = function(self)
 	frames.enableClassSpecButton:UnlockHighlight()
 	self:LockHighlight()
 end
+func.enableClassSpecButtonOnClick = function(self)
+	for i=1, #frames.enableCheckboxes do
+		for j=1, #frames.enableCheckboxes[i] do
+			frames.enableCheckboxes[i][j]:Show()
+		end
+	end
+	frames.trackAllOption.checkbox:Hide()
+	frames.trackRotationOption.checkbox:Hide()
+	frames.enableGroupInstanceButton:UnlockHighlight()
+	self:LockHighlight()
+end
 func.groupEnableOptionCheckboxOnClick = function(self, option)
 	local toggle = self:GetChecked()
 	option.fromSlider:SetEnabled(toggle)
@@ -497,167 +526,117 @@ func.groupEnableOptionCheckboxOnClick = function(self, option)
 	end
 end
 func.groupEnableOptionFromSliderOnMouseWheel = function(self, delta, option)
-	local fromTable, toTable
-	if self.value == "ALL" then
-		fromTable, toTable = trackAllFrom, trackAllTo
-	elseif self.value == "ROTATION" then
-		fromTable, toTable = trackRotationFrom, trackRotationTo
-	end
+	-- self.model == "ALL" then
+	-- self.model == "ROTATION" then
+	local minVal, maxVal = self:GetMinMaxValues()
+	local newVal
 	if delta == 1 then
-		if self:GetValue() == 40 then
+		if self:GetValue() == maxVal then
 			return
 		end
-		local new = min(self:GetValue()+1, 40)
-		if new > option.toSlider:GetValue() then
-			option.toSlider:SetValue(new)
-			option.toEditbox:SetText(new or "")
-			updateTable(toTable, new)
+		newVal = self:GetValue()+1
+		if newVal > option.toSlider:GetValue() then
+			option.toSlider:SetValue(newVal)
+			option.toEditbox:SetText(newVal)
+			rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
 		end
-		self:SetValue(new)
-		updateTable(fromTable, new)
+		self:SetValue(newVal)
+		rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
 	else
-		if self:GetValue() == 0 then
+		if self:GetValue() == minVal then
 			return
 		end
-		local new = max(self:GetValue()-1, 0)
-		self:SetValue(new)
-		updateTable(fromTable, new)
+		newVal = self:GetValue()-1
+		self:SetValue(newVal)
+		rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
 	end
-	if activeTabKey ~= "GENERAL" then
-		updateTrackMode(activeTabKey)
-	else
-		for i=1, numTabs do
-			updateTrackMode(i)
-		end
-	end
-	option.fromEditbox:SetText(fromTable[activeTabKey])
-	option.toEditbox:SetText(toTable[activeTabKey])
+	option.fromEditbox:SetText(newVal)
 end
 func.groupEnableOptionFromSliderOnMouseUp = function(self, option)
-	local fromTable, toTable
-	if self.value == "ALL" then
-		fromTable, toTable = trackAllFrom, trackAllTo
-	elseif self.value == "ROTATION" then
-		fromTable, toTable = trackRotationFrom, trackRotationTo
+	local newVal = self:GetValue()
+	if newVal == rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] then
+		return
 	end
-	local new = self:GetValue()
-	if new ~= fromTable[activeTabKey] then
-		if toTable[activeTabKey] and new > toTable[activeTabKey] then
-			option.toSlider:SetValue(new)
-			option.toEditbox:SetText(new or "")
-			updateTable(toTable, new)
-		end
-		option.fromEditbox:SetText(new or "")
-		updateTable(fromTable, new)
-
-		if activeTabKey ~= "GENERAL" then
-			updateTrackMode(activeTabKey)
-		else
-			for i=1, numTabs do
-				updateTrackMode(i)
-			end
-		end
+	if newVal > rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] then
+		option.toSlider:SetValue(newVal)
+		option.toEditbox:SetText(newVal)
+		rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
 	end
+	option.fromEditbox:SetText(newVal)
+	rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
 end
 func.groupEnableOptionToSliderOnMouseWheel = function(self, delta, option)
-	local fromTable, toTable
-	if self.value == "ALL" then
-		fromTable, toTable = trackAllFrom, trackAllTo
-	elseif self.value == "ROTATION" then
-		fromTable, toTable = trackRotationFrom, trackRotationTo
-	end
-	if delta == 1 and self:GetValue() < 40 then
-		local new = min(self:GetValue()+1, 40)
-		self:SetValue(new)
-		updateTable(toTable, new)
-	elseif self:GetValue() < 0 then
-		local new = max(self:GetValue()-1, 0)
-		if new < option.fromSlider:GetValue() then
-			option.fromSlider:SetValue(new)
-			option.fromEditbox:SetText(new or "")
-			updateTable(fromTable, new)
+	local minVal, maxVal = self:GetMinMaxValues()
+	local newVal
+
+	if delta == 1 then
+		if self:GetValue() == maxVal then
+			return
 		end
-		self:SetValue(new)
-		updateTable(toTable, new)
-	end
-	if activeTabKey ~= "GENERAL" then
-		updateTrackMode(activeTabKey)
+		newVal = self:GetValue()+1
+		self:SetValue(newVal)
+
 	else
-		for i=1, numTabs do
-			updateTrackMode(i)
+		if self:GetValue() == minVal then
+			return
+		end
+		newVal = self:GetValue()-1
+		self:SetValue(newVal)
+		if newVal < rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] then
+			option.fromSlider:SetValue(newVal)
+			option.fromEditbox:SetText(newVal)
 		end
 	end
-	option.fromEditbox:SetText(fromTable[activeTabKey])
-	option.toEditbox:SetText(toTable[activeTabKey])
+	option.toEditbox:SetText(newVal)
 end
 func.groupEnableOptionToSliderOnMouseUp = function(self, option)
-	local fromTable, toTable
-	if self.value == "ALL" then
-		fromTable, toTable = trackAllFrom, trackAllTo
-	elseif self.value == "ROTATION" then
-		fromTable, toTable = trackRotationFrom, trackRotationTo
+	local newVal = self:GetValue()
+	if newVal == rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] then
+		return
 	end
-	local new = self:GetValue()
-		if new ~= toTable[activeTabKey] then
-			if fromTable[activeTabKey] and new < fromTable[activeTabKey] then
-				option.fromSlider:SetValue(new)
-				option.fromEditbox:SetText(new or "")
-				updateTable(fromTable, new)
-			end
-			option.toEditbox:SetText(new or "")
-			updateTable(toTable, new)
-
-			if activeTabKey ~= "GENERAL" then
-				updateTrackMode(activeTabKey)
-			else
-				for i=1, numTabs do
-					updateTrackMode(i)
-				end
-			end
-		end
+	if newVal < rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] then
+		option.fromSlider:SetValue(newVal)
+		option.fromEditbox:SetText(newVal)
+		rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
+	end
+	option.toEditbox:SetText(newVal)
+	rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
 end
 func.groupEnableOptionFromEditboxOnEnterPressed = function(self, option)
-	local fromTable
-	if self.value == "ALL" then
-		fromTable = trackAllFrom
-	elseif self.value == "ROTATION" then
-		fromTable = trackRotationFrom
-	end
-	local val = tonumber(self:GetText())
-		if val > 40 then
-			self:SetText(40)
-			val = 40
-		end
-		option.fromSlider:SetValue(val)
-		updateTable(fromTable, val)
-		self:ClearFocus()
-end
-func.groupEnableOptionToEditboxOnEnterPressed = function(self, option)
-	local toTable
-	if self.value == "ALL" then
-		toTable = trackAllTo
-	elseif self.value == "ROTATION" then
-		toTable = trackRotationTo
-	end
-	local val = tonumber(self:GetText())
-	if val > 40 then
+	local newVal = tonumber(self:GetText())
+	if newVal > 40 then
 		self:SetText(40)
-		val = 40
+		if rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] == 40 then
+			return
+		end
+		newVal = 40
 	end
-	option.toSlider:SetValue(val)
-	updateTable(toTable, val)
+	rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
+	option.fromSlider:SetValue(newVal)
+	if newVal > rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] then
+		option.toSlider:SetValue(newVal)
+		option.toEditbox:SetText(newVal)
+		rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
+	end
 	self:ClearFocus()
 end
-func.enableClassSpecButtonOnClick = function(self)
-	for i=1, #frames.enableCheckboxes do
-		for j=1, #frames.enableCheckboxes[i] do
-			frames.enableCheckboxes[i][j]:Show()
+func.groupEnableOptionToEditboxOnEnterPressed = function(self, option)
+	local newVal = tonumber(self:GetText())
+	if newVal > 40 then
+		self:SetText(40)
+		if rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] == 40 then
+			return
 		end
+		newVal = 40
 	end
-	frames.trackAllOption.checkbox:Hide()
-	frames.trackRotationOption.checkbox:Hide()
-	frames.enableGroupInstanceButton:UnlockHighlight()
-	self:LockHighlight()
+	rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
+	option.toSlider:SetValue(newVal)
+	if newVal < rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] then
+		option.fromSlider:SetValue(newVal)
+		option.fromEditbox:SetText(newVal)
+		rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
+	end
+	self:ClearFocus()
 end
 func.enableClassOnClick = function(self, c)
 local newBool = self:GetChecked()

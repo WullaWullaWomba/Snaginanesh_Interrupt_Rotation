@@ -236,7 +236,7 @@ SIR.frameUtil = {
 		eb:SetTextInsets(-2.3, 2.3, 2, 0) --l r t b
 		return eb
 	end,
-	["createFromToOption"] = function(text, value, min, max, parent)
+	["createFromToOption"] = function(text, model, min, max, parent)
 		local option = {
 			["checkbox"] = SIR.frameUtil.createFontStringCheckbox(text, parent),
 			["fromSlider"] = SIR.frameUtil.createSlider(parent, min, max),
@@ -247,7 +247,7 @@ SIR.frameUtil = {
 		local fromFontString = option.checkbox:CreateFontString(_, "ARTWORK", "GameFontNormal")
 		local toFontString = option.checkbox:CreateFontString(_, "ARTWORK", "GameFontNormal")
 		for _, frame in pairs(option) do
-			frame.value = value
+			frame.model = model
 		end
 		for _, f in pairs({option.fromSlider, option.toSlider}) do
 			f.High:SetText(f.maxValue)
