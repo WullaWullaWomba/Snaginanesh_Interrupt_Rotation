@@ -640,86 +640,16 @@ func.groupEnableOptionToEditboxOnEnterPressed = function(self, option)
 end
 func.enableClassOnClick = function(self, c)
 local newBool = self:GetChecked()
-	classEnableOptions[activeTabKey][c] = newBool
-	if activeTabKey ~= "GENERAL" then
-		-- ROTATION CLASS
-		-- if player class - enable/disable frame
-		if c == playerClass then
-			if newBool then
-				rotationFrames[activeTabKey]:Show()
-			else
-				rotationFrames[activeTabKey]:Hide()
-			end
-			updateTrackMode(activeTabKey)
-		end
-		-- Adjust the rotation tabs options & checkboxes
-		for i=1, #classSpecIDs[c] do
-			specEnableOptions[activeTabKey][classSpecIDs[c][i]] = newBool
-		end
-		for i=2, #frames.enableCheckboxes[c] do
-			frames.enableCheckboxes[c][i]:SetChecked(newBool)
-		end
-
-		-- Adjust general class option
-		local generalClass = classEnableOptions[1][c]
-		for i=2, numTabs do
-			if generalClass ~= classEnableOptions[i][c] then
-				generalClass = nil
-				break
-			end
-		end
-		local generalSpec
-		local specID
-		classEnableOptions["GENERAL"][c] = generalClass
-		-- Adjust general specs option
-		-- For all specs in the class
-		for i=1, #classSpecIDs[c] do
-			specID = classSpecIDs[c][i]
-			generalSpec = specEnableOptions[1][specID]
-			-- If not all tabs options are the same change to nil
-			-- else change to new value
-			for j=2, numTabs do
-				if generalSpec ~= specEnableOptions[j][specID] then
-					generalSpec = nil
-					break
-				end
-			end
-			specEnableOptions["GENERAL"][specID] = generalSpec
-		end
-	else
-		-- GENERAL CLASS
-		-- if player class - enable/disable frames
-		if c == playerClass then
-			for i=1, numTabs do
-				if newBool then
-					rotationFrames[i]:Show()
-				else
-					rotationFrames[i]:Hide()
-				end
-				updateTrackMode(i)
-			end
-		end
-		-- adjust rotation options
-		for i=1, numTabs do
-			classEnableOptions[i][c] = newBool
-			for j=1, #classSpecIDs[c] do
-				specEnableOptions[i][classSpecIDs[c][j]] = newBool
-			end
-		end
-		-- adjust general tab
-		classEnableOptions["GENERAL"][c] = newBool
-		for j=1, #classSpecIDs[c] do
-			specEnableOptions["GENERAL"][classSpecIDs[c][j]] = newBool
-		end
-		frames.enableCheckboxes[c][1]:SetNormalTexture("Interface\\Buttons\\UI-CheckBox-Up")
-		for i=2, #frames.enableCheckboxes[c] do
-			frames.enableCheckboxes[c][i]:SetChecked(newBool)
-			frames.enableCheckboxes[c][i]:SetNormalTexture("Interface\\Buttons\\UI-CheckBox-Up")
-		end
+	rotationTabOptions[activeTab]["CLASSENABLEOPTIONS"][c] = newBool
+	for i=1, #classSpecIDs[c] do
+		rotationTabOptions[activeTab]["SPECENABLEOPTIONS"][classSpecIDs[c][i]] = newBool
+		frames.enableCheckboxes[c][i]:SetChecked(newBool)
 	end
+	-- todo if own spec option changed, update
 end
 func.enableSpecOnClick = function(self, c, s)
 	local newBool = self:GetChecked()
+	rotationTabOptions[activeTab]["SPECENABLEOPTIONS"][s] = newBool
 	specEnableOptions[activeTabKey][self.spec] = newBool
 	local allEqual = true
 	if activeTabKey ~= "GENERAL" then
