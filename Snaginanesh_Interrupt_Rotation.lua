@@ -649,7 +649,11 @@ local newBool = self:GetChecked()
 end
 func.enableSpecOnClick = function(self, c, s)
 	local newBool = self:GetChecked()
-	rotationTabOptions[activeTab]["SPECENABLEOPTIONS"][s] = newBool
+	local specID = classSpecIDs[c][s]
+	rotationTabOptions[activeTab]["SPECENABLEOPTIONS"][specID] = newBool
+	rotationTabOptions[activeTab]["CLASSENABLEOPTIONS"][c]
+
+	
 	specEnableOptions[activeTabKey][self.spec] = newBool
 	local allEqual = true
 	if activeTabKey ~= "GENERAL" then
