@@ -17,7 +17,7 @@ local classColorsHex, classColorsRGB = SIR.data.classColorsHex, SIR.data.classCo
 local classSpecIDs = SIR.data.classSpecIDs
 local util = SIR.util
 local frameUtil = SIR.frameUtil
-local frames = SIR.frames
+local optionFrames = SIR.optionFrames
 
 SIR.func = SIR.func or {}
 local func = SIR.func
@@ -34,7 +34,7 @@ local playerGUID
 local colouredPlayerName
 local trackModes = {}
 local defaultOptions = {
-	["TITLE"] = "COOKIE",
+	["TITLE"] = "new_tab",
 	["ROTATION"] = {},
 	["SPACE"] = 0,
 	["XOFF"] = 500,
@@ -138,10 +138,10 @@ local defaultOptions = {
 local rotationTabOptions = {}
 
 local toggleOptions = function()
-	if frames.container:IsShown() then
-		frames.container:Hide()
+	if optionFrames.container:IsShown() then
+		optionFrames.container:Hide()
 	else
-		frames.container:Show()
+		optionFrames.container:Show()
 	end
 end
 --SLASH COMMAND
@@ -154,19 +154,19 @@ end
 -- DATA
 
 ------------------------------------------------------------------------------------------------------------------------
-frames.container:RegisterEvent("PLAYER_LOGOUT")
-frames.container:RegisterEvent("PLAYER_LOGIN")
-frames.container:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-frames.container:RegisterEvent("GROUP_ROSTER_UPDATE")
-frames.container:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-frames.container:RegisterEvent("PLAYER_ENTERING_WORLD")
-frames.container:RegisterEvent("INSPECT_READY")
+optionFrames.container:RegisterEvent("PLAYER_LOGOUT")
+optionFrames.container:RegisterEvent("PLAYER_LOGIN")
+optionFrames.container:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+optionFrames.container:RegisterEvent("GROUP_ROSTER_UPDATE")
+optionFrames.container:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+optionFrames.container:RegisterEvent("PLAYER_ENTERING_WORLD")
+optionFrames.container:RegisterEvent("INSPECT_READY")
 
-frames.container.PLAYER_ENTERING_WORLD = function()
+optionFrames.container.PLAYER_ENTERING_WORLD = function()
 end
-frames.container.GROUP_ROSTER_UPDATE = function()
+optionFrames.container.GROUP_ROSTER_UPDATE = function()
 end
-frames.container.COMBAT_LOG_EVENT_UNFILTERED = function()
+optionFrames.container.COMBAT_LOG_EVENT_UNFILTERED = function()
 	local _, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
 	if subEvent == "SPELL_CAST_SUCCESS" then
 		if not cds[spellID] or sourceFlags%16 > 4 then return end
@@ -175,15 +175,15 @@ frames.container.COMBAT_LOG_EVENT_UNFILTERED = function()
 		--updateOrAddBar(sourceGUID, spellID, true)
 	end
 end
-frames.container.PLAYER_SPECIALIZATION_CHANGED = function()
+optionFrames.container.PLAYER_SPECIALIZATION_CHANGED = function()
 end
-frames.container.INSPECT_READY = function()
+optionFrames.container.INSPECT_READY = function()
 end
-frames.container.PLAYER_LOGIN = function()
+optionFrames.container.PLAYER_LOGIN = function()
 	playerGUID = UnitGUID("player")
 	colouredPlayerName = util.getColouredNameByGUID(playerGUID)
 end
-frames.container.PLAYER_LOGOUT = function()
+optionFrames.container.PLAYER_LOGOUT = function()
 end
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -194,7 +194,6 @@ C_ChatInfo.RegisterAddonMessagePrefix("SnagiIntRotaSend")
 C_ChatInfo.RegisterAddonMessagePrefix("SnagiIntRotaReq")
 
 local OriginalSetHyperlink = ItemRefTooltip.SetHyperlink
-	local titles = {}-- todo remove titles
 function ItemRefTooltip:SetHyperlink(link, ...)
 	if(link and link:sub(1, 14) == "SnagiIntRota: ") then
 		local text = link:sub(15)
@@ -211,30 +210,24 @@ function ItemRefTooltip:SetHyperlink(link, ...)
 		for GUID in gmatch(text, "%w*-%w*-%w*") do
 			rotation[#rotation+1] = GUID
 		end
-		frames.transmissionOkayButton.rotation = rotation
+		optionFrames.transmissionOkayButton.rotation = rotation
 		local rotationText = ""
 		for k=1, #rotation do
-			-- util.getColouredNameByGUID
-			local _, class, _, _, _, name = GetPlayerInfoByGUID(rotation[k])
-			rotationText = rotationText..k..". ".."\124cFF"..classColorsHex[class]..name.."\124r\n"
+			rotationText = rotationText..k..". "..util.getColouredNameByGUID(rotation[k])
 		end
-		frames.transmissionRotationEditBox:SetText(rotationText)
-		if titles[1] then
-			UIDropDownMenu_SetText(frames.transmissionDropdownMenu, "rotation1".." - "..titles[1])
-			for k=1, #titles do
-				if titles[k] == title then
-					UIDropDownMenu_SetText(frames.transmissionDropdownMenu, "rotation"..k.." - "..title)
-					break
-				end
+		optionFrames.transmissionRotationEditBox:SetText(rotationText)
+
+		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new rotation tab")
+		for index, option in ipairs(rotationTabOptions) do
+			if option["TITLE"] == title then
+				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "tab"..index.." - "..title)
+				break
 			end
-		else
-			UIDropDownMenu_SetText(frames.transmissionDropdownMenu, "new rotation tab")
 		end
-		-- util.getColouredNameByGUID
-		local _, class, _, _, _, name = GetPlayerInfoByGUID(source)
-		frames.transmissionRotationLabelEditBox:SetText(title..
-			"\n\124cFF"..classColorsHex[class]..name.."\124r")
-		frames.transmissionFrame:Show()
+		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new rotation tab")
+
+		optionFrames.transmissionRotationLabelEditBox:SetText(title.."\n"..util.getColouredNameByGUID(source))
+		optionFrames.transmissionFrame:Show()
 		return
 	end
 	return OriginalSetHyperlink(self, link, ...);
@@ -260,43 +253,44 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", filterFunc)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", filterFunc)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", filterFunc)
 
-frames.transmissionOkayButton:SetScript("OnClick", function(self)
-	local rotations = {} -- todo remove rotations
-	local tabButtons = {} -- todo remove tabButtons
-	rotations[1] = tabButtons[1]
-	tabButtons = rotations
-	local text = UIDropDownMenu_GetText(frames.transmissionDropdownMenu)
+optionFrames.transmissionOkayButton:SetScript("OnClick", function(self)
+	local text = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu)
 	if not text then
 		return
 	elseif text == "new rotation tab" then
-		frames.createNewTabButton:Click()
-		rotations[numTabs] = self.rotation
-		frames.container:Show()
-		tabButtons[numTabs]:Click()
+		optionFrames.createNewTabButton:Click()
+		rotationTabOptions[numTabs]["ROTATION"] = self.rotation
+		rotationTabOptions[numTabs]["TITLE"] = strsub(text, 7)
+		optionFrames.rotationTabButtons[numTabs]:SetText(rotationTabOptions[numTabs]["TITLE"])
+		optionFrames.container:Show()
+		optionFrames.rotationTabButtons[numTabs]:Click()
 	else
-		local _, j = strfind(text, "rotation%d+")
-		local index = tonumber(strsub(text, 9, j))
-		--myPrint("setting rotations["..index.."] = "..(unpack(self.rotation) or ""))
-		rotations[index] = self.rotation
-		--myPrint("rotations["..index.."]: "..(unpack(rotations[index]) or ""))
+		for i=1, #rotationTabOptions do
+			if rotationTabOptions[i]["TITLE"] == strsub(text, 7) then
+				rotationTabOptions[i]["ROTATION"] = self.rotation
+				optionFrames.container:Show()
+				optionFrames.rotationTabButtons[i]:Click()
+				break
+			end
+		end
 	end
-	frames.transmissionFrame:Hide()
+	optionFrames.transmissionFrame:Hide()
 end)
 
-UIDropDownMenu_Initialize(frames.transmissionDropdownMenu, function()--self, level, menuList)
+UIDropDownMenu_Initialize(optionFrames.transmissionDropdownMenu, function()--self, level, menuList)
 	local info = UIDropDownMenu_CreateInfo()
 	for i=1, numTabs do
-		info.text = "rotation"..i.." - "..titles[i]
-		info.checked = UIDropDownMenu_GetText(frames.transmissionDropdownMenu) == info.text
+		info.text = "tab"..i.." - "..rotationTabOptions[i]["TITLE"]
+		info.checked = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu) == info.text
 		info.func = function()
-				UIDropDownMenu_SetText(frames.transmissionDropdownMenu, "rotation"..i.." - "..titles[i])
+				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "tab"..i.." - "..rotationTabOptions[i]["TITLE"])
 			end
 		UIDropDownMenu_AddButton(info)
 	end
 	info.text = "new rotation tab"
-	info.checked = UIDropDownMenu_GetText(frames.transmissionDropdownMenu) == info.text
+	info.checked = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu) == info.text
 	info.func = function()
-		UIDropDownMenu_SetText(frames.transmissionDropdownMenu, "new rotation tab")
+		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new rotation tab")
 	end
 	UIDropDownMenu_AddButton(info)
 end)
@@ -312,72 +306,72 @@ func.updateGroupMemberButtons = function()
 	if IsInGroup() then
 		local numGroup = GetNumGroupMembers()
 		for i=numGroup+1, 40 do
-			frames.groupMemberButtons[i]:Hide()
+			optionFrames.groupMemberButtons[i]:Hide()
 		end
 
 		local groupType = "raid"
 		if not IsInRaid() then
 			-- only party1-4 exist (not one for the player himself)
 			groupType = "party"
-			frames.groupMemberButtons[numGroup]:SetGUID(playerGUID)
-			frames.groupMemberButtons[numGroup].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"], playerGUID)
-			frames.groupMemberButtons[numGroup]:updateTexture()
-			frames.groupMemberButtons[numGroup]:SetText(colouredPlayerName)
-			frames.groupMemberButtons[numGroup]:Show()
+			optionFrames.groupMemberButtons[numGroup]:SetGUID(playerGUID)
+			optionFrames.groupMemberButtons[numGroup].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"], playerGUID)
+			optionFrames.groupMemberButtons[numGroup]:updateTexture()
+			optionFrames.groupMemberButtons[numGroup]:SetText(colouredPlayerName)
+			optionFrames.groupMemberButtons[numGroup]:Show()
 			numGroup = numGroup-1
 		end
 		for i=1, numGroup do
 			local GUID = UnitGUID(groupType..i)
-			frames.groupMemberButtons[i]:SetGUID(GUID)
-			frames.groupMemberButtons[i].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"], GUID)
-			frames.groupMemberButtons[i]:updateTexture()
-			frames.groupMemberButtons:SetText(util.getColouredNameByGUID(GUID))
-			frames.groupMemberButtons[i]:Show()
+			optionFrames.groupMemberButtons[i]:SetGUID(GUID)
+			optionFrames.groupMemberButtons[i].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"], GUID)
+			optionFrames.groupMemberButtons[i]:updateTexture()
+			optionFrames.groupMemberButtons:SetText(util.getColouredNameByGUID(GUID))
+			optionFrames.groupMemberButtons[i]:Show()
 		end
 	else
 		for i=2, 40 do
-			frames.groupMemberButtons[i]:Hide()
+			optionFrames.groupMemberButtons[i]:Hide()
 		end
-		frames.groupMemberButtons[1]:SetGUID(playerGUID)
-		frames.groupMemberButtons[1].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"], playerGUID)
-		frames.groupMemberButtons[1]:UpdateTexture()
-		frames.groupMemberButtons[1]:SetText(colouredPlayerName)
-		frames.groupMemberButtons[1]:Show()
+		optionFrames.groupMemberButtons[1]:SetGUID(playerGUID)
+		optionFrames.groupMemberButtons[1].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"], playerGUID)
+		optionFrames.groupMemberButtons[1]:UpdateTexture()
+		optionFrames.groupMemberButtons[1]:SetText(colouredPlayerName)
+		optionFrames.groupMemberButtons[1]:Show()
 	end
 end
 
 func.updateRotationButtons = function()
 	local rotation = rotationTabOptions[activeTab]["ROTATION"]
-	for i=#rotation+1, #frames.rotationButtons do
-		frames.rotationButtons[i]:Hide()
+	for i=#rotation+1, #optionFrames.rotationButtons do
+		optionFrames.rotationButtons[i]:Hide()
 	end
 	for i=1, #rotation do
-		frames.rotationButtons:SetGUID(rotation[i])
-		frames.rotationButtons:SetGUID(util.getColouredNameByGUID(rotation[i]))
+		optionFrames.rotationButtons[i]:SetGUID(rotation[i])
+		optionFrames.rotationButtons[i]:SetText(util.getColouredNameByGUID(rotation[i]))
 	end
 end
 func.removeRotationMember = function(GUID)
 	for i=1, 40 do
-		if frames.groupMemberButtons[i]:GetGUID() == GUID then
-			frames.groupMemberButtons[i].inRotation = false
-			frames.groupMemberButtons[i]:UpdateTexture()
+		if optionFrames.groupMemberButtons[i]:GetGUID() == GUID then
+			optionFrames.groupMemberButtons[i].inRotation = false
+			optionFrames.groupMemberButtons[i]:UpdateTexture()
 			break
 		end
 	end
 	local rotationNum = #rotationTabOptions[activeTab]["ROTATION"]
 	for i=1, rotationNum-1 do
-		if frames.rotationButtons:GetGUID() == GUID then
+		if optionFrames.rotationButtons:GetGUID() == GUID then
 			for j=i, #rotationNum-1 do
-				frames.rotationButtons[j]:SetGUID(frames.rotationButtons[j+1]:GetGUID())
-				frames.rotationButtons[j]:SetText(frames.rotationButtons[j+1]:GetText())
+				optionFrames.rotationButtons[j]:SetGUID(optionFrames.rotationButtons[j+1]:GetGUID())
+				optionFrames.rotationButtons[j]:SetText(optionFrames.rotationButtons[j+1]:GetText())
 			end
 			break
 		end
 	end
-	frames.rotationButtons[rotationNum]:Hide()
-	for i=1, #rotationTabOptions[rotationNum]["ROTATION"] do
-		if rotationTabOptions[rotationNum]["ROTATION"][i] == GUID then
-			remove(rotationTabOptions[rotationNum]["ROTATION"], i)
+	optionFrames.rotationButtons[rotationNum]:Hide()
+	for i=1, #rotationTabOptions[activeTab]["ROTATION"] do
+		if rotationTabOptions[activeTab]["ROTATION"][i] == GUID then
+			remove(rotationTabOptions[activeTab]["ROTATION"], i)
 			break
 		end
 	end
@@ -419,49 +413,55 @@ func.updateTrackMode = function (tabb)
 
 	end
 end
-
+func.makeTransmissionText = function()
+	local text = "[SnagiIntRota:] "..optionFrames.titleEditBox:GetText().." "
+	for _, member in ipairs(rotationTabOptions[activeTab]["ROTATION"]) do
+		text = text..member.." "
+	end
+	return text
+end
 ------------------------------------------------------------------------------------------------------------------------
 
 -- FRAME SCRIPTS
 
 ------------------------------------------------------------------------------------------------------------------------
--- frames.groupMemberButtons
+-- optionFrames.groupMemberButtons
 
 func.generalTabButtonOnClick = function(self)
-	frames.rotationTab:Hide()
-	frames.generalTab:Show()
-	for _, rt in ipairs(frames.rotationTabButtons) do
+	optionFrames.rotationTab:Hide()
+	optionFrames.generalTab:Show()
+	for _, rt in ipairs(optionFrames.rotationTabButtons) do
 		rt.inactiveTexture:Show()
 		rt.activeTexture:Hide()
 	end
 	self.inactiveTexture:Hide()
 	self.activeTexture:Show()
-	frames.leftSideMenu:Hide()
+	optionFrames.leftSideMenu:Hide()
 end
 func.rotationTabButtonOnClick = function(self)
 	activeTab = self.key
-	frames.rotationTab:Show()
-	frames.generalTab:Hide()
-	for _, rt in ipairs(frames.rotationTabButtons) do
+	optionFrames.rotationTab:Show()
+	optionFrames.generalTab:Hide()
+	for _, rt in ipairs(optionFrames.rotationTabButtons) do
 		rt.inactiveTexture:Show()
 		rt.activeTexture:Hide()
 	end
-	frames.generalTabButton.activeTexture:Hide()
-	frames.generalTabButton.inactiveTexture:Show()
+	optionFrames.generalTabButton.activeTexture:Hide()
+	optionFrames.generalTabButton.inactiveTexture:Show()
 	self.inactiveTexture:Hide()
 	self.activeTexture:Show()
 	func.updateRotationButtons()
 	func.updateGroupMemberButtons()
-	frames.leftSideMenu:Show()
+	optionFrames.leftSideMenu:Show()
 end
 func.createNewTab = function()
 	numTabs = numTabs+1
-	frames.rotationFrames[numTabs] = frameUtil.aquireRotationFrame("COOKIE", numTabs)
-	frames.rotationTabButtons[numTabs] = frameUtil.aquireTabButton(frames.container)
-	frames.rotationTabButtons[numTabs].key = numTabs
-	frames.rotationTabButtons[numTabs]:SetPoint("LEFT", frames.rotationTabButtons[numTabs-1] or frames.generalTabButton,
+	optionFrames.rotationFrames[numTabs] = frameUtil.aquireRotationFrame(numTabs)
+	optionFrames.rotationTabButtons[numTabs] = frameUtil.aquireTabButton(optionFrames.container)
+	optionFrames.rotationTabButtons[numTabs].key = numTabs
+	optionFrames.rotationTabButtons[numTabs]:SetPoint("LEFT", optionFrames.rotationTabButtons[numTabs-1] or optionFrames.generalTabButton,
 		"RIGHT", -15, 0)
-	frames.rotationTabButtons[numTabs]:SetScript("OnClick", function(self) func.rotationTabButtonOnClick(self) end)
+	optionFrames.rotationTabButtons[numTabs]:SetScript("OnClick", function(self) func.rotationTabButtonOnClick(self) end)
 	rotationTabOptions[numTabs] = util.makeCopy(defaultOptions)
 end
 func.groupMemberOnClick = function(self)
@@ -469,17 +469,17 @@ func.groupMemberOnClick = function(self)
 	local GUID = self:GetGUID()
 	if not contains(rotation, GUID) then
 		-- Add player to activeRotation if not yet in activeRotation
-		if #rotation > (#frames.rotationButtons-1) then
+		if #rotation > (#optionFrames.rotationButtons-1) then
 			-- If activeRotation full return
 			util.myPrint("Rotation full!")
 			return
 		end
 		rotation[#rotation+1] = GUID
-		local rotationButton = frames.rotationButtons[#rotation]
+		local rotationButton = optionFrames.rotationButtons[#rotation]
 		rotationButton:SetText(self:GetText())
 		rotationButton:SetGUID(GUID)
 		rotationButton:Show()
-		self.inRotation = not self.inRotation
+		self.inRotation = true
 		self:UpdateTexture()
 	else
 		func.removeRotationMember(GUID)
@@ -487,23 +487,23 @@ func.groupMemberOnClick = function(self)
 
 end
 func.enableGroupInstanceButtonOnClick = function(self)
-	for _, c in ipairs({frames.enableClassSpecButton:GetChildren()}) do
+	for _, c in ipairs({optionFrames.enableClassSpecButton:GetChildren()}) do
 		c:Hide()
 	end
 	for _, c in ipairs({self:GetChildren()}) do
 		c:Show()
 	end
-	frames.enableClassSpecButton:UnlockHighlight()
+	optionFrames.enableClassSpecButton:UnlockHighlight()
 	self:LockHighlight()
 end
 func.enableClassSpecButtonOnClick = function(self)
-	for _, c in ipairs({frames.enableGroupInstanceButton:GetChildren()}) do
+	for _, c in ipairs({optionFrames.enableGroupInstanceButton:GetChildren()}) do
 		c:Hide()
 	end
 	for _, c in ipairs({self:GetChildren()}) do
 		c:Show()
 	end
-	frames.enableGroupInstanceButton:UnlockHighlight()
+	optionFrames.enableGroupInstanceButton:UnlockHighlight()
 	self:LockHighlight()
 end
 func.groupEnableOptionCheckboxOnClick = function(self, option)
@@ -643,7 +643,7 @@ local newBool = self:GetChecked()
 	rotationTabOptions[activeTab]["CLASSENABLEOPTIONS"][c] = newBool
 	for i=1, #classSpecIDs[c] do
 		rotationTabOptions[activeTab]["SPECENABLEOPTIONS"][classSpecIDs[c][i]] = newBool
-		frames.enableCheckboxes[c][i]:SetChecked(newBool)
+		optionFrames.enableCheckboxes[c][i]:SetChecked(newBool)
 	end
 	-- todo if own spec option changed, update
 end
@@ -658,13 +658,13 @@ func.enableSpecOnClick = function(self, c, s)
 
 	-- todo update if own spec changed
 end
--- frames.rotationButtons
+-- optionFrames.rotationButtons
 func.rotationButtonOnClick = function(self, button)
 	local rotation = rotationTabOptions[activeTab]["ROTATION"]
 	if button == "LeftButton" then
 		-- On leftclick
 		-- swap up / set last
-		local swapButton = frames.rotationButtons[self.value-1]
+		local swapButton = optionFrames.rotationButtons[self.value-1]
 		if swapButton then
 			-- If not first (shown) button then swap
 			-- Button
@@ -683,11 +683,11 @@ func.rotationButtonOnClick = function(self, button)
 			local tempGUID = self:GetGUID()
 			local tempText = self:GetText()
 			for j=2, #rotation do
-				frames.rotationButtons[j-1]:SetGUID(frames.rotationButtons[j]:GetGUID())
-				frames.rotationButtons[j-1]:SetText(frames.rotationButtons[j]:GetText())
+				optionFrames.rotationButtons[j-1]:SetGUID(optionFrames.rotationButtons[j]:GetGUID())
+				optionFrames.rotationButtons[j-1]:SetText(optionFrames.rotationButtons[j]:GetText())
 			end
-			frames.rotationButtons[#rotation]:SetGUID(tempGUID)
-			frames.rotationButtons[#rotation]:SetText(tempText)
+			optionFrames.rotationButtons[#rotation]:SetGUID(tempGUID)
+			optionFrames.rotationButtons[#rotation]:SetText(tempText)
 
 			-- Rotation
 			rotation[#rotation+1] = rotation[1]
@@ -698,7 +698,7 @@ func.rotationButtonOnClick = function(self, button)
 	else
 		-- On rightclick
 		-- move down / swap to first
-		local swapButton = frames.rotationButtons[self.value+1]
+		local swapButton = optionFrames.rotationButtons[self.value+1]
 		if swapButton and swapButton:IsShown() then
 			-- If not last (shown) button then swap
 			-- Button
@@ -718,11 +718,11 @@ func.rotationButtonOnClick = function(self, button)
 			local tempGUID = self:GetGUID()
 			local tempText = self:GetText()
 			for j=#rotation-1, 1, -1 do
-				frames.rotationButtons[j+1]:SetGUID(frames.rotationButtons[j]:GetGUID())
-				frames.rotationButtons[j+1]:SetText(frames.rotationButtons[j]:GetText())
+				optionFrames.rotationButtons[j+1]:SetGUID(optionFrames.rotationButtons[j]:GetGUID())
+				optionFrames.rotationButtons[j+1]:SetText(optionFrames.rotationButtons[j]:GetText())
 			end
-			frames.rotationButtons[1]:SetGUID(tempGUID)
-			frames.rotationButtons[1]:SetText(tempText)
+			optionFrames.rotationButtons[1]:SetGUID(tempGUID)
+			optionFrames.rotationButtons[1]:SetText(tempText)
 			-- rotation
 			local temp = rotation[#rotation]
 			for j=#rotation, 2 do
@@ -780,8 +780,8 @@ func.testButtonOnClick = function()
 	end
 	]]--
 end
-func.enableMenuOnClick = function(self)
-	for _, button in pairs(frames.menuButtons) do
+func.menuButtonOnClick = function(self)
+	for _, button in pairs(optionFrames.menuButtons) do
 		for _, c in ipairs({button:GetChildren()}) do
 			c:Hide()
 		end
@@ -793,8 +793,8 @@ func.enableMenuOnClick = function(self)
 	self:LockHighlight()
 end
 
-func.sortModeCheckboxOnClick = function(self)
-	for _, scb in frames.sortModeCheckboxes do
+func.sortCheckboxOnClick = function(self)
+	for _, scb in pairs(optionFrames.sortModeCheckboxes) do
 		if scb ~= self then
 			scb:SetChecked(false)
 		end
@@ -808,19 +808,16 @@ end
 
 func.titleEditBoxOnEnterPressed = function(self)
 	local text = self:GetText()
-	if not contains(titles, text) and text~= "" then
-		titles[activeTabKey] = self:GetText()
+	if text ~= "" then
+		rotationTabOptions[activeTab]["TITLE"] = text
+		optionFrames.rotationTabButtons[activeTab]:SetText(text)
 	else
-		self:SetText(self.oldText)
+		text:SetText(rotationTabOptions[activeTab]["TITLE"])
 	end
 	self:ClearFocus()
 end
 
 func.sendRotationOnClick = function(self)
-	local rotationText = ""
-	for j=1, #activeRotation do
-		rotationText = rotationText..activeRotation[j].." "
-	end
-	SendChatMessage("[SnagiIntRota:] "..frames.titleEditBox:GetText().." "..rotationText, self.value, _,
-		frames.whisperToEditBox:GetText())
+	SendChatMessage(func.makeTransmissionText(), self.value, _,
+		optionFrames.whisperToEditBox:GetText())
 end

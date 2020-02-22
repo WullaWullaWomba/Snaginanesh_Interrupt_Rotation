@@ -144,14 +144,11 @@ testButton:SetText("Test")
 testButton:SetScript("OnClick", function() func.testButtonOnClick() end)
 
 local menuButtons = {
-    ["ENABLE"] = frameUtil.createArrowButton("Enable", rotationTab),
-    ["SEND"] = frameUtil.createArrowButton("Send", rotationTab),
-    ["DISPLAY"] = frameUtil.createArrowButton("Display", rotationTab),
-    ["SORTING"] = frameUtil.createArrowButton("Sorting", rotationTab),
+    ["ENABLE"] = frameUtil.createMenuButton("Enable", rotationTab),
+    ["SEND"] = frameUtil.createMenuButton("Send", rotationTab),
+    ["DISPLAY"] = frameUtil.createMenuButton("Display", rotationTab),
+    ["SORTING"] = frameUtil.createMenuButton("Sorting", rotationTab),
 }
-for _, button in pairs(menuButtons) do
-    button:SetScript("OnClick", function(self) func.menuButtonOnClick(self) end)
-end
 menuButtons["ENABLE"].tooltipText = "Select when & what to track."
 menuButtons["ENABLE"]:SetPoint("TOPLEFT", testButton, "BOTTOMLEFT", 0, -5)
 menuButtons["SEND"].tooltipText = "Send your currently selected\124ntab's rotation.\124nThe title must be unique!"
@@ -190,7 +187,7 @@ titleFontString:SetText("Title: ")
 titleFontString:ClearAllPoints()
 titleFontString:SetPoint("BOTTOM", titleEditBox, "TOP", 0, 5)
 titleEditBox:SetWidth(100)
-titleEditBox:SetMaxLetters(12)
+titleEditBox:SetMaxLetters(11)
 titleEditBox:SetPoint("TOP", leftSideMenu, "TOP", 0, -50)
 titleEditBox:SetScript("OnSpacePressed", function(self)
     self:SetText(gsub(self:GetText(), "%s","_"))
@@ -358,7 +355,7 @@ sortModeCheckboxes["CD"]:SetPoint("TOPLEFT", leftSideMenu, "TOP", 0, -50)
 sortModeCheckboxes["ROTATION"].value = "ROTATION"
 sortModeCheckboxes["ROTATION"]:SetPoint("TOP", sortModeCheckboxes["CD"], "BOTTOM", 0, -5)
 
-SIR.frames = {
+SIR.optionFrames = {
     --single frames
     ["container"] = container,
     ["generalTab"] = generalTab,

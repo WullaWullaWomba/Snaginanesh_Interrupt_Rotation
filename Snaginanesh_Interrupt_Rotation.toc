@@ -8,5 +8,6 @@ data.lua
 util.lua
 groupInfo.lua
 frameUtil.lua
-frames.lua
+optionFrames.lua
+rotationFrames.lua
 Snaginanesh_Interrupt_Rotation.lua

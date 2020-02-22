@@ -17,6 +17,7 @@ SIR.frameUtil = {
 			tabButton:SetHitRectInsets(6, 6, 0, 0) --left, right, top, bottom
 			local fontString = tabButton:CreateFontString(_, "ARTWORK", "GameFontNormal")
 			fontString:SetTextColor(1,1,1)
+			fontString:SetText("new_tab")
 			tabButton:SetFontString(fontString)
 
 			local inactiveTexture = tabButton:CreateTexture(_, "BACKGROUND")
@@ -41,7 +42,7 @@ SIR.frameUtil = {
 		tabButton:Hide()
 		tabButtonPool[#tabButtonPool+1] = tabButton
 	end,
-	["aquireRotationFrame"] = function(text, key)
+	["aquireRotationFrame"] = function(key)
 		local rotationFrame = rotationFramePool[#rotationFramePool]
 		if rotationFrame then
 			tremove(rotationFramePool, #rotationFramePool)
@@ -67,7 +68,7 @@ SIR.frameUtil = {
 			end)
 		end
 		rotationFrame.key = key
-		rotationFrame.fontString:SetText(text)
+		rotationFrame.fontString:SetText("new_tab")
 		rotationFrame.fontString:SetAllPoints()
 		rotationFrame:Show()
 		rotationFrame:EnableMouse(false)
@@ -206,11 +207,11 @@ SIR.frameUtil = {
 		label:SetText(text)
 		return scb
 	end,
-	["createArrowButton"] = function(text, parent)
+	["createMenuButton"] = function(text, parent)
 		local ab = CreateFrame("Button", _, parent, "UIPanelButtonTemplate")
 		ab:SetSize(100, 40)
 		ab:SetText(text)
-
+		ab:SetScript("OnClick", function(self) func.menuButtonOnClick(self) end)
 		local arrow = ab:CreateTexture()
 		arrow:SetTexture("Interface\\MONEYFRAME\\Arrow-Left-Up")
 		arrow:SetSize(20, 40)
