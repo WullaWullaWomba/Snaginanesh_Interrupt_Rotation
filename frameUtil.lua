@@ -17,7 +17,6 @@ SIR.frameUtil = {
 			tabButton:SetHitRectInsets(6, 6, 0, 0) --left, right, top, bottom
 			local fontString = tabButton:CreateFontString(_, "ARTWORK", "GameFontNormal")
 			fontString:SetTextColor(1,1,1)
-			fontString:SetText("new_tab")
 			tabButton:SetFontString(fontString)
 
 			local inactiveTexture = tabButton:CreateTexture(_, "BACKGROUND")

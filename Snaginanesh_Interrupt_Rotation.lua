@@ -276,7 +276,6 @@ optionFrames.transmissionOkayButton:SetScript("OnClick", function(self)
 	end
 	optionFrames.transmissionFrame:Hide()
 end)
-
 UIDropDownMenu_Initialize(optionFrames.transmissionDropdownMenu, function()--self, level, menuList)
 	local info = UIDropDownMenu_CreateInfo()
 	for i=1, numTabs do
@@ -314,7 +313,7 @@ func.updateGroupMemberButtons = function()
 			-- only party1-4 exist (not one for the player himself)
 			groupType = "party"
 			optionFrames.groupMemberButtons[numGroup]:SetGUID(playerGUID)
-			optionFrames.groupMemberButtons[numGroup].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"], playerGUID)
+			optionFrames.groupMemberButtons[numGroup].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"],playerGUID)
 			optionFrames.groupMemberButtons[numGroup]:updateTexture()
 			optionFrames.groupMemberButtons[numGroup]:SetText(colouredPlayerName)
 			optionFrames.groupMemberButtons[numGroup]:Show()
@@ -339,7 +338,6 @@ func.updateGroupMemberButtons = function()
 		optionFrames.groupMemberButtons[1]:Show()
 	end
 end
-
 func.updateRotationButtons = function()
 	local rotation = rotationTabOptions[activeTab]["ROTATION"]
 	for i=#rotation+1, #optionFrames.rotationButtons do
@@ -456,11 +454,10 @@ func.rotationTabButtonOnClick = function(self)
 end
 func.createNewTab = function()
 	numTabs = numTabs+1
-	optionFrames.rotationFrames[numTabs] = frameUtil.aquireRotationFrame(numTabs)
 	optionFrames.rotationTabButtons[numTabs] = frameUtil.aquireTabButton(optionFrames.container)
 	optionFrames.rotationTabButtons[numTabs].key = numTabs
-	optionFrames.rotationTabButtons[numTabs]:SetPoint("LEFT", optionFrames.rotationTabButtons[numTabs-1] or optionFrames.generalTabButton,
-		"RIGHT", -15, 0)
+	optionFrames.rotationTabButtons[numTabs]:SetPoint("LEFT", optionFrames.rotationTabButtons[numTabs-1] 
+		or optionFrames.generalTabButton, "RIGHT", -15, 0)
 	optionFrames.rotationTabButtons[numTabs]:SetScript("OnClick", function(self) func.rotationTabButtonOnClick(self) end)
 	rotationTabOptions[numTabs] = util.makeCopy(defaultOptions)
 end
@@ -655,10 +652,10 @@ func.enableSpecOnClick = function(self, c, s)
 		newBool = newBool and rotationTabOptions[activeTab]["SPECENABLEOPTIONS"][spec]
 	end
 	rotationTabOptions[activeTab]["CLASSENABLEOPTIONS"][c] = newBool
+	optionFrames.enableCheckboxes[c][1]:SetChecked(newBool)
 
 	-- todo update if own spec changed
 end
--- optionFrames.rotationButtons
 func.rotationButtonOnClick = function(self, button)
 	local rotation = rotationTabOptions[activeTab]["ROTATION"]
 	if button == "LeftButton" then
@@ -792,7 +789,6 @@ func.menuButtonOnClick = function(self)
 	end
 	self:LockHighlight()
 end
-
 func.sortCheckboxOnClick = function(self)
 	for _, scb in pairs(optionFrames.sortModeCheckboxes) do
 		if scb ~= self then
@@ -801,11 +797,24 @@ func.sortCheckboxOnClick = function(self)
 	end
 	rotationTabOptions[activeTab]["SORTMODE"] = (self:GetChecked() and self.value) or "NONE"
 end
-
 func.removeTabOnClick = function()
+	for i=activeTab, #rotationTabOptions do
+		rotationTabOptions[i] = util.makeCopy(rotationTabOptions[i+1])
+	end
+	for i=activeTab, #optionFrames.rotationTabButtons-1 do
+		optionFrames.rotationTabButtons[i]:SetText(optionFrames.rotationTabButtons[i+1]:GetText())
+	end
+	frameUtil.releaseTabButton(optionFrames.rotationTabButtons[#optionFrames.rotationTabButtons])
+	tremove(optionFrames.rotationTabButtons, #optionFrames.rotationTabButtons)
+	if optionFrames.rotationTabButtons[activeTab] then
+		optionFrames.rotationTabButtons[#optionFrames.rotationTabButtons]:Click()
+	elseif optionFrames.rotationTabButtons[activeTab-1] then
+		optionFrames.rotationTabButtons[activeTab-1]:Click()
+	else
+		optionFrames.generalTabButton:Click()
+	end
 	--todo
 end
-
 func.titleEditBoxOnEnterPressed = function(self)
 	local text = self:GetText()
 	if text ~= "" then
@@ -816,7 +825,6 @@ func.titleEditBoxOnEnterPressed = function(self)
 	end
 	self:ClearFocus()
 end
-
 func.sendRotationOnClick = function(self)
 	SendChatMessage(func.makeTransmissionText(), self.value, _,
 		optionFrames.whisperToEditBox:GetText())

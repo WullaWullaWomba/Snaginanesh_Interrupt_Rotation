@@ -260,7 +260,7 @@ for c=1, 12 do
 		enableCheckboxes[c][s+1].icon:SetTexture(icon)
 
 		enableCheckboxes[c][s+1]:SetScript("OnClick", function(self)
-            func.enableSpecOnClick(self, c, s+1)
+            func.enableSpecOnClick(self, c, s)
 		end)
 	end
 end
