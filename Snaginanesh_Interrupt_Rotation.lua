@@ -736,6 +736,7 @@ func.removeMemberOnClick = function(self)
 	func.removeRotationMember(self:GetParent():GetGUID())
 end
 func.testButtonOnClick = function()
+	--[[
 	if #testStatusBars == 0 then
 		local testClasses = {
 			"DEATHKNIGHT",
@@ -777,47 +778,32 @@ func.testButtonOnClick = function()
 			end
 		end
 	end
+	]]--
 end
 func.enableMenuOnClick = function(self)
+	for _, button in pairs(frames.menuButtons) do
+		for _, c in ipairs({button:GetChildren()}) do
+			c:Hide()
+		end
+		button:UnlockHighlight()
+	end
 	for _, c in ipairs({self:GetChildren()}) do
 		c:SetShown(not c:IsShown())
 	end
+	self:LockHighlight()
 end
 
-func.sendMenuOnClick = function()
-	updateLeftSideMenu("SEND")
-end
-
-func.displayMenuOnClick = function()
-	updateLeftSideMenu("DISPLAY")
-end
-
-func.sortingMenuOnClick = function()
-	updateLeftSideMenu("SORTING")
-end
-
-func.sortModeCheckBoxOnClick = function(self)
-	if sortModes[activeTabKey] ~= self.value then
-		-- should only happen in general tab
-		if sortModes[activeTabKey] == nil then
-			myPrint("sortModes[activeTabKey] == nil")
-			for j=1, #frames.sortModeCheckboxes do
-				frames.sortModeCheckboxes[j]:SetNormalTexture("Interface\\Buttons\\UI-CheckBox-Up")
-			end
+func.sortModeCheckboxOnClick = function(self)
+	for _, scb in frames.sortModeCheckboxes do
+		if scb ~= self then
+			scb:SetChecked(false)
 		end
-		for j=1, #frames.sortModeCheckboxes do
-			if frames.sortModeCheckboxes[j] ~= self then
-				frames.sortModeCheckboxes[j]:SetChecked(false)
-			end
-		end
-		setSortMode(activeTabKey, self.value)
-	else
-		setSortMode(activeTabKey, "NONE")
 	end
+	rotationTabOptions[activeTab]["SORTMODE"] = (self:GetChecked() and self.value) or "NONE"
 end
 
 func.removeTabOnClick = function()
-	releaseTab(activeTabKey)
+	--todo
 end
 
 func.titleEditBoxOnEnterPressed = function(self)

@@ -195,11 +195,12 @@ SIR.frameUtil = {
 		rmb:Show()
 		return rmb
 	end,
-	["createSortingCheckbox"] = function(text, parent)
+	["createSortCheckbox"] = function(text, parent)
 		local scb = CreateFrame("CheckButton", _, parent, "ChatConfigBaseCheckButtonTemplate")
 		scb:Hide()
 		scb:SetSize(30, 30)
 		scb:SetHitRectInsets(-30, 0, 0, 0)
+		scb:SetScript("OnClick", function(self) func.sortCheckboxOnClick(self) end)
 		local label = scb:CreateFontString(_, "ARTWORK", "GameFontNormal")
 		label:SetPoint("RIGHT", scb, "LEFT", -5, 0)
 		label:SetText(text)

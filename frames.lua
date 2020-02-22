@@ -1,5 +1,5 @@
 --luacheck: globals CreateFrame UIParent UISpecialFrames UIDropDownMenu_SetWidth GetClassInfo CLASS_ICON_TCOORDS
---luacheck: globals GetNumSpecializationsForClassID GetSpecializationInfoByID gsub
+--luacheck: globals GetNumSpecializationsForClassID GetSpecializationInfoByID gsub unpack
 local _, SIR = ...
 local frameUtil = SIR.frameUtil
 local data = SIR.data
@@ -136,32 +136,55 @@ transmissionRotationLabelEditBox:SetSize(140, 20)
 transmissionRotationLabelEditBox:SetPoint("TOPLEFT", transmissionRotationFrame, "TOPRIGHT", 3, -25)
 transmissionRotationLabelEditBox:Disable()
 
-local widthFontString, widthEditBox = frameUtil.createFontStringEditBox(leftSideMenu)
+local testButton = CreateFrame("Button", _, container, "UIPanelButtonTemplate")
+testButton.tooltipText = "Generates some example statusbars."
+testButton:SetSize(100, 40)
+testButton:SetPoint("TOPLEFT", container, "TOPLEFT", 15, -15)
+testButton:SetText("Test")
+testButton:SetScript("OnClick", function() func.testButtonOnClick() end)
+
+local menuButtons = {
+    ["ENABLE"] = frameUtil.createArrowButton("Enable", rotationTab),
+    ["SEND"] = frameUtil.createArrowButton("Send", rotationTab),
+    ["DISPLAY"] = frameUtil.createArrowButton("Display", rotationTab),
+    ["SORTING"] = frameUtil.createArrowButton("Sorting", rotationTab),
+}
+for _, button in pairs(menuButtons) do
+    button:SetScript("OnClick", function(self) func.menuButtonOnClick(self) end)
+end
+menuButtons["ENABLE"].tooltipText = "Select when & what to track."
+menuButtons["ENABLE"]:SetPoint("TOPLEFT", testButton, "BOTTOMLEFT", 0, -5)
+menuButtons["SEND"].tooltipText = "Send your currently selected\124ntab's rotation.\124nThe title must be unique!"
+menuButtons["SEND"]:SetPoint("TOPLEFT", menuButtons["ENABLE"], "BOTTOMLEFT", 0, -5)
+menuButtons["DISPLAY"]:SetPoint("TOPLEFT", menuButtons["SEND"], "BOTTOMLEFT", 0, -5)
+menuButtons["SORTING"]:SetPoint("TOPLEFT", menuButtons["DISPLAY"], "BOTTOMLEFT", 0, -5)
+
+local widthFontString, widthEditBox = frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 widthFontString:SetText("width:")
 widthEditBox:SetPoint("TOPLEFT", leftSideMenu, "TOPLEFT", 115, -35)
 widthEditBox:Hide()
 
-local heightFontString, heightEditBox = frameUtil.createFontStringEditBox(leftSideMenu)
+local heightFontString, heightEditBox = frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 heightFontString:SetText("height:")
 heightEditBox:SetPoint("TOP", widthEditBox, "BOTTOM", 0, -6)
 heightEditBox:Hide()
 
-local spaceFontString, spaceEditBox = SIR.frameUtil.createFontStringEditBox(leftSideMenu)
+local spaceFontString, spaceEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 spaceFontString:SetText("space:")
 spaceEditBox:SetPoint("TOP", heightEditBox, "BOTTOM", 0, -6)
 spaceEditBox:Hide()
 
-local xOffFontString, xOffEditBox = SIR.frameUtil.createFontStringEditBox(leftSideMenu)
+local xOffFontString, xOffEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 xOffFontString:SetText("x offset:")
 xOffEditBox:SetPoint("TOP", spaceEditBox, "BOTTOM", 0, -6)
 xOffEditBox:Hide()
 
-local yOffFontString, yOffEditBox = SIR.frameUtil.createFontStringEditBox(leftSideMenu)
+local yOffFontString, yOffEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 yOffFontString:SetText("y offset:")
 yOffEditBox:SetPoint("TOP", xOffEditBox, "BOTTOM", 0, -6)
 yOffEditBox:Hide()
 
-local titleFontString, titleEditBox = SIR.frameUtil.createFontStringEditBox(leftSideMenu)
+local titleFontString, titleEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["SEND"])
 titleEditBox:Hide()
 titleFontString:SetText("Title: ")
 titleFontString:ClearAllPoints()
@@ -186,34 +209,6 @@ removeTabButton:SetSize(100, 40)
 removeTabButton:SetPoint("BOTTOMRIGHT", rotationTab, "BOTTOMRIGHT", -15, 15)
 removeTabButton:SetText("Remove tab")
 removeTabButton:SetScript("OnClick", function() func.removeTabOnClick() end)
-
-local testButton = CreateFrame("Button", _, container, "UIPanelButtonTemplate")
-testButton.tooltipText = "Generates some example statusbars."
-testButton:SetSize(100, 40)
-testButton:SetPoint("TOPLEFT", container, "TOPLEFT", 15, -15)
-testButton:SetText("Test")
-testButton:SetScript("OnClick", function() func.testButtonOnClick() end)
-
-local menuButtons = {
-    ["ENABLE"] = frameUtil.createArrowButton("Enable", rotationTab),
-    ["SEND"] = frameUtil.createArrowButton("Send", rotationTab),
-    ["DISPLAY"] = frameUtil.createArrowButton("Display", rotationTab),
-    ["SORTING"] = frameUtil.createArrowButton("Sorting", rotationTab),
-}
-
-menuButtons["ENABLE"].tooltipText = "Select when & what to track."
-menuButtons["ENABLE"]:SetPoint("TOPLEFT", testButton, "BOTTOMLEFT", 0, -5)
-menuButtons["ENABLE"]:SetScript("OnClick", function(self) func.enableMenuOnClick(self) end)
-
-menuButtons["SEND"].tooltipText = "Send your currently selected\124ntab's rotation.\124nThe title must be unique!"
-menuButtons["SEND"]:SetPoint("TOPLEFT", menuButtons["ENABLE"], "BOTTOMLEFT", 0, -5)
-menuButtons["SEND"]:SetScript("OnClick", function() func.sendMenuOnClick() end)
-
-menuButtons["DISPLAY"]:SetPoint("TOPLEFT", menuButtons["SEND"], "BOTTOMLEFT", 0, -5)
-menuButtons["DISPLAY"]:SetScript("OnClick", function() func.displayMenuOnClick() end)
-
-menuButtons["SORTING"]:SetPoint("TOPLEFT", menuButtons["DISPLAY"], "BOTTOMLEFT", 0, -5)
-menuButtons["SORTING"]:SetScript("OnClick", function() func.sortingMenuOnClick() end)
 
 local enableClassSpecButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
 local enableGroupInstanceButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
@@ -303,7 +298,7 @@ for i=1, 4 do
     sendRotationButtons[i]:SetScript("OnClick", function(self) func.sendRotationOnClick(self) end)
 end
 
-local sendRotationFontString, whisperToEditBox = SIR.frameUtil.createFontStringEditBox(leftSideMenu)
+local sendRotationFontString, whisperToEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["SEND"])
 whisperToEditBox:Hide()
 sendRotationFontString:SetText("Link in:")
 sendRotationFontString:SetSize(76, 30)
@@ -353,18 +348,15 @@ end
 rotationButtons[1]:ClearAllPoints()
 rotationButtons[1]:SetPoint("TOPRIGHT", -25, -25)
 
-local sortModeCheckboxes = {}
-local byCD = frameUtil.createSortingCheckbox("by CD", leftSideMenu)
-byCD.value = "CD"
-byCD:SetPoint("TOPLEFT", leftSideMenu, "TOP", 0, -50)
-sortModeCheckboxes[1] = byCD
-byCD:SetScript("OnClick", function(self) func.sortModeCheckBoxOnClick(self) end)
+local sortModeCheckboxes = {
+    ["CD"] = frameUtil.createSortCheckbox("by CD", menuButtons["SORTING"]),
+    ["ROTATION"] = frameUtil.createSortCheckbox("by rotation", menuButtons["SORTING"]),
+}
+sortModeCheckboxes["CD"].value = "CD"
+sortModeCheckboxes["CD"]:SetPoint("TOPLEFT", leftSideMenu, "TOP", 0, -50)
 
-local byRotation = frameUtil.createSortingCheckbox("by rotation", leftSideMenu)
-byRotation.value = "ROTATION"
-byRotation:SetPoint("TOP", byCD, "BOTTOM", 0, -5)
-sortModeCheckboxes[2] = byRotation
-byRotation:SetScript("OnClick", function(self) func.sortModeCheckBoxOnClick(self) end)
+sortModeCheckboxes["ROTATION"].value = "ROTATION"
+sortModeCheckboxes["ROTATION"]:SetPoint("TOP", sortModeCheckboxes["CD"], "BOTTOM", 0, -5)
 
 SIR.frames = {
     --single frames
