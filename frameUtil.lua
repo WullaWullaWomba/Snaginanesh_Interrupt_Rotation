@@ -211,7 +211,6 @@ SIR.frameUtil = {
 		ab:SetText(text)
 
 		local arrow = ab:CreateTexture()
-		arrow:SetTexture("Interface\\ICONS\\misc_arrowleft")
 		arrow:SetTexture("Interface\\MONEYFRAME\\Arrow-Left-Up")
 		arrow:SetSize(20, 40)
 		arrow:SetPoint("RIGHT", ab, "LEFT", 9, -4)

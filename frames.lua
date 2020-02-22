@@ -194,13 +194,29 @@ testButton:SetPoint("TOPLEFT", container, "TOPLEFT", 15, -15)
 testButton:SetText("Test")
 testButton:SetScript("OnClick", function() func.testButtonOnClick() end)
 
-local enableOptionsMenuButton = frameUtil.createArrowButton("Enable", rotationTab)
-enableOptionsMenuButton.tooltipText = "Select when & what to track."
-enableOptionsMenuButton:SetPoint("TOPLEFT", testButton, "BOTTOMLEFT", 0, -5)
-enableOptionsMenuButton:SetScript("OnClick", function(self) func.enableOptionOnClick(self) end)
+local menuButtons = {
+    ["ENABLE"] = frameUtil.createArrowButton("Enable", rotationTab),
+    ["SEND"] = frameUtil.createArrowButton("Send", rotationTab),
+    ["DISPLAY"] = frameUtil.createArrowButton("Display", rotationTab),
+    ["SORTING"] = frameUtil.createArrowButton("Sorting", rotationTab),
+}
 
-local enableClassSpecButton = CreateFrame("Button", _, enableOptionsMenuButton, "UIPanelButtonTemplate")
-local enableGroupInstanceButton = CreateFrame("Button", _, enableOptionsMenuButton, "UIPanelButtonTemplate")
+menuButtons["ENABLE"].tooltipText = "Select when & what to track."
+menuButtons["ENABLE"]:SetPoint("TOPLEFT", testButton, "BOTTOMLEFT", 0, -5)
+menuButtons["ENABLE"]:SetScript("OnClick", function(self) func.enableMenuOnClick(self) end)
+
+menuButtons["SEND"].tooltipText = "Send your currently selected\124ntab's rotation.\124nThe title must be unique!"
+menuButtons["SEND"]:SetPoint("TOPLEFT", menuButtons["ENABLE"], "BOTTOMLEFT", 0, -5)
+menuButtons["SEND"]:SetScript("OnClick", function() func.sendMenuOnClick() end)
+
+menuButtons["DISPLAY"]:SetPoint("TOPLEFT", menuButtons["SEND"], "BOTTOMLEFT", 0, -5)
+menuButtons["DISPLAY"]:SetScript("OnClick", function() func.displayMenuOnClick() end)
+
+menuButtons["SORTING"]:SetPoint("TOPLEFT", menuButtons["DISPLAY"], "BOTTOMLEFT", 0, -5)
+menuButtons["SORTING"]:SetScript("OnClick", function() func.sortingMenuOnClick() end)
+
+local enableClassSpecButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
+local enableGroupInstanceButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
 
 enableGroupInstanceButton.tooltipText = "Select when to track all/none/rotation only interrupts."
 enableGroupInstanceButton:Hide()
@@ -277,23 +293,9 @@ trackRotationOption.checkbox.tooltipText = "Tracks the given players in the rota
 								"\n\nNOTE - If track all is active, tihs will be overruled. "
 --Enable trackall / track rotation frames
 
-
-local sendMenuButton = frameUtil.createArrowButton("Send", rotationTab)
-sendMenuButton.tooltipText = "Send your currently selected\124ntab's rotation.\124nThe title must be unique!"
-sendMenuButton:SetPoint("TOPLEFT", enableOptionsMenuButton, "BOTTOMLEFT", 0, -5)
-sendMenuButton:SetScript("OnClick", function() func.sendOnClick() end)
-
-local displayMenuButton = frameUtil.createArrowButton("Display", rotationTab)
-displayMenuButton:SetPoint("TOPLEFT", sendMenuButton, "BOTTOMLEFT", 0, -5)
-displayMenuButton:SetScript("OnClick", function() func.displayOnClick() end)
-
-local sortingMenuButton = frameUtil.createArrowButton("Sorting", rotationTab)
-sortingMenuButton:SetPoint("TOPLEFT", displayMenuButton, "BOTTOMLEFT", 0, -5)
-sortingMenuButton:SetScript("OnClick", function() func.sortingOnClick() end)
-
 local sendRotationButtons = {}
 for i=1, 4 do
-    sendRotationButtons[i] = CreateFrame("Button", _, leftSideMenu, "UIPanelButtonTemplate")
+    sendRotationButtons[i] = CreateFrame("Button", _, menuButtons["SEND"], "UIPanelButtonTemplate")
 	sendRotationButtons[i]:Hide()
 	sendRotationButtons[i]:SetSize(60, 40)
     sendRotationButtons[i]:SetText(data.chatTypes[i])
@@ -388,17 +390,14 @@ SIR.frames = {
     ["createNewTabButton"] = createNewTabButton,
     ["removeTabButton"] = removeTabButton,
     ["testButton"] = testButton,
-    ["enableOptionsMenuButton"] = enableOptionsMenuButton,
     ["enableGroupInstanceButton"] = enableGroupInstanceButton,
     ["enableClassSpecButton"] = enableClassSpecButton,
-    ["sendMenuButton"] = sendMenuButton,
-    ["displayMenuButton"] = displayMenuButton,
-    ["sortingMenuButton"] = sortingMenuButton,
     ["whisperToEditBox"] = whisperToEditBox,
     -- table with different frames
     ["trackAllOption"] = trackAllOption,
     ["trackRotationOption"] = trackRotationOption,
     -- table of equivalent frames
+    ["menuButtons"] = menuButtons,
     ["rotationTabButtons"] = rotationTabButtons,
     ["rotationFrames"] = rotationFrames,
     ["groupMemberButtons"] = groupMemberButtons,
