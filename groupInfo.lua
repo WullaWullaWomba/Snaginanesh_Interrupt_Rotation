@@ -4,7 +4,7 @@
 --luacheck: globals GetTime C_Timer max UnitGUID UnitInParty
 --luacheck: globals SLASH_MYINSPECT1 SlashCmdList GetRealmName
 local _, SIR = ...
-local func = SIR.func or {}
+SIR.groupInfo = SIR.groupInfo or {}
 local reverseTable, remove = SIR.util.reverseTable, SIR.util.remove
 local groupInfo = {}
 local toBeInitialized = {}

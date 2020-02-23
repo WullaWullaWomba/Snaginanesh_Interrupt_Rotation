@@ -1,9 +1,14 @@
 --luacheck: globals CreateFrame UIParent UISpecialFrames UIDropDownMenu_SetWidth GetClassInfo CLASS_ICON_TCOORDS
 --luacheck: globals GetNumSpecializationsForClassID GetSpecializationInfoByID gsub unpack
 local _, SIR = ...
-local frameUtil = SIR.frameUtil
-local data = SIR.data
+SIR.data = SIR.data or {}
+SIR.util = SIR.util or {}
+SIR.frameUtil = SIR.frameUtil or {}
+SIR.rotationFrames = SIR.rotationFrames or {}
 SIR.func = SIR.func or {}
+SIR.optionFrames = SIR.optionFrames or {}
+
+local data = SIR.data
 local func = SIR.func
 local container = CreateFrame("Frame", "SnagiIntRotaContainer", UIParent)
 UISpecialFrames[#UISpecialFrames+1] = container:GetName() -- hide on escape - and maybe more <.<
@@ -50,7 +55,6 @@ rotationTab:SetAllPoints()
 rotationTab:Hide()
 
 local rotationTabButtons = {}
-local rotationFrames = {}
 
 local leftSideMenu = CreateFrame("Frame", _ , container)
 leftSideMenu:SetPoint("TOPRIGHT", container, "TOPLEFT", 12, 0)
@@ -98,7 +102,7 @@ transmissionRotationFrame:SetPoint("TOPLEFT", transmissionFrame, "TOPLEFT")
 transmissionRotationFrame:SetPoint("BOTTOMLEFT", transmissionFrame, "BOTTOMLEFT")
 transmissionRotationFrame:SetWidth(150)
 
-local transmissionRotationEditBox = CreateFrame("Editbox", _ , transmissionRotationFrame)
+local transmissionRotationEditBox = CreateFrame("EditBox", _ , transmissionRotationFrame)
 transmissionRotationEditBox:SetFontObject("GameFontNormal")
 transmissionRotationEditBox:SetAutoFocus(false)
 transmissionRotationEditBox:SetMultiLine(true)
@@ -126,7 +130,7 @@ transmissionDropdownMenuLabel:SetPoint("BOTTOMLEFT", transmissionDropdownMenu, "
 transmissionDropdownMenuLabel:SetPoint("BOTTOMRIGHT", transmissionDropdownMenu, "TOPRIGHT", 0, 5)
 transmissionDropdownMenuLabel:SetText("Place inside:")
 
-local transmissionRotationLabelEditBox = CreateFrame("Editbox", _ , transmissionRotationFrame)
+local transmissionRotationLabelEditBox = CreateFrame("EditBox", _ , transmissionRotationFrame)
 transmissionRotationLabelEditBox:SetFontObject("GameFontNormal")
 transmissionRotationLabelEditBox:SetAutoFocus(false)
 transmissionRotationLabelEditBox:SetMultiLine(true)
@@ -159,26 +163,31 @@ menuButtons["SORTING"]:SetPoint("TOPLEFT", menuButtons["DISPLAY"], "BOTTOMLEFT",
 local widthFontString, widthEditBox = frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 widthFontString:SetText("width:")
 widthEditBox:SetPoint("TOPLEFT", leftSideMenu, "TOPLEFT", 115, -35)
+widthEditBox:SetScript("OnEnterPressed", function(self) func.displayEditBoxOnEnter(self, "WIDTH") end)
 widthEditBox:Hide()
 
 local heightFontString, heightEditBox = frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 heightFontString:SetText("height:")
 heightEditBox:SetPoint("TOP", widthEditBox, "BOTTOM", 0, -6)
+heightEditBox:SetScript("OnEnterPressed", function(self) func.displayEditBoxOnEnter(self, "HEIGHT") end)
 heightEditBox:Hide()
 
 local spaceFontString, spaceEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 spaceFontString:SetText("space:")
 spaceEditBox:SetPoint("TOP", heightEditBox, "BOTTOM", 0, -6)
+spaceEditBox:SetScript("OnEnterPressed", function(self) func.displayEditBoxOnEnter(self, "SPACE") end)
 spaceEditBox:Hide()
 
 local xOffFontString, xOffEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 xOffFontString:SetText("x offset:")
 xOffEditBox:SetPoint("TOP", spaceEditBox, "BOTTOM", 0, -6)
+xOffEditBox:SetScript("OnEnterPressed", function(self) func.displayEditBoxOnEnter(self, "XOFF") end)
 xOffEditBox:Hide()
 
 local yOffFontString, yOffEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 yOffFontString:SetText("y offset:")
 yOffEditBox:SetPoint("TOP", xOffEditBox, "BOTTOM", 0, -6)
+yOffEditBox:SetScript("OnEnterPressed", function(self) func.displayEditBoxOnEnter(self, "YOFF") end)
 yOffEditBox:Hide()
 
 local titleFontString, titleEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["SEND"])
@@ -225,62 +234,62 @@ enableClassSpecButton:SetText("class/spec")
 enableClassSpecButton:SetPoint("LEFT", enableGroupInstanceButton, "RIGHT", 5, 0)
 enableClassSpecButton:SetScript("OnClick", function(self) func.enableClassSpecButtonOnClick(self) end)
 
-local enableCheckboxes = {}
---Enable class/spec checkboxes
+local enableCheckBoxes = {}
+--Enable class/spec checkBoxes
 for c=1, 12 do
 	--for each class
-	--make class checkbox & icon
-	enableCheckboxes[c] = {}
-	enableCheckboxes[c][1] = SIR.frameUtil.createIconCheckbox(32, 32, enableClassSpecButton)
+	--make class checkBox & icon
+	enableCheckBoxes[c] = {}
+	enableCheckBoxes[c][1] = SIR.frameUtil.createIconCheckBox(32, 32, enableClassSpecButton)
 
-	if enableCheckboxes[c-1] then
-		enableCheckboxes[c][1]:SetPoint("LEFT", enableCheckboxes[c-1][1], "LEFT")
-		enableCheckboxes[c][1]:SetPoint("TOP", enableCheckboxes[c-1][#enableCheckboxes[c-1]], "BOTTOM", 0, -5)
+	if enableCheckBoxes[c-1] then
+		enableCheckBoxes[c][1]:SetPoint("LEFT", enableCheckBoxes[c-1][1], "LEFT")
+		enableCheckBoxes[c][1]:SetPoint("TOP", enableCheckBoxes[c-1][#enableCheckBoxes[c-1]], "BOTTOM", 0, -5)
 	else
-		enableCheckboxes[c][1]:SetPoint("TOPLEFT", enableGroupInstanceButton, "BOTTOMLEFT", 0+32, -5)
+		enableCheckBoxes[c][1]:SetPoint("TOPLEFT", enableGroupInstanceButton, "BOTTOMLEFT", 0+32, -5)
 	end
-	enableCheckboxes[c][1].icon:SetTexture("Interface\\GLUES\\CHARACTERCREATE\\UI-CHARACTERCREATE-CLASSES")
+	enableCheckBoxes[c][1].icon:SetTexture("Interface\\GLUES\\CHARACTERCREATE\\UI-CHARACTERCREATE-CLASSES")
 	local class = select(2, GetClassInfo(c))
 	local coords = CLASS_ICON_TCOORDS[class]
-	enableCheckboxes[c][1].icon:SetTexCoord(unpack(coords))
-    enableCheckboxes[c][1]:SetScript("OnClick", function(self) func.enableClassOnClick(self, c) end)
+	enableCheckBoxes[c][1].icon:SetTexCoord(unpack(coords))
+    enableCheckBoxes[c][1]:SetScript("OnClick", function(self) func.enableClassOnClick(self, c) end)
 
 	for s=1, GetNumSpecializationsForClassID(c) do
 		local specID = data.classSpecIDs[c][s]
-		--make spec checkbox & icon
+		--make spec checkBox & icon
 		local extraOffset = 0
 		if s == 1 then
 			extraOffset = 10
 		end
-		enableCheckboxes[c][s+1] = SIR.frameUtil.createIconCheckbox(22, 22, enableClassSpecButton)
-		enableCheckboxes[c][s+1]:SetPoint("LEFT", enableCheckboxes[c][s], "RIGHT", 22+extraOffset, 0)
-		enableCheckboxes[c][s+1].spec = specID
-		enableCheckboxes[c][s+1].class = c
-		local icon = select(4, GetSpecializationInfoByID(enableCheckboxes[c][s+1].spec))
-		enableCheckboxes[c][s+1].icon:SetTexture(icon)
+		enableCheckBoxes[c][s+1] = SIR.frameUtil.createIconCheckBox(22, 22, enableClassSpecButton)
+		enableCheckBoxes[c][s+1]:SetPoint("LEFT", enableCheckBoxes[c][s], "RIGHT", 22+extraOffset, 0)
+		enableCheckBoxes[c][s+1].spec = specID
+		enableCheckBoxes[c][s+1].class = c
+		local icon = select(4, GetSpecializationInfoByID(enableCheckBoxes[c][s+1].spec))
+		enableCheckBoxes[c][s+1].icon:SetTexture(icon)
 
-		enableCheckboxes[c][s+1]:SetScript("OnClick", function(self)
+		enableCheckBoxes[c][s+1]:SetScript("OnClick", function(self)
             func.enableSpecOnClick(self, c, s)
 		end)
 	end
 end
 -- move guardian (and thereby restoration and DH)
-enableCheckboxes[11][4]:ClearAllPoints()
-enableCheckboxes[11][4]:SetPoint("TOP", enableCheckboxes[11][2], "BOTTOM")
+enableCheckBoxes[11][4]:ClearAllPoints()
+enableCheckBoxes[11][4]:SetPoint("TOP", enableCheckBoxes[11][2], "BOTTOM")
 
-for i=1, #enableCheckboxes do
-	for j=1, #enableCheckboxes[i] do
-		enableCheckboxes[i][j]:Hide()
+for i=1, #enableCheckBoxes do
+	for j=1, #enableCheckBoxes[i] do
+		enableCheckBoxes[i][j]:Hide()
 	end
 end
 
 local trackAllOption = frameUtil.createFromToOption("Track all", "ALL", 0, 40, enableGroupInstanceButton)
-local trackRotationOption = frameUtil.createFromToOption("rotation", "ROTATION", 0, 40, enableGroupInstanceButton)
-trackAllOption.checkbox:SetPoint("TOP", enableGroupInstanceButton, "BOTTOMRIGHT", -31, -20)
-trackAllOption.checkbox.tooltipText = "Tracks all interrupts from players in the party\n"..
+local trackRotationOption = frameUtil.createFromToOption("Rotation", "ROTATION", 0, 40, enableGroupInstanceButton)
+trackAllOption.checkBox:SetPoint("TOP", enableGroupInstanceButton, "BOTTOMRIGHT", -31, -20)
+trackAllOption.checkBox.tooltipText = "Tracks all interrupts from players in the party\n"..
 								"when enabled and within the given groupsize."
-trackRotationOption.checkbox:SetPoint("TOP", trackAllOption.checkbox, "BOTTOMRIGHT", -14, -80)
-trackRotationOption.checkbox.tooltipText = "Tracks the given players in the rotation"..
+trackRotationOption.checkBox:SetPoint("TOP", trackAllOption.checkBox, "BOTTOMRIGHT", -14, -80)
+trackRotationOption.checkBox.tooltipText = "Tracks the given players in the rotation"..
 								"\nwhen enabled and within the given groupsize."..
 								"\n\nNOTE - If track all is active, tihs will be overruled. "
 --Enable trackall / track rotation frames
@@ -345,15 +354,15 @@ end
 rotationButtons[1]:ClearAllPoints()
 rotationButtons[1]:SetPoint("TOPRIGHT", -25, -25)
 
-local sortModeCheckboxes = {
-    ["CD"] = frameUtil.createSortCheckbox("by CD", menuButtons["SORTING"]),
-    ["ROTATION"] = frameUtil.createSortCheckbox("by rotation", menuButtons["SORTING"]),
+local sortModeCheckBoxes = {
+    ["CD"] = frameUtil.createSortCheckBox("by CD", menuButtons["SORTING"]),
+    ["ROTATION"] = frameUtil.createSortCheckBox("by rotation", menuButtons["SORTING"]),
 }
-sortModeCheckboxes["CD"].value = "CD"
-sortModeCheckboxes["CD"]:SetPoint("TOPLEFT", leftSideMenu, "TOP", 0, -50)
+sortModeCheckBoxes["CD"].value = "CD"
+sortModeCheckBoxes["CD"]:SetPoint("TOPLEFT", leftSideMenu, "TOP", 0, -50)
 
-sortModeCheckboxes["ROTATION"].value = "ROTATION"
-sortModeCheckboxes["ROTATION"]:SetPoint("TOP", sortModeCheckboxes["CD"], "BOTTOM", 0, -5)
+sortModeCheckBoxes["ROTATION"].value = "ROTATION"
+sortModeCheckBoxes["ROTATION"]:SetPoint("TOP", sortModeCheckBoxes["CD"], "BOTTOM", 0, -5)
 
 SIR.optionFrames = {
     --single frames
@@ -388,11 +397,10 @@ SIR.optionFrames = {
     -- table of equivalent frames
     ["menuButtons"] = menuButtons,
     ["rotationTabButtons"] = rotationTabButtons,
-    ["rotationFrames"] = rotationFrames,
     ["groupMemberButtons"] = groupMemberButtons,
     ["rotationButtons"] = rotationButtons,
     ["removeMemberButtons"] = removeMemberButtons,
     ["sendRotationButtons"] = sendRotationButtons,
-    ["sortModeCheckboxes"] = sortModeCheckboxes,
-    ["enableCheckboxes"] = enableCheckboxes,
+    ["sortModeCheckBoxes"] = sortModeCheckBoxes,
+    ["enableCheckBoxes"] = enableCheckBoxes,
 }
