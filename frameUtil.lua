@@ -1,4 +1,4 @@
---luacheck: globals CreateFrame GameTooltip UISpecialFrames tremove
+--luacheck: globals CreateFrame GameTooltip UISpecialFrames tremove unpack
 local _, SIR = ...
 SIR.data = SIR.data or {}
 SIR.util = SIR.util or {}
@@ -103,7 +103,7 @@ SIR.frameUtil = {
 			sb:SetBackdrop({bgFile = "Interface\\ChatFrame\\ChatFrameBackground"})
 			sb:SetBackdropColor(0, 0, 0, 0.6)
 			sb:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
-			sb:SetMinMaxValues(0,0)
+			sb:SetMinMaxValues(0, 15)
 		end
 		return sb
 	end,

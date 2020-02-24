@@ -20,12 +20,15 @@ SIR.frameUtil = SIR.frameUtil or {}
 SIR.rotationFrames = SIR.rotationFrames or {}
 SIR.func = SIR.func or {}
 SIR.optionFrames = SIR.optionFrames or {}
+SIR.rotationFunc = SIR.rotationFunc or {}
 local util = SIR.util
 local frameUtil = SIR.frameUtil
 local optionFrames = SIR.optionFrames
 local func = SIR.func
 
+
 local contains, remove= util.contains, util.remove
+SIR.tabOptions = SIR.tabOptions or {}
 ------------------------------------------------------------------------------------------------------------------------
 
 -- LOCALS!
@@ -36,7 +39,6 @@ local activeTab = "GENERAL"
 local playerGUID
 local colouredPlayerName
 local trackModes = {}
-local statusBars = {}
 local defaultOptions = {
 	["TITLE"] = "new_tab",
 	["ROTATION"] = {},
@@ -140,7 +142,6 @@ local defaultOptions = {
 	["TRACKALLTO"] = 5,
 	["SORTMODE"] = "CD"
 }
-local rotationTabOptions = {}
 
 local toggleOptions = function()
 	if optionFrames.container:IsShown() then
@@ -223,7 +224,7 @@ function ItemRefTooltip:SetHyperlink(link, ...)
 		optionFrames.transmissionRotationEditBox:SetText(rotationText)
 
 		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new rotation tab")
-		for index, option in ipairs(rotationTabOptions) do
+		for index, option in ipairs(SIR.tabOptions) do
 			if option["TITLE"] == title then
 				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "tab"..index.." - "..title)
 				break
@@ -264,15 +265,15 @@ optionFrames.transmissionOkayButton:SetScript("OnClick", function(self)
 		return
 	elseif text == "new rotation tab" then
 		optionFrames.createNewTabButton:Click()
-		rotationTabOptions[numTabs]["ROTATION"] = self.rotation
-		rotationTabOptions[numTabs]["TITLE"] = strsub(text, 7)
-		optionFrames.rotationTabButtons[numTabs]:SetText(rotationTabOptions[numTabs]["TITLE"])
+		SIR.tabOptions[numTabs]["ROTATION"] = self.rotation
+		SIR.tabOptions[numTabs]["TITLE"] = strsub(text, 7)
+		optionFrames.rotationTabButtons[numTabs]:SetText(SIR.tabOptions[numTabs]["TITLE"])
 		optionFrames.container:Show()
 		optionFrames.rotationTabButtons[numTabs]:Click()
 	else
-		for i=1, #rotationTabOptions do
-			if rotationTabOptions[i]["TITLE"] == strsub(text, 7) then
-				rotationTabOptions[i]["ROTATION"] = self.rotation
+		for i=1, #SIR.tabOptions do
+			if SIR.tabOptions[i]["TITLE"] == strsub(text, 7) then
+				SIR.tabOptions[i]["ROTATION"] = self.rotation
 				optionFrames.container:Show()
 				optionFrames.rotationTabButtons[i]:Click()
 				break
@@ -284,10 +285,10 @@ end)
 UIDropDownMenu_Initialize(optionFrames.transmissionDropdownMenu, function()--self, level, menuList)
 	local info = UIDropDownMenu_CreateInfo()
 	for i=1, numTabs do
-		info.text = "tab"..i.." - "..rotationTabOptions[i]["TITLE"]
+		info.text = "tab"..i.." - "..SIR.tabOptions[i]["TITLE"]
 		info.checked = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu) == info.text
 		info.func = function()
-				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "tab"..i.." - "..rotationTabOptions[i]["TITLE"])
+				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "tab"..i.." - "..SIR.tabOptions[i]["TITLE"])
 			end
 		UIDropDownMenu_AddButton(info)
 	end
@@ -318,7 +319,7 @@ func.updateGroupMemberButtons = function()
 			-- only party1-4 exist (not one for the player himself)
 			groupType = "party"
 			optionFrames.groupMemberButtons[numGroup]:SetGUID(playerGUID)
-			optionFrames.groupMemberButtons[numGroup].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"],playerGUID)
+			optionFrames.groupMemberButtons[numGroup].inRotation = contains(SIR.tabOptions[activeTab]["ROTATION"],playerGUID)
 			optionFrames.groupMemberButtons[numGroup]:updateTexture()
 			optionFrames.groupMemberButtons[numGroup]:SetText(colouredPlayerName)
 			optionFrames.groupMemberButtons[numGroup]:Show()
@@ -327,7 +328,7 @@ func.updateGroupMemberButtons = function()
 		for i=1, numGroup do
 			local GUID = UnitGUID(groupType..i)
 			optionFrames.groupMemberButtons[i]:SetGUID(GUID)
-			optionFrames.groupMemberButtons[i].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"], GUID)
+			optionFrames.groupMemberButtons[i].inRotation = contains(SIR.tabOptions[activeTab]["ROTATION"], GUID)
 			optionFrames.groupMemberButtons[i]:updateTexture()
 			optionFrames.groupMemberButtons:SetText(util.getColouredNameByGUID(GUID))
 			optionFrames.groupMemberButtons[i]:Show()
@@ -337,14 +338,14 @@ func.updateGroupMemberButtons = function()
 			optionFrames.groupMemberButtons[i]:Hide()
 		end
 		optionFrames.groupMemberButtons[1]:SetGUID(playerGUID)
-		optionFrames.groupMemberButtons[1].inRotation = contains(rotationTabOptions[activeTab]["ROTATION"], playerGUID)
+		optionFrames.groupMemberButtons[1].inRotation = contains(SIR.tabOptions[activeTab]["ROTATION"], playerGUID)
 		optionFrames.groupMemberButtons[1]:UpdateTexture()
 		optionFrames.groupMemberButtons[1]:SetText(colouredPlayerName)
 		optionFrames.groupMemberButtons[1]:Show()
 	end
 end
 func.updateRotationButtons = function()
-	local rotation = rotationTabOptions[activeTab]["ROTATION"]
+	local rotation = SIR.tabOptions[activeTab]["ROTATION"]
 	for i=#rotation+1, #optionFrames.rotationButtons do
 		optionFrames.rotationButtons[i]:Hide()
 	end
@@ -361,7 +362,7 @@ func.removeRotationMember = function(GUID)
 			break
 		end
 	end
-	local rotationNum = #rotationTabOptions[activeTab]["ROTATION"]
+	local rotationNum = #SIR.tabOptions[activeTab]["ROTATION"]
 	for i=1, rotationNum-1 do
 		if optionFrames.rotationButtons:GetGUID() == GUID then
 			for j=i, #rotationNum-1 do
@@ -372,70 +373,33 @@ func.removeRotationMember = function(GUID)
 		end
 	end
 	optionFrames.rotationButtons[rotationNum]:Hide()
-	for i=1, #rotationTabOptions[activeTab]["ROTATION"] do
-		if rotationTabOptions[activeTab]["ROTATION"][i] == GUID then
-			remove(rotationTabOptions[activeTab]["ROTATION"], i)
+	for i=1, #SIR.tabOptions[activeTab]["ROTATION"] do
+		if SIR.tabOptions[activeTab]["ROTATION"][i] == GUID then
+			remove(SIR.tabOptions[activeTab]["ROTATION"], i)
 			break
 		end
 	end
 end
-func.updateTrackMode = function (tabb)
-	-- todo get other groupnum?
-	local tab = tabb or activeTab
-	local old = trackModes[tab]
-	if rotationTabOptions[tab]["TRACKALLCHECKED"] and rotationTabOptions[tab]["TRACKALLFROM"]<= numGroup
-			<= rotationTabOptions[tab]["TRACKALLTO"] then
-		trackModes[tab] = "ALL"
-	elseif rotationTabOptions[tab]["TRACKROTATIONCHECKED"] and rotationTabOptions[tab]["TRACKROTATIONFROM"]<= numGroup
-			<= rotationTabOptions[tab]["TRACKROTATIONTO"] then
-		trackModes[tab] = "ROTATION"
-	else
-		trackModes[tab] = "NONE"
-	end
-	if old == trackModes[tab] then
-		return
-	end
-	-- todo
-	if trackModes[tab] == "NONE" then
-		--remove all bars for tab todo
-	elseif old == "NONE" then
-		if trackModes[tab] == "ROTATION" then
-			-- add rotation
-		elseif trackModes[tab] == "ALL" then
-			-- add all players
-		end
-	elseif old == "ROTATION" then
-			-- trackModes[tab] == "ALL" unless more modes added
-
-			-- add all that havent been added yet
-	else
-		-- old == "ALL" unless more modes added
-		-- trackModes[tab] == "ROTATION" unless more modes added
-
-		-- remove players that arent part of the rotation
-
-	end
-end
 func.makeTransmissionText = function()
 	local text = "[SnagiIntRota:] "..optionFrames.titleEditBox:GetText().." "
-	for _, member in ipairs(rotationTabOptions[activeTab]["ROTATION"]) do
+	for _, member in ipairs(SIR.tabOptions[activeTab]["ROTATION"]) do
 		text = text..member.." "
 	end
 	return text
 end
 func.updateEnableMenu = function()
-	optionFrames.trackAllOption.checkBox:SetChecked(rotationTabOptions[activeTab]["TRACKALLCHECKED"])
-	optionFrames.trackAllOption.fromSlider:SetValue(rotationTabOptions[activeTab]["TRACKALLFROM"])
-	optionFrames.trackAllOption.toSlider:SetValue(rotationTabOptions[activeTab]["TRACKALLTO"])
-	optionFrames.trackAllOption.fromEditBox:SetText(rotationTabOptions[activeTab]["TRACKALLFROM"])
-	optionFrames.trackAllOption.toEditBox:SetText(rotationTabOptions[activeTab]["TRACKALLTO"])
+	optionFrames.trackAllOption.checkBox:SetChecked(SIR.tabOptions[activeTab]["TRACKALLCHECKED"])
+	optionFrames.trackAllOption.fromSlider:SetValue(SIR.tabOptions[activeTab]["TRACKALLFROM"])
+	optionFrames.trackAllOption.toSlider:SetValue(SIR.tabOptions[activeTab]["TRACKALLTO"])
+	optionFrames.trackAllOption.fromEditBox:SetText(SIR.tabOptions[activeTab]["TRACKALLFROM"])
+	optionFrames.trackAllOption.toEditBox:SetText(SIR.tabOptions[activeTab]["TRACKALLTO"])
 
-	optionFrames.trackAllOption.fromSlider:SetEnabled(rotationTabOptions[activeTab]["TRACKALLCHECKED"])
-	optionFrames.trackAllOption.toSlider:SetEnabled(rotationTabOptions[activeTab]["TRACKALLCHECKED"])
-	optionFrames.trackAllOption.fromEditBox:SetEnabled(rotationTabOptions[activeTab]["TRACKALLCHECKED"])
-	optionFrames.trackAllOption.toEditBox:SetEnabled(rotationTabOptions[activeTab]["TRACKALLCHECKED"])
+	optionFrames.trackAllOption.fromSlider:SetEnabled(SIR.tabOptions[activeTab]["TRACKALLCHECKED"])
+	optionFrames.trackAllOption.toSlider:SetEnabled(SIR.tabOptions[activeTab]["TRACKALLCHECKED"])
+	optionFrames.trackAllOption.fromEditBox:SetEnabled(SIR.tabOptions[activeTab]["TRACKALLCHECKED"])
+	optionFrames.trackAllOption.toEditBox:SetEnabled(SIR.tabOptions[activeTab]["TRACKALLCHECKED"])
 
-	if rotationTabOptions[activeTab]["TRACKALLCHECKED"] then
+	if SIR.tabOptions[activeTab]["TRACKALLCHECKED"] then
 		optionFrames.trackAllOption.fromFontString:SetTextColor(0.98, 0.82, 0)
 		optionFrames.trackAllOption.toFontString:SetTextColor(0.98, 0.82, 0)
 	else
@@ -443,18 +407,18 @@ func.updateEnableMenu = function()
 		optionFrames.trackAllOption.toFontString:SetTextColor(0.3, 0.3, 0.3)
 	end
 
-	optionFrames.trackRotationOption.checkBox:SetChecked(rotationTabOptions[activeTab]["TRACKROTATIONCHECKED"])
-	optionFrames.trackRotationOption.fromSlider:SetValue(rotationTabOptions[activeTab]["TRACKROTATIONFROM"])
-	optionFrames.trackRotationOption.toSlider:SetValue(rotationTabOptions[activeTab]["TRACKROTATIONTO"])
-	optionFrames.trackRotationOption.fromEditBox:SetText(rotationTabOptions[activeTab]["TRACKROTATIONFROM"])
-	optionFrames.trackRotationOption.toEditBox:SetText(rotationTabOptions[activeTab]["TRACKROTATIONTO"])
+	optionFrames.trackRotationOption.checkBox:SetChecked(SIR.tabOptions[activeTab]["TRACKROTATIONCHECKED"])
+	optionFrames.trackRotationOption.fromSlider:SetValue(SIR.tabOptions[activeTab]["TRACKROTATIONFROM"])
+	optionFrames.trackRotationOption.toSlider:SetValue(SIR.tabOptions[activeTab]["TRACKROTATIONTO"])
+	optionFrames.trackRotationOption.fromEditBox:SetText(SIR.tabOptions[activeTab]["TRACKROTATIONFROM"])
+	optionFrames.trackRotationOption.toEditBox:SetText(SIR.tabOptions[activeTab]["TRACKROTATIONTO"])
 
-	optionFrames.trackRotationOption.fromSlider:SetEnabled(rotationTabOptions[activeTab]["TRACKROTATIONCHECKED"])
-	optionFrames.trackRotationOption.toSlider:SetEnabled(rotationTabOptions[activeTab]["TRACKROTATIONCHECKED"])
-	optionFrames.trackRotationOption.fromEditBox:SetEnabled(rotationTabOptions[activeTab]["TRACKROTATIONCHECKED"])
-	optionFrames.trackRotationOption.toEditBox:SetEnabled(rotationTabOptions[activeTab]["TRACKROTATIONCHECKED"])
+	optionFrames.trackRotationOption.fromSlider:SetEnabled(SIR.tabOptions[activeTab]["TRACKROTATIONCHECKED"])
+	optionFrames.trackRotationOption.toSlider:SetEnabled(SIR.tabOptions[activeTab]["TRACKROTATIONCHECKED"])
+	optionFrames.trackRotationOption.fromEditBox:SetEnabled(SIR.tabOptions[activeTab]["TRACKROTATIONCHECKED"])
+	optionFrames.trackRotationOption.toEditBox:SetEnabled(SIR.tabOptions[activeTab]["TRACKROTATIONCHECKED"])
 
-	if rotationTabOptions[activeTab]["TRACKROTATIONCHECKED"] then
+	if SIR.tabOptions[activeTab]["TRACKROTATIONCHECKED"] then
 		optionFrames.trackRotationOption.fromFontString:SetTextColor(0.98, 0.82, 0)
 		optionFrames.trackRotationOption.toFontString:SetTextColor(0.98, 0.82, 0)
 	else
@@ -462,31 +426,29 @@ func.updateEnableMenu = function()
 		optionFrames.trackRotationOption.toFontString:SetTextColor(0.3, 0.3, 0.3)
 	end
 	for c=1, #optionFrames.enableCheckBoxes do
-		optionFrames.enableCheckBoxes[c][1]:SetChecked(rotationTabOptions[activeTab]["CLASSENABLEOPTIONS"][c])
+		optionFrames.enableCheckBoxes[c][1]:SetChecked(SIR.tabOptions[activeTab]["CLASSENABLEOPTIONS"][c])
 		for s=1, #classSpecIDs[c] do
 			optionFrames.enableCheckBoxes[c][s+1]:SetChecked(
-				rotationTabOptions[activeTab]["SPECENABLEOPTIONS"][classSpecIDs[c][s]])
+				SIR.tabOptions[activeTab]["SPECENABLEOPTIONS"][classSpecIDs[c][s]])
 		end
 	end
 end
 func.updateSendMenu = function()
-	optionFrames.titleEditBox:SetText(rotationTabOptions[activeTab]["TITLE"])
+	optionFrames.titleEditBox:SetText(SIR.tabOptions[activeTab]["TITLE"])
 end
 func.updateDisplayMenu = function()
-	optionFrames.widthEditBox:SetText(rotationTabOptions[activeTab]["WIDTH"])
-	optionFrames.heightEditBox:SetText(rotationTabOptions[activeTab]["HEIGHT"])
-	optionFrames.spaceEditBox:SetText(rotationTabOptions[activeTab]["SPACE"])
-	optionFrames.xOffEditBox:SetText(rotationTabOptions[activeTab]["XOFF"])
-	optionFrames.yOffEditBox:SetText(rotationTabOptions[activeTab]["YOFF"])
+	optionFrames.widthEditBox:SetText(SIR.tabOptions[activeTab]["WIDTH"])
+	optionFrames.heightEditBox:SetText(SIR.tabOptions[activeTab]["HEIGHT"])
+	optionFrames.spaceEditBox:SetText(SIR.tabOptions[activeTab]["SPACE"])
+	optionFrames.xOffEditBox:SetText(SIR.tabOptions[activeTab]["XOFF"])
+	optionFrames.yOffEditBox:SetText(SIR.tabOptions[activeTab]["YOFF"])
 end
 func.updateSortMenu = function()
 	for k, cb in pairs(optionFrames.sortModeCheckBoxes) do
-		cb:SetChecked(k == rotationTabOptions[activeTab]["SORTMODE"])
+		cb:SetChecked(k == SIR.tabOptions[activeTab]["SORTMODE"])
 	end
 end
-func.addNewPlayer = function(GUID)
 
-end
 
 func.setStatusBarOnUpdate = function(bar)
 	bar:SetScript("OnUpdate", function(self, elapsed)
@@ -549,10 +511,10 @@ func.createNewTab = function()
 		or optionFrames.generalTabButton, "RIGHT", -15, 0)
 	optionFrames.rotationTabButtons[numTabs]:SetScript("OnClick", function(self) func.rotationTabButtonOnClick(self) end)
 	optionFrames.rotationTabButtons[numTabs]:SetText("new_tab")
-	rotationTabOptions[numTabs] = util.makeCopy(defaultOptions)
+	SIR.tabOptions[numTabs] = util.makeCopy(defaultOptions)
 end
 func.groupMemberOnClick = function(self)
-	local rotation = rotationTabOptions[activeTab]["ROTATION"]
+	local rotation = SIR.tabOptions[activeTab]["ROTATION"]
 	local GUID = self:GetGUID()
 	if not contains(rotation, GUID) then
 		-- Add player to activeRotation if not yet in activeRotation
@@ -605,8 +567,8 @@ func.groupEnableOptionCheckBoxOnClick = function(self, option)
 	else
 		option.fromFontString:SetTextColor(0.3, 0.3, 0.3)
 		option.toFontString:SetTextColor(0.3, 0.3, 0.3)
-		--todo func.updateTrackMode()
 	end
+	SIR.rotationFunc.updateTrackMode(activeTab)
 end
 func.groupEnableOptionFromSliderOnMouseWheel = function(self, delta, option)
 	-- self.model == "ALL" then
@@ -621,32 +583,34 @@ func.groupEnableOptionFromSliderOnMouseWheel = function(self, delta, option)
 		if newVal > option.toSlider:GetValue() then
 			option.toSlider:SetValue(newVal)
 			option.toEditBox:SetText(newVal)
-			rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
+			SIR.tabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
 		end
 		self:SetValue(newVal)
-		rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
+		SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
 	else
 		if self:GetValue() == minVal then
 			return
 		end
 		newVal = self:GetValue()-1
 		self:SetValue(newVal)
-		rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
+		SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
 	end
 	option.fromEditBox:SetText(newVal)
+	SIR.rotationFunc.updateTrackMode(activeTab)
 end
 func.groupEnableOptionFromSliderOnMouseUp = function(self, option)
 	local newVal = self:GetValue()
-	if newVal == rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] then
+	if newVal == SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] then
 		return
 	end
-	if newVal > rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] then
+	if newVal > SIR.tabOptions[activeTab]["TRACK"..self.model.."TO"] then
 		option.toSlider:SetValue(newVal)
 		option.toEditBox:SetText(newVal)
-		rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
+		SIR.tabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
 	end
 	option.fromEditBox:SetText(newVal)
-	rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
+	SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
+	SIR.rotationFunc.updateTrackMode(activeTab)
 end
 func.groupEnableOptionToSliderOnMouseWheel = function(self, delta, option)
 	local minVal, maxVal = self:GetMinMaxValues()
@@ -665,67 +629,71 @@ func.groupEnableOptionToSliderOnMouseWheel = function(self, delta, option)
 		end
 		newVal = self:GetValue()-1
 		self:SetValue(newVal)
-		if newVal < rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] then
+		if newVal < SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] then
 			option.fromSlider:SetValue(newVal)
 			option.fromEditBox:SetText(newVal)
 		end
 	end
 	option.toEditBox:SetText(newVal)
+	SIR.rotationFunc.updateTrackMode(activeTab)
 end
 func.groupEnableOptionToSliderOnMouseUp = function(self, option)
 	local newVal = self:GetValue()
-	if newVal == rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] then
+	if newVal == SIR.tabOptions[activeTab]["TRACK"..self.model.."TO"] then
 		return
 	end
-	if newVal < rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] then
+	if newVal < SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] then
 		option.fromSlider:SetValue(newVal)
 		option.fromEditBox:SetText(newVal)
-		rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
+		SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
 	end
 	option.toEditBox:SetText(newVal)
-	rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
+	SIR.tabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
+	SIR.rotationFunc.updateTrackMode(activeTab)
 end
 func.groupEnableOptionFromEditBoxOnEnterPressed = function(self, option)
 	local newVal = tonumber(self:GetText())
 	if newVal > 40 then
 		self:SetText(40)
-		if rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] == 40 then
+		if SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] == 40 then
 			return
 		end
 		newVal = 40
 	end
-	rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
+	SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
 	option.fromSlider:SetValue(newVal)
-	if newVal > rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] then
+	if newVal > SIR.tabOptions[activeTab]["TRACK"..self.model.."TO"] then
 		option.toSlider:SetValue(newVal)
 		option.toEditBox:SetText(newVal)
-		rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
+		SIR.tabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
 	end
 	self:ClearFocus()
+	SIR.rotationFunc.updateTrackMode(activeTab)
 end
 func.groupEnableOptionToEditBoxOnEnterPressed = function(self, option)
 	local newVal = tonumber(self:GetText())
 	if newVal > 40 then
 		self:SetText(40)
-		if rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] == 40 then
+		if SIR.tabOptions[activeTab]["TRACK"..self.model.."TO"] == 40 then
 			return
 		end
 		newVal = 40
 	end
-	rotationTabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
+	SIR.tabOptions[activeTab]["TRACK"..self.model.."TO"] = newVal
 	option.toSlider:SetValue(newVal)
-	if newVal < rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] then
+	if newVal < SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] then
 		option.fromSlider:SetValue(newVal)
 		option.fromEditBox:SetText(newVal)
-		rotationTabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
+		SIR.tabOptions[activeTab]["TRACK"..self.model.."FROM"] = newVal
 	end
 	self:ClearFocus()
+	SIR.rotationFunc.updateTrackMode(activeTab)
 end
 func.enableClassOnClick = function(self, c)
 local newBool = self:GetChecked()
-	rotationTabOptions[activeTab]["CLASSENABLEOPTIONS"][c] = newBool
+	SIR.tabOptions[activeTab]["CLASSENABLEOPTIONS"][c] = newBool
 	for i=1, #classSpecIDs[c] do
-		rotationTabOptions[activeTab]["SPECENABLEOPTIONS"][classSpecIDs[c][i]] = newBool
+		SIR.tabOptions[activeTab]["SPECENABLEOPTIONS"][classSpecIDs[c][i]] = newBool
 		optionFrames.enableCheckBoxes[c][i+1]:SetChecked(newBool)
 	end
 	-- todo if own spec option changed, update
@@ -733,17 +701,17 @@ end
 func.enableSpecOnClick = function(self, c, s)
 	local newBool = self:GetChecked()
 	local specID = classSpecIDs[c][s]
-	rotationTabOptions[activeTab]["SPECENABLEOPTIONS"][specID] = newBool
+	SIR.tabOptions[activeTab]["SPECENABLEOPTIONS"][specID] = newBool
 	for _, spec in ipairs(classSpecIDs[c]) do
-		newBool = newBool and rotationTabOptions[activeTab]["SPECENABLEOPTIONS"][spec]
+		newBool = newBool and SIR.tabOptions[activeTab]["SPECENABLEOPTIONS"][spec]
 	end
-	rotationTabOptions[activeTab]["CLASSENABLEOPTIONS"][c] = newBool
+	SIR.tabOptions[activeTab]["CLASSENABLEOPTIONS"][c] = newBool
 	optionFrames.enableCheckBoxes[c][1]:SetChecked(newBool)
 
 	-- todo update if own spec changed
 end
 func.rotationButtonOnClick = function(self, button)
-	local rotation = rotationTabOptions[activeTab]["ROTATION"]
+	local rotation = SIR.tabOptions[activeTab]["ROTATION"]
 	if button == "LeftButton" then
 		-- On leftclick
 		-- swap up / set last
@@ -881,11 +849,11 @@ func.sortCheckBoxOnClick = function(self)
 			scb:SetChecked(false)
 		end
 	end
-	rotationTabOptions[activeTab]["SORTMODE"] = (self:GetChecked() and self.value) or "NONE"
+	SIR.tabOptions[activeTab]["SORTMODE"] = (self:GetChecked() and self.value) or "NONE"
 end
 func.removeTabOnClick = function()
-	for i=activeTab, #rotationTabOptions do
-		rotationTabOptions[i] = util.makeCopy(rotationTabOptions[i+1])
+	for i=activeTab, #SIR.tabOptions do
+		SIR.tabOptions[i] = util.makeCopy(SIR.tabOptions[i+1])
 	end
 	for i=activeTab, #optionFrames.rotationTabButtons-1 do
 		optionFrames.rotationTabButtons[i]:SetText(optionFrames.rotationTabButtons[i+1]:GetText())
@@ -904,17 +872,17 @@ func.removeTabOnClick = function()
 end
 func.displayEditBoxOnEnter = function(self, value)
 	if tonumber(self:GetText()) then
-		rotationTabOptions[activeTab][value] = tonumber(self:GetText())
+		SIR.tabOptions[activeTab][value] = tonumber(self:GetText())
 	end
 	self:ClearFocus()
 end
 func.titleEditBoxOnEnterPressed = function(self)
 	local text = self:GetText()
 	if text ~= "" then
-		rotationTabOptions[activeTab]["TITLE"] = text
+		SIR.tabOptions[activeTab]["TITLE"] = text
 		optionFrames.rotationTabButtons[activeTab]:SetText(text)
 	else
-		text:SetText(rotationTabOptions[activeTab]["TITLE"])
+		text:SetText(SIR.tabOptions[activeTab]["TITLE"])
 	end
 	self:ClearFocus()
 end

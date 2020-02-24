@@ -1,7 +1,7 @@
 --luacheck: globals CreateFrame GetTalentInfo GetPlayerInfoByGUID GetInspectSpecialization NotifyInspect
 --luacheck: globals GetSpecializationInfo GetSpecialization CanInspect UnitIsConnected InspectFrame
 --luacheck: globals GetNumGroupMembers IsInGroup IsInRaid UnitIsDeadOrGhost
---luacheck: globals GetTime C_Timer max UnitGUID UnitInParty
+--luacheck: globals GetTime C_Timer max UnitGUID UnitInParty unpack
 --luacheck: globals SLASH_MYINSPECT1 SlashCmdList GetRealmName
 local _, SIR = ...
 SIR.groupInfo = SIR.groupInfo or {}
@@ -53,6 +53,7 @@ local setInitialInfo = function(GUID)
         ["CLASS"] = class,
         ["TALENTS"] = {},
     }
+    SIR.rotationFunc.playerInit(GUID)
     return true
 end
 
@@ -96,6 +97,7 @@ f.INSPECT_READY = function(...)
     if not GUID or (not groupInfo[GUID] and not setInitialInfo(GUID)) then
         return
     end
+    local oldSpec = groupInfo[GUID]["SPEC"]
     groupInfo[GUID]["SPEC"] = GetInspectSpecialization(groupInfo[GUID]["NAME"])
     for i=1, 7 do
         for j=1, 3 do
@@ -106,11 +108,12 @@ f.INSPECT_READY = function(...)
             end
         end
     end
-    -- TODO setup/update character for/if talents changed
+    SIR.rotationFunc.specUpdate(GUID, groupInfo[GUID]["CLASS"], oldSpec, groupInfo[GUID]["SPEC"])
 end
 f.GROUP_ROSTER_UPDATE = function()
     if GetNumGroupMembers() ~= numGroupMembers then
         local newNumGroupMembers = max(GetNumGroupMembers(), 1)
+        SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
         if newNumGroupMembers > numGroupMembers then
             -- add new players
             local groupType = "party"
@@ -130,14 +133,14 @@ f.GROUP_ROSTER_UPDATE = function()
                 for GUID, info in pairs(groupInfo) do
                     if not UnitInParty(info["NAME"]) then
                         groupInfo[GUID] = nil
-                        -- TODO elsewhere bars
+                        SIR.rotationFunc.removePlayer(GUID)
                     end
                 end
             else
                 for GUID, _ in pairs(groupInfo) do
                     if GUID ~= playerGUID then
                         groupInfo[GUID] = nil
-                        -- TODO elsewhere bars
+                        SIR.rotationFunc.removePlayer(GUID)
                     end
                 end
             end
