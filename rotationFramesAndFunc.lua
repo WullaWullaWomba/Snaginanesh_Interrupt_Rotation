@@ -1,4 +1,4 @@
---luacheck: globals GetSpellInfo strsub UIParent
+--luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID
 local _, SIR = ...
 SIR.util = SIR.util or {}
 SIR.frameUtil = SIR.frameUtil or {}
@@ -18,17 +18,84 @@ local statusBars = {}
 local trackModes = {}
 local numGroup = 1
 
-local getStatusBar = function(GUID, spellID, class)
-    print("getStatusBar")
-    local sb = SIR.frameUtil.aquireStatusBar()
-    sb.icon:SetTexture(select(3, GetSpellInfo(spellID)))
-    sb.currentTime = 0
-    sb.expirationTime = 0
-    sb.GUID = GUID
-    sb.spellID = spellID
-    sb:SetStatusBarColor(unpack(classColorsRGB[class]))
-    return sb
+local setBarOnUpdate = function(sb)
+    sb:SetScript("OnUpdate", function(self, elapsed)
+        self.currentTime = self.currentTime+elapsed
+        local t = self.expirationTime-self.currentTime
+        if t>10 then
+            self.rightText:SetText(strsub(t, 1, 4))
+        elseif t>0 then
+            self.rightText:SetText(strsub(t, 1, 3))
+        else
+            self:SetScript("OnUpdate", nil)
+            self.rightText:SetText("")
+        end
+        self:SetValue(15-t)
+    end)
 end
+local addStatusBar = function(tab, GUID, spellID, class, timestamp)
+    local currStatusBars = statusBars[tab]
+    local oldNum = #currStatusBars
+    local statusBar = SIR.frameUtil.aquireStatusBar()
+    statusBar.icon:SetTexture(select(3, GetSpellInfo(spellID)))
+    statusBar.GUID = GUID
+    statusBar.spellID = spellID
+    statusBar:SetStatusBarColor(unpack(classColorsRGB[class]))
+    --todo sorting
+    statusBar:SetPoint("TOPRIGHT", currStatusBars[oldNum] or rotationFrames[tab],
+       "BOTTOMRIGHT", 0, currStatusBars[oldNum] and -SIR.tabOptions[tab]["SPACE"])
+    statusBar:SetSize(SIR.tabOptions[tab]["WIDTH"], SIR.tabOptions[tab]["HEIGHT"])
+    statusBar.icon:SetSize(SIR.tabOptions[tab]["HEIGHT"], SIR.tabOptions[tab]["HEIGHT"])
+    if timestamp then
+        statusBar.currentTime = timestamp
+        statusBar.expirationTime = timestamp+cds[spellID]
+    else
+        statusBar.currentTime = 0
+        statusBar.expirationTime = 0
+        setBarOnUpdate(statusBar)
+    end
+    statusBar:Show()
+    currStatusBars[oldNum+1] = statusBar
+    -- todo sort
+end
+local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
+    -- update if a bar for the player exists
+    for _, bar in ipairs(statusBars[tab]) do
+        if bar.GUID == GUID then
+            bar.spellID = spellID
+            if timestamp then
+                bar.currentTime = timestamp
+                bar.expirationTime = timestamp+cds[spellID]
+                setBarOnUpdate(bar)
+            else
+                bar.currentTime = 0
+                bar.expirationTime = 0
+            end
+            -- todo sort
+            return
+        end
+    end
+    -- else add a new bar
+    addStatusBar(tab, GUID, spellID, class, timestamp)
+end
+local insertBarByCD = function(bars, bar)
+    local insertAt = 1
+    for i=#bars, 1, -1 do
+        if bars[i].expirationTime < bar.expirationTime then
+            insertAt = i+1
+            break
+        end
+    end
+    --todoo
+end
+local sortTabByCD = function(tab)
+    local temp = {}
+    for _, bar in ipairs(statusBars[tab]) do
+        insertBarByCD(temp, bar)
+    end
+    statusBars[tab] = temp
+end
+
 local removeStatusBar = function(tab, index)
     if statusBars[tab][index+1] then
         statusBars[tab][index+1]:ClearAllPoints()
@@ -49,20 +116,15 @@ local removeAllStatusBars = function(tab)
     end
     statusBars[tab] = {}
 end
-local setBarOnUpdate = function(sb)
-    sb:SetScript("OnUpdate", function(self, elapsed)
-        self.currentTime = self.currentTime+elapsed
-        local t = self.expirationTime-self.currentTime
-        if t>10 then
-            self.rightText:SetText(strsub(t, 1, 4))
-        elseif t>0 then
-            self.rightText:SetText(strsub(t, 1, 3))
+rotationFunc.onInterrupt = function (GUID, spellID, timestamp)
+    for tab=1, #statusBars do
+        if SIR.groupInfo[GUID] then
+            updateOrAddStatusBar(tab, GUID, spellID, SIR.groupInfo[GUID]["CLASS"], timestamp)
         else
-            self:SetScript("OnUpdate", nil)
-            self.rightText:SetText("")
+            -- should (basically) never happen?!
+            updateOrAddStatusBar(tab, GUID, spellID, select(2, GetPlayerInfoByGUID(GUID)), timestamp)
         end
-        self:SetValue(15-t)
-    end)
+    end
 end
 rotationFunc.removePlayer = function(GUID)
     for tab=1, #statusBars do
@@ -150,22 +212,20 @@ rotationFunc.playerInit = function(GUID, class)
             print(rotationFrames[tab])
             if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
                 and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
-                local currStatusBars = statusBars[tab]
-                local oldNum = #currStatusBars
-                local statusBar = getStatusBar(GUID, classWideInterrupts[class], class)
-                statusBar:SetPoint("TOPRIGHT", currStatusBars[oldNum] or rotationFrames[tab],
-                   "BOTTOMRIGHT", 0, currStatusBars[oldNum] and -SIR.tabOptions[tab]["SPACE"])
-                statusBar:SetSize(SIR.tabOptions[tab]["WIDTH"], SIR.tabOptions[tab]["HEIGHT"])
-                statusBar.icon:SetSize(SIR.tabOptions[tab]["HEIGHT"], SIR.tabOptions[tab]["HEIGHT"])
-                setBarOnUpdate(statusBar)
-                statusBar:Show()
-                currStatusBars[oldNum+1] = statusBar
+                addStatusBar(tab, GUID)
             end
         end
     end
 end
-rotationFunc.specUpdate = function(GUID, class, oldSpec, newSpec)
-    if classWideInterrupts[class] then
+rotationFunc.specUpdate = function(GUID, class, newSpec)
+    if not specInterrupts[newSpec] then
+        rotationFunc.removePlayer(GUID)
+    else
+        for tab=1, #statusBars do
+            updateOrAddStatusBar(tab, GUID, specInterrupts[newSpec], class)
+        end
+    end
+    --[[ if classWideInterrupts[class] then
         return
     end
     if oldSpec then
@@ -173,20 +233,37 @@ rotationFunc.specUpdate = function(GUID, class, oldSpec, newSpec)
             return
         end
         if not specInterrupts[oldSpec] then
-            -- setup bars for new spec
+            addStatusBar(tab, GUID, specInterrupts[spec])
         elseif not specInterrupts[newSpec] then
-            -- remove oldSpec bars
+            for tab=1, #statusBars do
+                local currStatusBars = statusBars[tab]
+                for i, bar in ipairs(currStatusBars) do
+                    if bar.GUID == GUID then
+                        removeStatusBar(tab, i)
+                    end
+                end
+            end
         else
-            -- update existing bars
+            for tab=1, #statusBars do
+                local currStatusBars = statusBars[tab]
+                for _, bar in ipairs(currStatusBars) do
+                    if bar.GUID == GUID and bar.spellID ~= specInterrupts[newSpec]then
+                        bar.spellID = specInterrupts[newSpec]
+                        bar.icon:SetTexture(select(3, GetSpellInfo(specInterrupts[newSpec])))
+                        bar.expirationTime = 0
+                        bar.currentTime = 0
+                    end
+                end
+            end
         end
-    end
+    end ]]--
 end
 rotationFunc.newRotationTab = function(tab)
     local rotationFrame = SIR.frameUtil.aquireRotationFrame(SIR.optionFrames.container, tab)
     rotationFrame:SetPoint("CENTER", UIParent, "CENTER", SIR.tabOptions[tab]["XOFF"], SIR.tabOptions[tab]["YOFF"])
     rotationFrame:SetSize(SIR.tabOptions[tab]["WIDTH"], SIR.tabOptions[tab]["HEIGHT"])
+    rotationFrame.fontString:SetText(SIR.tabOptions[tab]["TITLE"])
     rotationFrames[tab] = rotationFrame
-    rotationFrame.fontString:SetText("ASDGFASDASD")
     trackModes[tab] = "NONE"
     statusBars[tab] = {}
     rotationFunc.updateTrackMode(tab)
@@ -197,6 +274,6 @@ rotationFunc.removeRotationTab = function(tab)
     for i=tab, #rotationFrames-1 do
         rotationFrames[i] = rotationFrames[i+1]
         trackModes[i] = trackModes[i+1]
+        statusBars[i] = statusBars[i+1]
     end
 end
-

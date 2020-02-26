@@ -22,24 +22,20 @@ f:RegisterEvent("PLAYER_ENTERING_WORLD")
 f:RegisterEvent("PLAYER_LEAVING_WORLD")
 f:RegisterEvent("INSPECT_READY")
 
-
-
-f.PLAYER_ENTERING_WORLD = function()
-
-end
 f.GROUP_ROSTER_UPDATE = function()
+	SIR.groupInfoOnGroupRosterUpdate()
 end
 f.COMBAT_LOG_EVENT_UNFILTERED = function()
-	local _, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
+	local timestamp, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
 	if subEvent == "SPELL_CAST_SUCCESS" then
 		if not cds[spellID] or sourceFlags%16 > 4 then return end
-		IsInGroup(sourceGUID)
-		--updateOrAddBar(sourceGUID, spellID, true)
+		SIR.rotationFramesAndFunc.onInterrupt(sourceGUID, spellID, timestamp)
 	end
 end
 f.PLAYER_SPECIALIZATION_CHANGED = function()
 end
 f.INSPECT_READY = function()
+	SIR.groupInfoOnInspect()
 end
 f.PLAYER_LOGIN = function()
 end

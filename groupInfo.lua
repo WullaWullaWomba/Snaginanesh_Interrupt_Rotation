@@ -15,8 +15,6 @@ local toBeInspectedInactive = {}
 local recentInspectTimes = {}
 local numGroupMembers = -99
 
-local f = CreateFrame("Frame")
-
 local printInspect = function()
     print("----------------------------------------")
     print("SIR.groupInfo :")
@@ -147,17 +145,12 @@ end
 SIR.groupInfoSave = function()
     SnagiIntRotaSaved.groupInfo = SIR.groupInfo
 end
-f:SetScript("OnEvent", function(_, event, ...) f[event](...) end)
-f:RegisterEvent("INSPECT_READY")
-f:RegisterEvent("GROUP_ROSTER_UPDATE")
-
-f.INSPECT_READY = function(...)
+SIR.groupInfoOnInspect = function(...)
     recentInspectTimes[#recentInspectTimes+1] = GetTime()
     local GUID = ...
     if not GUID or (not SIR.groupInfo[GUID] and not setInitialInfo(GUID)) then
         return
     end
-    local oldSpec = SIR.groupInfo[GUID]["SPEC"]
     SIR.groupInfo[GUID]["SPEC"] = GetInspectSpecialization(SIR.groupInfo[GUID]["NAME"])
     for i=1, 7 do
         for j=1, 3 do
@@ -168,9 +161,9 @@ f.INSPECT_READY = function(...)
             end
         end
     end
-    SIR.rotationFunc.specUpdate(GUID, SIR.groupInfo[GUID]["CLASS"], oldSpec, SIR.groupInfo[GUID]["SPEC"])
+    SIR.rotationFunc.specUpdate(GUID, SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo[GUID]["SPEC"])
 end
-f.GROUP_ROSTER_UPDATE = function()
+SIR.groupInfoOnGroupRosterUpdate = function()
     if max(GetNumGroupMembers(), 1) ~= numGroupMembers then
         local newNumGroupMembers = max(GetNumGroupMembers(), 1)
         SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
