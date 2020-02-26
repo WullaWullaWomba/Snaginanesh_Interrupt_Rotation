@@ -75,7 +75,6 @@ SIR.frameUtil = {
 		end
 		rotationFrame.fontString:SetText("new_tab")
 		rotationFrame.key = key
-		print(rotationFrame.key)
 		rotationFrame.fontString:SetAllPoints()
 		rotationFrame:Show()
 		rotationFrame:EnableMouse(true)

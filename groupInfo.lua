@@ -192,6 +192,7 @@ SIR.groupInfoOnGroupRosterUpdate = function()
             else
                 for GUID, _ in pairs(SIR.groupInfo) do
                     if GUID ~= SIR.playerInfo["GUID"] then
+                        SIR.util.myPrint("not in grp GUID ~= SIR.playerInfo[\"GUID\"] - removing player")
                         SIR.groupInfo[GUID] = nil
                         SIR.rotationFunc.removePlayer(GUID)
                     end

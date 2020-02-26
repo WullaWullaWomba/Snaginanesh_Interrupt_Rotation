@@ -29,7 +29,7 @@ f.COMBAT_LOG_EVENT_UNFILTERED = function()
 	local timestamp, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
 	if subEvent == "SPELL_CAST_SUCCESS" then
 		if not cds[spellID] or sourceFlags%16 > 4 then return end
-		SIR.rotationFramesAndFunc.onInterrupt(sourceGUID, spellID, timestamp)
+		SIR.rotationFunc.onInterrupt(sourceGUID, spellID, timestamp)
 	end
 end
 f.PLAYER_SPECIALIZATION_CHANGED = function()

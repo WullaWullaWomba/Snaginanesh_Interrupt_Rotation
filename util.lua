@@ -36,7 +36,7 @@ SIR.util = {
         end
     end,
     ["myPrint"] = function(...)
-        print("" or ...)
+        print(...)
     end,
     ["setTextClassColor"] = function(text, class)
         if classColorsHex[class] then
