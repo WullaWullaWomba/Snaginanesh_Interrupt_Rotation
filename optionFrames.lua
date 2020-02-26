@@ -8,6 +8,7 @@ SIR.rotationFrames = SIR.rotationFrames or {}
 SIR.func = SIR.func or {}
 SIR.optionFrames = SIR.optionFrames or {}
 
+local frameUtil = SIR.frameUtil
 local data = SIR.data
 local func = SIR.func
 local container = CreateFrame("Frame", "SnagiIntRotaContainer", UIParent)

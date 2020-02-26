@@ -2,30 +2,31 @@
 --luacheck: globals GetSpecializationInfo GetSpecialization CanInspect UnitIsConnected InspectFrame
 --luacheck: globals GetNumGroupMembers IsInGroup IsInRaid UnitIsDeadOrGhost
 --luacheck: globals GetTime C_Timer max UnitGUID UnitInParty unpack
---luacheck: globals SLASH_MYINSPECT1 SlashCmdList GetRealmName
+--luacheck: globals SLASH_MYINSPECT1 SlashCmdList SnagiIntRotaSaved
 local _, SIR = ...
+SIR.util = SIR.util or {}
+SIR.playerInfo = SIR.playerInfo or {}
 SIR.groupInfo = SIR.groupInfo or {}
+
 local reverseTable, remove = SIR.util.reverseTable, SIR.util.remove
-local groupInfo = {}
 local toBeInitialized = {}
 local toBeInspectedActive = {}
 local toBeInspectedInactive = {}
 local recentInspectTimes = {}
+local numGroupMembers = -99
 
-local numGroupMembers = 1
-local playerGUID
 local f = CreateFrame("Frame")
 
 local printInspect = function()
     print("----------------------------------------")
-    print("groupInfo :")
+    print("SIR.groupInfo :")
     local count = 0
-    for guid, info in pairs(groupInfo) do
+    for guid, info in pairs(SIR.groupInfo) do
         print(guid, " ", info["NAME"], " ", info["SERVER"], " ", info["CLASS"], " ",
         info["SPEC"], " ", unpack(info["TALENTS"]))
         count = count+1
     end
-    print("#groupInfo "..count)
+    print("#SIR.groupInfo "..count)
     print(" ")
     print("toBeInspectedActive #"..#toBeInspectedActive..":")
     for _, guid in ipairs(toBeInspectedActive) do
@@ -42,12 +43,12 @@ local setInitialInfo = function(GUID)
     local _, class, _, _, _, name, server = GetPlayerInfoByGUID(GUID)
     if server then
         if server == "" then
-            server = GetRealmName();
+            server = SIR.playerInfo["REALMN"];
         end
     else
         return false
     end
-    groupInfo[GUID] = {
+    SIR.groupInfo[GUID] = {
         ["NAME"] = name,
         ["SERVER"] = server,
         ["CLASS"] = class,
@@ -55,99 +56,6 @@ local setInitialInfo = function(GUID)
     }
     SIR.rotationFunc.playerInit(GUID)
     return true
-end
-
-SLASH_MYINSPECT1 = "/myinspect"
-SlashCmdList["MYINSPECT"] = function()
-	printInspect()
-end
-
-f:SetScript("OnEvent", function(_, event, ...) f[event](...)
-end)
-f:RegisterEvent("INSPECT_READY")
-f:RegisterEvent("PLAYER_LOGIN")
-f:RegisterEvent("GROUP_ROSTER_UPDATE")
-
-f.PLAYER_LOGIN = function()
-    playerGUID = UnitGUID("player")
-    local _, class, _, _, _, name = GetPlayerInfoByGUID(playerGUID)
-    groupInfo[playerGUID] = {
-        ["NAME"] = name,
-        ["SERVER"] = GetRealmName(),
-        ["CLASS"] = class,
-        ["SPEC"] =  GetSpecializationInfo(GetSpecialization()),
-        ["TALENTS"] = {},
-    }
-    for i=1, 7 do
-        for j=1, 3 do
-            if select(4, GetTalentInfo(i, j, 1, false)) then
-                groupInfo[playerGUID]["TALENTS"][i] = j
-                break
-            elseif j==3 then
-                groupInfo[playerGUID]["TALENTS"][i] = 0
-            end
-        end
-    end
-    numGroupMembers = 1
-    -- TODO setup player bars
-end
-f.INSPECT_READY = function(...)
-    recentInspectTimes[#recentInspectTimes+1] = GetTime()
-    local GUID = ...
-    if not GUID or (not groupInfo[GUID] and not setInitialInfo(GUID)) then
-        return
-    end
-    local oldSpec = groupInfo[GUID]["SPEC"]
-    groupInfo[GUID]["SPEC"] = GetInspectSpecialization(groupInfo[GUID]["NAME"])
-    for i=1, 7 do
-        for j=1, 3 do
-            local _, _, _, selected = GetTalentInfo(i, j, 1, true, groupInfo[GUID]["NAME"])
-            if selected then
-                groupInfo[GUID]["TALENTS"][i] = j
-                break
-            end
-        end
-    end
-    SIR.rotationFunc.specUpdate(GUID, groupInfo[GUID]["CLASS"], oldSpec, groupInfo[GUID]["SPEC"])
-end
-f.GROUP_ROSTER_UPDATE = function()
-    if GetNumGroupMembers() ~= numGroupMembers then
-        local newNumGroupMembers = max(GetNumGroupMembers(), 1)
-        SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
-        if newNumGroupMembers > numGroupMembers then
-            -- add new players
-            local groupType = "party"
-            if IsInRaid() then
-                groupType = "raid"
-            end
-            for i=1, newNumGroupMembers do
-                local GUID = UnitGUID(groupType..i) or UnitGUID("player")
-                if not groupInfo[GUID] then
-                    setInitialInfo(GUID)
-                    toBeInitialized[#toBeInitialized+1] = GUID
-                end
-            end
-        else
-            -- remove players that left
-            if IsInGroup() then
-                for GUID, info in pairs(groupInfo) do
-                    if not UnitInParty(info["NAME"]) then
-                        groupInfo[GUID] = nil
-                        SIR.rotationFunc.removePlayer(GUID)
-                    end
-                end
-            else
-                for GUID, _ in pairs(groupInfo) do
-                    if GUID ~= playerGUID then
-                        groupInfo[GUID] = nil
-                        SIR.rotationFunc.removePlayer(GUID)
-                    end
-                end
-            end
-        end
-        numGroupMembers = newNumGroupMembers
-    end
-    return
 end
 
 local inspectNext
@@ -177,7 +85,7 @@ inspectNext = function()
         local GUID = toBeInspectedActive[i]
         toBeInspectedActive[i] = nil
         toBeInspectedInactive[#toBeInspectedInactive+1] = GUID
-        local name = groupInfo[GUID]["NAME"]
+        local name = SIR.groupInfo[GUID]["NAME"]
         --todo UnitInParty(name)
         if CanInspect(name) and UnitIsConnected(name) and UnitInParty(name) then
             NotifyInspect(name)
@@ -187,4 +95,121 @@ inspectNext = function()
     end
     C_Timer.After(2.1, function() inspectNext() end)
 end
-inspectNext()
+SIR.groupInfoLoad = function()
+    if not IsInGroup() then
+        numGroupMembers = 1
+        SIR.groupInfo = {
+            [SIR.playerInfo["GUID"]] = {
+                ["NAME"] = SIR.playerInfo["NAME"],
+                ["SERVER"] = SIR.playerInfo["REALMN"],
+                ["CLASS"] = SIR.playerInfo["CLASS"],
+                ["SPEC"] =  SIR.playerInfo["SPEC"],
+                ["TALENTS"] = {},
+            },
+        }
+        SIR.rotationFunc.playerInit(SIR.playerInfo["GUID"], SIR.playerInfo["CLASS"])
+        SIR.rotationFunc.specUpdate(SIR.playerInfo["GUID"], SIR.playerInfo["CLASS"], nil, SIR.playerInfo["SPEC"])
+        numGroupMembers = 1
+    else
+        SIR.groupInfo = SnagiIntRotaSaved.groupInfo
+        numGroupMembers = 0
+        SIR.groupInfo[SIR.playerInfo["GUID"]] = {
+            ["NAME"] = SIR.playerInfo["NAME"],
+            ["SERVER"] = SIR.playerInfo["REALMN"],
+            ["CLASS"] = SIR.playerInfo["CLASS"],
+            ["SPEC"] =  SIR.playerInfo["SPEC"],
+            ["TALENTS"] = {},
+        }
+        for GUID, info in pairs(SIR.groupInfo) do
+            if not UnitInParty(info["NAME"]) then
+                SIR.groupInfo[GUID] = nil
+            else
+                numGroupMembers = numGroupMembers+1
+                SIR.rotationFunc.playerInit(GUID, info["CLASS"])
+                if info["SPEC"] then
+                    SIR.rotationFunc.specUpdate(GUID, info["CLASS"], nil, info["SPEC"])
+                end
+            end
+        end
+    end
+    for i=1, 7 do
+        for j=1, 3 do
+            if select(4, GetTalentInfo(i, j, 1, false)) then
+                SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"][i] = j
+                break
+            elseif j==3 then
+                SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"][i] = 0
+            end
+        end
+    end
+    inspectNext()
+end
+SIR.groupInfoSave = function()
+    SnagiIntRotaSaved.groupInfo = SIR.groupInfo
+end
+f:SetScript("OnEvent", function(_, event, ...) f[event](...) end)
+f:RegisterEvent("INSPECT_READY")
+f:RegisterEvent("GROUP_ROSTER_UPDATE")
+
+f.INSPECT_READY = function(...)
+    recentInspectTimes[#recentInspectTimes+1] = GetTime()
+    local GUID = ...
+    if not GUID or (not SIR.groupInfo[GUID] and not setInitialInfo(GUID)) then
+        return
+    end
+    local oldSpec = SIR.groupInfo[GUID]["SPEC"]
+    SIR.groupInfo[GUID]["SPEC"] = GetInspectSpecialization(SIR.groupInfo[GUID]["NAME"])
+    for i=1, 7 do
+        for j=1, 3 do
+            local _, _, _, selected = GetTalentInfo(i, j, 1, true, SIR.groupInfo[GUID]["NAME"])
+            if selected then
+                SIR.groupInfo[GUID]["TALENTS"][i] = j
+                break
+            end
+        end
+    end
+    SIR.rotationFunc.specUpdate(GUID, SIR.groupInfo[GUID]["CLASS"], oldSpec, SIR.groupInfo[GUID]["SPEC"])
+end
+f.GROUP_ROSTER_UPDATE = function()
+    if max(GetNumGroupMembers(), 1) ~= numGroupMembers then
+        local newNumGroupMembers = max(GetNumGroupMembers(), 1)
+        SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
+        if newNumGroupMembers > numGroupMembers then
+            -- add new players
+            local groupType = "party"
+            if IsInRaid() then
+                groupType = "raid"
+            end
+            for i=1, newNumGroupMembers do
+                local GUID = UnitGUID(groupType..i) or UnitGUID("player")
+                if not SIR.groupInfo[GUID] then
+                    setInitialInfo(GUID)
+                    toBeInitialized[#toBeInitialized+1] = GUID
+                end
+            end
+        else
+            -- remove players that left
+            if IsInGroup() then
+                for GUID, info in pairs(SIR.groupInfo) do
+                    if not UnitInParty(info["NAME"]) then
+                        SIR.groupInfo[GUID] = nil
+                        SIR.rotationFunc.removePlayer(GUID)
+                    end
+                end
+            else
+                for GUID, _ in pairs(SIR.groupInfo) do
+                    if GUID ~= SIR.playerInfo["GUID"] then
+                        SIR.groupInfo[GUID] = nil
+                        SIR.rotationFunc.removePlayer(GUID)
+                    end
+                end
+            end
+        end
+        numGroupMembers = newNumGroupMembers
+    end
+    return
+end
+SLASH_MYINSPECT1 = "/myinspect"
+SlashCmdList["MYINSPECT"] = function()
+	printInspect()
+end

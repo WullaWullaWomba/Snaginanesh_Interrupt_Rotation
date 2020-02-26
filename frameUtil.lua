@@ -1,4 +1,4 @@
---luacheck: globals CreateFrame GameTooltip UISpecialFrames tremove unpack
+--luacheck: globals CreateFrame GameTooltip UISpecialFrames tremove unpack strsub
 local _, SIR = ...
 SIR.data = SIR.data or {}
 SIR.util = SIR.util or {}
@@ -48,13 +48,13 @@ SIR.frameUtil = {
 		tabButton:Hide()
 		tabButtonPool[#tabButtonPool+1] = tabButton
 	end,
-	["aquireRotationFrame"] = function(key)
+	["aquireRotationFrame"] = function(parent, key)
 		local rotationFrame = rotationFramePool[#rotationFramePool]
 		if rotationFrame then
 			tremove(rotationFramePool, #rotationFramePool)
 			rotationFrame:ClearAllPoints()
 		else
-			rotationFrame = CreateFrame("Frame")
+			rotationFrame = CreateFrame("Frame", _, parent)
 			rotationFrame:SetBackdrop({
 				bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
 				tileSize = 32,
@@ -73,12 +73,12 @@ SIR.frameUtil = {
 				SIR.func.rotationFrameOnDragStop(self)
 			end)
 		end
-		rotationFrame.key = key
 		rotationFrame.fontString:SetText("new_tab")
+		rotationFrame.key = key
+		print(rotationFrame.key)
 		rotationFrame.fontString:SetAllPoints()
 		rotationFrame:Show()
-		rotationFrame:EnableMouse(false)
-		rotationFrame:SetAlpha(0)
+		rotationFrame:EnableMouse(true)
 		return rotationFrame
 	end,
 	["releaseRotationFrame"] = function(rotationFrame)

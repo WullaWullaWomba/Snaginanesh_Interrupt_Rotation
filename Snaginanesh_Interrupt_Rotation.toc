@@ -9,5 +9,6 @@ util.lua
 groupInfo.lua
 frameUtil.lua
 optionFrames.lua
-rotationFrames.lua
+optionFunc.lua
+rotationFramesAndFunc.lua
 Snaginanesh_Interrupt_Rotation.lua
