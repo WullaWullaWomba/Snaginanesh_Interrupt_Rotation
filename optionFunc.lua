@@ -767,6 +767,7 @@ func.rotationButtonOnClick = function(self, button)
 			rotation[1] = temp
 		end
 	end
+	SIR.rotationFunc.sortTab(activeTab)
 end
 func.removeMemberOnClick = function(self)
 	func.removeRotationMember(self:GetParent():GetGUID())
@@ -835,6 +836,7 @@ func.sortCheckBoxOnClick = function(self)
 		end
 	end
 	SIR.tabOptions[activeTab]["SORTMODE"] = (self:GetChecked() and self.value) or "NONE"
+	SIR.rotationFunc.sortTab(activeTab)
 end
 func.removeTabOnClick = function()
 	for i=activeTab, #SIR.tabOptions do

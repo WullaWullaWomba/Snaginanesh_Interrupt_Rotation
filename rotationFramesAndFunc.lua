@@ -33,6 +33,54 @@ local setBarOnUpdate = function(sb)
         self:SetValue(15-t)
     end)
 end
+local insertBar = function(tab, bar)
+    local currStatusBars = statusBars[tab]
+    local insertAt = 1
+    if SIR.tabOptions[tab]["SORTMODE"] == "CD" then
+        for i=#currStatusBars, 1, -1 do
+            if currStatusBars[i].expirationTime < bar.expirationTime then
+                insertAt = i+1
+                break
+            end
+        end
+        for j=#currStatusBars, insertAt do
+            currStatusBars[j+1] = currStatusBars[j]
+        end
+    elseif SIR.tabOptions[tab]["SORTMODE"] == "ROTATION" then
+        local rotationPos
+        local prePos = {}
+        for i, rotaMemberGUID in ipairs(SIR.tabOptions[tab]["ROTATION"]) do
+            if bar.GUID == rotaMemberGUID then
+                rotationPos = i
+                break
+            end
+        end
+        for i=1, rotationPos-1 do
+            prePos[i] = SIR.tabOptions[tab]["ROTATION"][i]
+        end
+        insertAt = #currStatusBars+1
+        for i=1, #currStatusBars do
+            if not contains(prePos, currStatusBars[i].GUID) then
+                insertAt = i
+                break
+            end
+        end
+    else --SIR.tabOptions[tab]["SORTMODE"] == "NONE"
+        insertAt = #currStatusBars+1
+    end
+    currStatusBars[insertAt] = bar
+    if currStatusBars[insertAt+1] then
+        for i=1, currStatusBars[insertAt+1]:GetNumPoints() do
+        local point, anchorFrame, anchorPoint, _, space= currStatusBars[insertAt+1]:GetPoint(i)
+            currStatusBars[insertAt]:SetPoint(point, anchorFrame, anchorPoint, 0, space)
+            currStatusBars[insertAt+1]:SetPoint(point, currStatusBars[insertAt], anchorPoint,
+                0, SIR.tabOptions[tab]["SPACE"])
+        end
+    else
+        currStatusBars[insertAt]:SetPoint("TOPRIGHT", currStatusBars[insertAt-1] or rotationFrames[tab], "BOTTOMRIGHT",
+            0, currStatusBars[insertAt-1] and SIR.tabOptions[tab]["SPACE"] or 0)
+    end
+end
 local addStatusBar = function(tab, GUID, spellID, class, timestamp)
     SIR.util.myPrint("addStatusBar")
     local currStatusBars = statusBars[tab]
@@ -43,8 +91,8 @@ local addStatusBar = function(tab, GUID, spellID, class, timestamp)
     statusBar.spellID = spellID
     statusBar:SetStatusBarColor(unpack(classColorsRGB[class]))
     --todo sorting
-    statusBar:SetPoint("TOPRIGHT", currStatusBars[oldNum] or rotationFrames[tab],
-        "BOTTOMRIGHT", 0, currStatusBars[oldNum] and -SIR.tabOptions[tab]["SPACE"])
+    --statusBar:SetPoint("TOPRIGHT", currStatusBars[oldNum] or rotationFrames[tab],
+    --    "BOTTOMRIGHT", 0, currStatusBars[oldNum] and -SIR.tabOptions[tab]["SPACE"])
     statusBar:SetSize(SIR.tabOptions[tab]["WIDTH"]-SIR.tabOptions[tab]["HEIGHT"], SIR.tabOptions[tab]["HEIGHT"])
     statusBar.icon:SetSize(SIR.tabOptions[tab]["HEIGHT"], SIR.tabOptions[tab]["HEIGHT"])
     statusBar.leftText:SetText(SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["NAME"] or "noname")
@@ -57,6 +105,7 @@ local addStatusBar = function(tab, GUID, spellID, class, timestamp)
         statusBar.expirationTime = 0
         setBarOnUpdate(statusBar)
     end
+    insertBar(tab, statusBar)
     statusBar:Show()
     statusBars[tab][oldNum+1] = statusBar
     -- todo sort
@@ -75,27 +124,19 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 bar.currentTime = 0
                 bar.expirationTime = 0
             end
-            -- todo sort
+            if SIR.tabOptions[tab]["SORTMODE"] == "CD" then
+                --todo move bar depending on CD
+            end
             return
         end
     end
     -- else add a new bar
     addStatusBar(tab, GUID, spellID, class, timestamp)
 end
-local insertBarByCD = function(bars, bar)
-    local insertAt = 1
-    for i=#bars, 1, -1 do
-        if bars[i].expirationTime < bar.expirationTime then
-            insertAt = i+1
-            break
-        end
-    end
-    --todoo
-end
-local sortTabByCD = function(tab)
+rotationFunc.sortTab = function(tab)
     local temp = {}
     for _, bar in ipairs(statusBars[tab]) do
-        insertBarByCD(temp, bar)
+        insertBar(tab, temp, bar)
     end
     statusBars[tab] = temp
 end
