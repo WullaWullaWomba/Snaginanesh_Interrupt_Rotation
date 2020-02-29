@@ -33,9 +33,15 @@ f.COMBAT_LOG_EVENT_UNFILTERED = function()
 	end
 end
 f.PLAYER_SPECIALIZATION_CHANGED = function()
+	SIR.playerInfo["SPEC"] = GetSpecializationInfo(GetSpecialization())
+	SIR.groupInfo[SIR.playerInfo["GUID"]]["SPEC"] = SIR.playerInfo["SPEC"]
+	-- todo update talents
+	for i=1, #SIR.tabOptions do
+		SIR.rotationFunc.updateTrackMode(i)
+	end
 end
-f.INSPECT_READY = function()
-	SIR.groupInfoOnInspect()
+f.INSPECT_READY = function(...)
+	SIR.groupInfoOnInspect(...)
 end
 f.PLAYER_LOGIN = function()
 end
@@ -51,6 +57,7 @@ f.PLAYER_ENTERING_WORLD = function()
 		["COLOUREDNAME"] = SIR.util.getColouredNameByGUID(GUID),
 	}
 	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
+	SIR.optionFrames.generalTabButton:Click()
 	--SIR.func.load()
 	SIR.groupInfoLoad()
 end

@@ -33,20 +33,18 @@ local setBarOnUpdate = function(sb)
         self:SetValue(15-t)
     end)
 end
-local insertBar = function(tab, bar)
-    local currStatusBars = statusBars[tab]
-    local insertAt = 1
+local insertBar = function(tab, bars, bar)
+    SIR.util.myPrint("insertBar")
+    local insertAt = #bars+1
     if SIR.tabOptions[tab]["SORTMODE"] == "CD" then
-        for i=#currStatusBars, 1, -1 do
-            if currStatusBars[i].expirationTime < bar.expirationTime then
+        for i=#bars, 1, -1 do
+            if bars[i].expirationTime < bar.expirationTime then
                 insertAt = i+1
                 break
             end
         end
-        for j=#currStatusBars, insertAt do
-            currStatusBars[j+1] = currStatusBars[j]
-        end
     elseif SIR.tabOptions[tab]["SORTMODE"] == "ROTATION" then
+        -- if not part of the rotation all rotation people should be in front
         local rotationPos
         local prePos = {}
         for i, rotaMemberGUID in ipairs(SIR.tabOptions[tab]["ROTATION"]) do
@@ -55,44 +53,37 @@ local insertBar = function(tab, bar)
                 break
             end
         end
-        for i=1, rotationPos-1 do
-            prePos[i] = SIR.tabOptions[tab]["ROTATION"][i]
-        end
-        insertAt = #currStatusBars+1
-        for i=1, #currStatusBars do
-            if not contains(prePos, currStatusBars[i].GUID) then
-                insertAt = i
-                break
+        if rotationPos then
+            for i=1, rotationPos-1 do
+                prePos[i] = SIR.tabOptions[tab]["ROTATION"][i]
+            end
+            insertAt = #bars+1
+            for i=1, #bars do
+                if not contains(prePos, bars[i].GUID) then
+                    insertAt = i
+                    break
+                end
             end
         end
-    else --SIR.tabOptions[tab]["SORTMODE"] == "NONE"
-        insertAt = #currStatusBars+1
     end
-    currStatusBars[insertAt] = bar
-    if currStatusBars[insertAt+1] then
-        for i=1, currStatusBars[insertAt+1]:GetNumPoints() do
-        local point, anchorFrame, anchorPoint, _, space= currStatusBars[insertAt+1]:GetPoint(i)
-            currStatusBars[insertAt]:SetPoint(point, anchorFrame, anchorPoint, 0, space)
-            currStatusBars[insertAt+1]:SetPoint(point, currStatusBars[insertAt], anchorPoint,
-                0, SIR.tabOptions[tab]["SPACE"])
-        end
-    else
-        currStatusBars[insertAt]:SetPoint("TOPRIGHT", currStatusBars[insertAt-1] or rotationFrames[tab], "BOTTOMRIGHT",
-            0, currStatusBars[insertAt-1] and SIR.tabOptions[tab]["SPACE"] or 0)
+    bar:SetPoint("TOPRIGHT", bars[insertAt-1] or rotationFrames[tab], "BOTTOMRIGHT",
+    0, bars[insertAt-1] and SIR.tabOptions[tab]["SPACE"] or 0)
+    if bars[insertAt] then
+        bars[insertAt]:SetPoint("TOPRIGHT", bar, "BOTTOMRIGHT",
+            0, SIR.tabOptions[tab]["SPACE"])
     end
+    for i=#bars, insertAt, -1 do
+        bars[i+1] = bars[i]
+    end
+    bars[insertAt] = bar
 end
 local addStatusBar = function(tab, GUID, spellID, class, timestamp)
     SIR.util.myPrint("addStatusBar")
-    local currStatusBars = statusBars[tab]
-    local oldNum = #currStatusBars
     local statusBar = SIR.frameUtil.aquireStatusBar()
     statusBar.icon:SetTexture(select(3, GetSpellInfo(spellID)))
     statusBar.GUID = GUID
     statusBar.spellID = spellID
     statusBar:SetStatusBarColor(unpack(classColorsRGB[class]))
-    --todo sorting
-    --statusBar:SetPoint("TOPRIGHT", currStatusBars[oldNum] or rotationFrames[tab],
-    --    "BOTTOMRIGHT", 0, currStatusBars[oldNum] and -SIR.tabOptions[tab]["SPACE"])
     statusBar:SetSize(SIR.tabOptions[tab]["WIDTH"]-SIR.tabOptions[tab]["HEIGHT"], SIR.tabOptions[tab]["HEIGHT"])
     statusBar.icon:SetSize(SIR.tabOptions[tab]["HEIGHT"], SIR.tabOptions[tab]["HEIGHT"])
     statusBar.leftText:SetText(SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["NAME"] or "noname")
@@ -105,15 +96,13 @@ local addStatusBar = function(tab, GUID, spellID, class, timestamp)
         statusBar.expirationTime = 0
         setBarOnUpdate(statusBar)
     end
-    insertBar(tab, statusBar)
+    insertBar(tab, statusBars[tab], statusBar)
     statusBar:Show()
-    statusBars[tab][oldNum+1] = statusBar
-    -- todo sort
 end
 local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
     SIR.util.myPrint("updateOrAddStatusBar")
     -- update if a bar for the player exists
-    for _, bar in ipairs(statusBars[tab]) do
+    for i, bar in ipairs(statusBars[tab]) do
         if bar.GUID == GUID then
             bar.spellID = spellID
             if timestamp then
@@ -124,8 +113,33 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 bar.currentTime = 0
                 bar.expirationTime = 0
             end
+            -- resort / move bar to correct index if sortmode is by CD
             if SIR.tabOptions[tab]["SORTMODE"] == "CD" then
-                --todo move bar depending on CD
+                local moveTo = i
+                -- find the index to place the bar into
+                for j=i+1, #statusBars[tab] do
+                    if statusBars[tab][j].expirationTime < bar.expirationTime then
+                        moveTo = moveTo+1
+                    else
+                        break
+                    end
+                end
+                -- if the position changes
+                if moveTo ~= i then
+                    -- adjust anchors
+                    SIR.util.myPrint("moveTo", moveTo, "i", i)
+                    statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
+                    bar:SetPoint("TOPRIGHT", statusBars[tab][moveTo], "BOTTOMRIGHT", 0, -SIR.tabOptions[tab]["SPACE"])
+                    if statusBars[tab][moveTo+1] then
+                        statusBars[tab][moveTo+1]:SetPoint("TOPRIGHT", statusBars[tab][moveTo], "BOTTOMRIGHT",
+                        0, -SIR.tabOptions[tab]["SPACE"])
+                    end
+                    -- adjust table
+                    for j=i, moveTo-1 do
+                        statusBars[tab][j] = statusBars[tab][j+1]
+                    end
+                    statusBars[tab][moveTo] = bar
+                end
             end
             return
         end
@@ -133,34 +147,35 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
     -- else add a new bar
     addStatusBar(tab, GUID, spellID, class, timestamp)
 end
+
+local removeStatusBar = function(tab, index)
+    SIR.util.myPrint("removeStatusBar")
+    if statusBars[tab][index+1] then
+        statusBars[tab][index+1]:SetPoint("TOPRIGHT", statusBars[tab][index-1] or rotationFrames[tab], "BOTTOMRIGHT",
+            0, statusBars[tab][index-1] and SIR.tabOptions[tab]["SPACE"] or 0)
+    end
+    SIR.frameUtil.releaseStatusBar(statusBars[tab][index])
+    for i=index, #statusBars do
+        statusBars[tab][i] = statusBars[tab][i+1]
+    end
+end
+local removeAllStatusBars = function(tab)
+    SIR.util.myPrint("removeAllStatusBars tab", tab, "#", #statusBars[tab])
+    for i=#statusBars[tab], 1, -1 do
+        print(statusBars[tab][i])
+        SIR.frameUtil.releaseStatusBar(statusBars[tab][i])
+    end
+    statusBars[tab] = {}
+end
+
 rotationFunc.sortTab = function(tab)
+    SIR.util.myPrint("sortTab", tab)
+    SIR.util.myPrint(statusBars[tab])
     local temp = {}
     for _, bar in ipairs(statusBars[tab]) do
         insertBar(tab, temp, bar)
     end
     statusBars[tab] = temp
-end
-local removeStatusBar = function(tab, index)
-    SIR.util.myPrint("removeStatusBar")
-    if statusBars[tab][index+1] then
-        statusBars[tab][index+1]:ClearAllPoints()
-        for j=1, statusBars[tab][index]:GetNumPoints() do
-            local point, _, anchorPoint, xOff, yOff = statusBars[tab][index]:GetPoint(j)
-            statusBars[tab][index+1]:SetPoint(point, statusBars[index-1] or rotationFrames[tab],
-                anchorPoint, xOff, yOff)
-        end
-    end
-    SIR.frameUtil.releaseStatusBar(statusBars[tab][index])
-    for i=index, #statusBars-1 do
-        statusBars[tab][i] = statusBars[tab][i+1]
-    end
-end
-local removeAllStatusBars = function(tab)
-    SIR.util.myPrint("removeAllStatusBars")
-    for i=1, #statusBars[tab] do
-        SIR.frameUtil.releaseStatusBar(statusBars[tab][i])
-    end
-    statusBars[tab] = {}
 end
 rotationFunc.onInterrupt = function (GUID, spellID, timestamp)
     SIR.util.myPrint("rotationFunc.onInterrupt")
@@ -180,6 +195,35 @@ rotationFunc.removePlayer = function(GUID)
             if statusBars[tab][bar].GUID == GUID then
                 removeStatusBar(tab, bar)
             end
+        end
+    end
+end
+SIR.rotationFunc.addRotationMember = function(tab, GUID)
+    if not (trackModes[tab] == "ROTATION") then
+        return
+    end
+    SIR.util.myPrint("rotationFunc.addPlayerToTab")
+    local class, spec = SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo[GUID]["SPEC"]
+    if not class then
+        SIR.util.myPrint("rotationFunc.addPlayerToTab", "no class")
+        return
+    end
+    local spellID = classWideInterrupts[class]
+    if not spellID and spec then
+        spellID = specInterrupts[spec]
+    end
+    if spellID then
+        addStatusBar(tab, GUID, spellID, class)
+    end
+end
+rotationFunc.removeRotationMember = function(tab, GUID)
+    if not (trackModes[tab] == "ROTATION") then
+        return
+    end
+    SIR.util.myPrint("rotationFunc.removePlayerFromTab")
+    for i, bar in ipairs(statusBars[tab]) do
+        if bar.GUID == GUID then
+            removeStatusBar(tab, i)
         end
     end
 end
@@ -245,7 +289,7 @@ rotationFunc.updateTrackMode = function(tab)
 		-- trackModes[tab] == "ROTATION" unless more modes added
         -- remove players that arent part of the rotation
         for i=#statusBars[tab], 1, -1 do
-            if not contains(SIR.tabOptions[tab]["ROTATION"], statusBars[tab][i]:GetGUID()) then
+            if not contains(SIR.tabOptions[tab]["ROTATION"], statusBars[tab][i].GUID) then
                 removeStatusBar(tab, i)
             end
         end
@@ -306,7 +350,9 @@ rotationFunc.specUpdate = function(GUID, class, newSpec)
 end
 rotationFunc.newRotationTab = function(tab)
     local rotationFrame = SIR.frameUtil.aquireRotationFrame(SIR.optionFrames.container, tab)
-    rotationFrame:SetPoint("CENTER", UIParent, "CENTER", SIR.tabOptions[tab]["XOFF"], SIR.tabOptions[tab]["YOFF"])
+    rotationFrame:ClearAllPoints()
+    rotationFrame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT",
+        SIR.tabOptions[tab]["XOFF"], SIR.tabOptions[tab]["YOFF"])
     rotationFrame:SetSize(SIR.tabOptions[tab]["WIDTH"], SIR.tabOptions[tab]["HEIGHT"])
     rotationFrame.fontString:SetText(SIR.tabOptions[tab]["TITLE"])
     rotationFrames[tab] = rotationFrame
@@ -322,4 +368,45 @@ rotationFunc.removeRotationTab = function(tab)
         trackModes[i] = trackModes[i+1]
         statusBars[i] = statusBars[i+1]
     end
+end
+rotationFunc.updateDisplay = function(tab, value)
+    SIR.util.myPrint("rotationFunc.updateDisplay")
+    if value == "WIDTH" then
+        rotationFrames[tab]:SetWidth(SIR.tabOptions[tab]["WIDTH"])
+        for _, bar in ipairs(statusBars[tab]) do
+            bar:SetWidth(SIR.tabOptions[tab]["WIDTH"]-SIR.tabOptions[tab]["HEIGHT"])
+        end
+    elseif value == "HEIGHT" then
+        rotationFrames[tab]:SetHeight(SIR.tabOptions[tab]["HEIGHT"])
+        for _, bar in ipairs(statusBars[tab]) do
+            bar:SetHeight(SIR.tabOptions[tab]["HEIGHT"])
+            bar.icon:SetSize(SIR.tabOptions[tab]["HEIGHT"], SIR.tabOptions[tab]["HEIGHT"])
+        end
+    elseif value == "SPACE" then
+        local currStatusBars = statusBars[tab]
+        for i=2, #currStatusBars do
+            for j=1, currStatusBars:GetNumPoints() do
+                local point, anchorFrame, anchorPoint = currStatusBars[i]:GetPoint(j)
+                currStatusBars[i]:SetPoint(point, anchorFrame, anchorPoint, 0, SIR.tabOptions[tab]["SPACE"])
+            end
+        end
+    else -- value == "XOFF" or value == "YOFF"
+        rotationFrames[tab]:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT",
+            SIR.tabOptions[tab]["XOFF"], SIR.tabOptions[tab]["YOFF"])
+        for i=1, rotationFrames[tab]:GetNumPoints() do
+            print(rotationFrames[tab]:GetPoint(i))
+        end
+    end
+end
+rotationFunc.rotationFrameOnDragStop = function(self)
+    self:StopMovingOrSizing()
+    local xOff ,yOff = self:GetRect()
+    SIR.tabOptions[self.key]["XOFF"], SIR.tabOptions[self.key]["YOFF"] = xOff, yOff
+    SIR.optionFrames.xOffEditBox:SetText(xOff)
+    SIR.optionFrames.yOffEditBox:SetText(yOff)
+    self:ClearAllPoints()
+    print(xOff, yOff)
+    self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", xOff, yOff)
+    self:SetSize(SIR.tabOptions[self.key]["WIDTH"], SIR.tabOptions[self.key]["HEIGHT"])
+    self:Show()
 end

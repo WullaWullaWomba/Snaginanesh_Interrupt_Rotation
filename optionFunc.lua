@@ -39,8 +39,8 @@ local defaultOptions = {
 	["TITLE"] = "new_tab",
 	["ROTATION"] = {},
 	["SPACE"] = 0,
-	["XOFF"] = 500,
-	["YOFF"] = 0,
+	["XOFF"] = 700,
+	["YOFF"] = 700,
 	["WIDTH"] = 120,
 	["HEIGHT"] = 22,
 	["CLASSENABLEOPTIONS"] = {
@@ -292,6 +292,7 @@ func.loadTab = function(title)
 end
 func.updateGroupMemberButtons = function()
 	--done?!!
+	SIR.util.myPrint("func.updateGroupMemberButtons")
 	if IsInGroup() then
 		local numGroup = GetNumGroupMembers()
 		for i=numGroup+1, 40 do
@@ -305,7 +306,7 @@ func.updateGroupMemberButtons = function()
 			optionFrames.groupMemberButtons[numGroup]:SetGUID(SIR.playerInfo["GUID"])
             optionFrames.groupMemberButtons[numGroup].inRotation = contains(SIR.tabOptions[activeTab]["ROTATION"],
                 SIR.playerInfo["GUID"])
-			optionFrames.groupMemberButtons[numGroup]:updateTexture()
+			optionFrames.groupMemberButtons[numGroup]:UpdateTexture()
 			optionFrames.groupMemberButtons[numGroup]:SetText(SIR.playerInfo["COLOUREDNAME"])
 			optionFrames.groupMemberButtons[numGroup]:Show()
 			numGroup = numGroup-1
@@ -314,8 +315,8 @@ func.updateGroupMemberButtons = function()
 			local GUID = UnitGUID(groupType..i)
 			optionFrames.groupMemberButtons[i]:SetGUID(GUID)
 			optionFrames.groupMemberButtons[i].inRotation = contains(SIR.tabOptions[activeTab]["ROTATION"], GUID)
-			optionFrames.groupMemberButtons[i]:updateTexture()
-			optionFrames.groupMemberButtons:SetText(util.getColouredNameByGUID(GUID))
+			optionFrames.groupMemberButtons[i]:UpdateTexture()
+			optionFrames.groupMemberButtons[i]:SetText(SIR.util.getColouredNameByGUID(GUID))
 			optionFrames.groupMemberButtons[i]:Show()
 		end
 	else
@@ -349,8 +350,8 @@ func.removeRotationMember = function(GUID)
 	end
 	local rotationNum = #SIR.tabOptions[activeTab]["ROTATION"]
 	for i=1, rotationNum-1 do
-		if optionFrames.rotationButtons:GetGUID() == GUID then
-			for j=i, #rotationNum-1 do
+		if optionFrames.rotationButtons[i]:GetGUID() == GUID then
+			for j=i, rotationNum-1 do
 				optionFrames.rotationButtons[j]:SetGUID(optionFrames.rotationButtons[j+1]:GetGUID())
 				optionFrames.rotationButtons[j]:SetText(optionFrames.rotationButtons[j+1]:GetText())
 			end
@@ -364,6 +365,7 @@ func.removeRotationMember = function(GUID)
 			break
 		end
 	end
+	SIR.rotationFunc.removeRotationMember(activeTab, GUID)
 end
 func.makeTransmissionText = function()
 	local text = "[SnagiIntRota:] "..optionFrames.titleEditBox:GetText().." "
@@ -499,10 +501,10 @@ func.groupMemberOnClick = function(self)
 		rotationButton:Show()
 		self.inRotation = true
 		self:UpdateTexture()
+		SIR.rotationFunc.addRotationMember(activeTab, GUID)
 	else
 		func.removeRotationMember(GUID)
 	end
-
 end
 func.enableGroupInstanceButtonOnClick = function(self)
 	for _, c in ipairs({optionFrames.enableClassSpecButton:GetChildren()}) do
@@ -661,21 +663,13 @@ func.groupEnableOptionToEditBoxOnEnterPressed = function(self, option)
 end
 func.enableClassOnClick = function(self, c)
 local newBool = self:GetChecked()
-	local needToUpdate
-	if c == SIR.playerClass and newBool ~= SIR.tabOptions[activeTab]["SPECENABLEOPTIONS"][SIR.playerInfo["SPEC"]] then
-		needToUpdate = true
-	end
 	SIR.tabOptions[activeTab]["CLASSENABLEOPTIONS"][c] = newBool
 	for i=1, #classSpecIDs[c] do
 		SIR.tabOptions[activeTab]["SPECENABLEOPTIONS"][classSpecIDs[c][i]] = newBool
 		optionFrames.enableCheckBoxes[c][i+1]:SetChecked(newBool)
 	end
-	if needToUpdate then
-		if newBool then
-			SIR.rotationFunc.fillRotationTab(activeTab)
-		else
-			SIR.rotationFunc.emptyRotationTab()
-		end
+	if select(2, GetClassInfo(c)) == SIR.playerInfo["CLASS"] then
+		SIR.rotationFunc.updateTrackMode(activeTab)
 	end
 end
 func.enableSpecOnClick = function(self, c, s)
@@ -688,11 +682,7 @@ func.enableSpecOnClick = function(self, c, s)
 	SIR.tabOptions[activeTab]["CLASSENABLEOPTIONS"][c] = newBool
 	optionFrames.enableCheckBoxes[c][1]:SetChecked(newBool)
 	if specID == SIR.playerInfo["SPEC"] then
-		if newBool then
-			SIR.rotationFunc.setupTab(activeTab)
-		else
-			SIR.rotationFunc.removeTab()
-		end
+		SIR.rotationFunc.updateTrackMode(activeTab)
 	end
 end
 func.rotationButtonOnClick = function(self, button)
@@ -767,7 +757,9 @@ func.rotationButtonOnClick = function(self, button)
 			rotation[1] = temp
 		end
 	end
-	SIR.rotationFunc.sortTab(activeTab)
+	if SIR.tabOptions[activeTab]["SORTMODE"] == "ROTATION" then
+		SIR.rotationFunc.sortTab(activeTab)
+	end
 end
 func.removeMemberOnClick = function(self)
 	func.removeRotationMember(self:GetParent():GetGUID())
@@ -860,6 +852,9 @@ end
 func.displayEditBoxOnEnter = function(self, value)
 	if tonumber(self:GetText()) then
 		SIR.tabOptions[activeTab][value] = tonumber(self:GetText())
+		SIR.rotationFunc.updateDisplay(activeTab, value)
+	else
+		self:SetText(SIR.tabOptions[activeTab][value])
 	end
 	self:ClearFocus()
 end
@@ -876,8 +871,4 @@ end
 func.sendRotationOnClick = function(self)
 	SendChatMessage(func.makeTransmissionText(), self.value, _,
 		optionFrames.whisperToEditBox:GetText())
-end
-func.rotationFrameOnDragStop = function(self)
-    self:StopMovingOrSizing()
-    SIR.tabOptions[self.key]["XOFF"], SIR.tabOptions[self.key]["YOFF"] = self:GetRect()
 end

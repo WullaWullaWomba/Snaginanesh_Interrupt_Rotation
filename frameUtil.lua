@@ -66,13 +66,13 @@ SIR.frameUtil = {
 			rotationFrame:SetMovable(true)
 			rotationFrame:RegisterForDrag("LeftButton")
 			rotationFrame:SetScript("OnDragStart", function(self)
-					self:StartMoving()
-				end
-			)
+				self:StartMoving()
+			end)
 			rotationFrame:SetScript("OnDragStop", function(self)
-				SIR.func.rotationFrameOnDragStop(self)
+				SIR.rotationFunc.rotationFrameOnDragStop(self)
 			end)
 		end
+		rotationFrame:SetScale(1.4)
 		rotationFrame.fontString:SetText("new_tab")
 		rotationFrame.key = key
 		rotationFrame.fontString:SetAllPoints()
