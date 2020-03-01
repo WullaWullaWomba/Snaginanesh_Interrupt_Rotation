@@ -1,4 +1,4 @@
---luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID
+--luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID CombatLogGetCurrentEventInfo
 local _, SIR = ...
 SIR.util = SIR.util or {}
 SIR.frameUtil = SIR.frameUtil or {}
@@ -107,8 +107,12 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
             bar.spellID = spellID
             if timestamp then
                 bar.currentTime = timestamp
-                bar.expirationTime = timestamp+cds[spellID]
-                setBarOnUpdate(bar)
+                if spellID == 15487 and SIR.groupInfo[GUID]["TALENTS"][4] == 1 then
+                    bar.expirationTime = timestamp+30
+                else
+                    bar.expirationTime = timestamp+cds[spellID]
+                    setBarOnUpdate(bar)
+                end
             else
                 bar.currentTime = 0
                 bar.expirationTime = 0
@@ -147,7 +151,6 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
     -- else add a new bar
     addStatusBar(tab, GUID, spellID, class, timestamp)
 end
-
 local removeStatusBar = function(tab, index)
     SIR.util.myPrint("removeStatusBar")
     if statusBars[tab][index+1] then
@@ -177,14 +180,17 @@ rotationFunc.sortTab = function(tab)
     end
     statusBars[tab] = temp
 end
-rotationFunc.onInterrupt = function (GUID, spellID, timestamp)
-    SIR.util.myPrint("rotationFunc.onInterrupt")
+rotationFunc.onCombatLogEvent = function ()
+    local timestamp, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
+	if subEvent == "SPELL_CAST_SUCCESS" then
+		if not cds[spellID] or sourceFlags%16 > 4 then return end
+	end
     for tab=1, #statusBars do
-        if SIR.groupInfo[GUID] then
-            updateOrAddStatusBar(tab, GUID, spellID, SIR.groupInfo[GUID]["CLASS"], timestamp)
+        if SIR.groupInfo[sourceGUID] then
+            updateOrAddStatusBar(tab, sourceGUID, spellID, SIR.groupInfo[sourceGUID]["CLASS"], timestamp)
         else
             -- should (basically) never happen?!
-            updateOrAddStatusBar(tab, GUID, spellID, select(2, GetPlayerInfoByGUID(GUID)), timestamp)
+            updateOrAddStatusBar(tab, sourceGUID, spellID, select(2, GetPlayerInfoByGUID(sourceGUID)), timestamp)
         end
     end
 end

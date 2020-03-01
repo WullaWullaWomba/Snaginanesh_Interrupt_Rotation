@@ -13,6 +13,7 @@ SIR.tabOptions = SIR.tabOptions or {}
 local cds = SIR.data.cds
 local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(_, event, ...) f[event](...) end)
+
 f:RegisterEvent("PLAYER_LOGOUT")
 f:RegisterEvent("PLAYER_LOGIN")
 f:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -26,11 +27,7 @@ f.GROUP_ROSTER_UPDATE = function()
 	SIR.groupInfoOnGroupRosterUpdate()
 end
 f.COMBAT_LOG_EVENT_UNFILTERED = function()
-	local timestamp, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
-	if subEvent == "SPELL_CAST_SUCCESS" then
-		if not cds[spellID] or sourceFlags%16 > 4 then return end
-		SIR.rotationFunc.onInterrupt(sourceGUID, spellID, timestamp)
-	end
+	SIR.rotationFunc.onCombatLogEvent()
 end
 f.PLAYER_SPECIALIZATION_CHANGED = function()
 	SIR.playerInfo["SPEC"] = GetSpecializationInfo(GetSpecialization())
