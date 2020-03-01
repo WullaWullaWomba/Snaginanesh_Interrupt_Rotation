@@ -79,6 +79,7 @@ local insertBar = function(tab, bars, bar)
 end
 local addStatusBar = function(tab, GUID, spellID, class, timestamp)
     SIR.util.myPrint("addStatusBar")
+    SIR.util.myPrint(tab, GUID, spellID, class, timestamp)
     local statusBar = SIR.frameUtil.aquireStatusBar()
     statusBar.icon:SetTexture(select(3, GetSpellInfo(spellID)))
     statusBar.GUID = GUID
@@ -165,7 +166,6 @@ end
 local removeAllStatusBars = function(tab)
     SIR.util.myPrint("removeAllStatusBars tab", tab, "#", #statusBars[tab])
     for i=#statusBars[tab], 1, -1 do
-        print(statusBars[tab][i])
         SIR.frameUtil.releaseStatusBar(statusBars[tab][i])
     end
     statusBars[tab] = {}
@@ -182,25 +182,15 @@ rotationFunc.sortTab = function(tab)
 end
 rotationFunc.onCombatLogEvent = function ()
     local timestamp, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
-	if subEvent == "SPELL_CAST_SUCCESS" then
-		if not cds[spellID] or sourceFlags%16 > 4 then return end
-	end
+    if subEvent ~= "SPELL_CAST_SUCCESS" or not cds[spellID] or sourceFlags%16 > 4 then
+        return
+    end
     for tab=1, #statusBars do
         if SIR.groupInfo[sourceGUID] then
             updateOrAddStatusBar(tab, sourceGUID, spellID, SIR.groupInfo[sourceGUID]["CLASS"], timestamp)
         else
             -- should (basically) never happen?!
             updateOrAddStatusBar(tab, sourceGUID, spellID, select(2, GetPlayerInfoByGUID(sourceGUID)), timestamp)
-        end
-    end
-end
-rotationFunc.removePlayer = function(GUID)
-    SIR.util.myPrint("rotationFunc.removePlayer")
-    for tab=1, #statusBars do
-        for bar=1, #statusBars[tab] do
-            if statusBars[tab][bar].GUID == GUID then
-                removeStatusBar(tab, bar)
-            end
         end
     end
 end
@@ -354,6 +344,16 @@ rotationFunc.specUpdate = function(GUID, class, newSpec)
         end
     end ]]--
 end
+rotationFunc.removePlayer = function(GUID)
+    SIR.util.myPrint("rotationFunc.removePlayer")
+    for tab=1, #statusBars do
+        for bar=1, #statusBars[tab] do
+            if statusBars[tab][bar].GUID == GUID then
+                removeStatusBar(tab, bar)
+            end
+        end
+    end
+end
 rotationFunc.newRotationTab = function(tab)
     local rotationFrame = SIR.frameUtil.aquireRotationFrame(SIR.optionFrames.container, tab)
     rotationFrame:ClearAllPoints()
@@ -399,9 +399,6 @@ rotationFunc.updateDisplay = function(tab, value)
     else -- value == "XOFF" or value == "YOFF"
         rotationFrames[tab]:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT",
             SIR.tabOptions[tab]["XOFF"], SIR.tabOptions[tab]["YOFF"])
-        for i=1, rotationFrames[tab]:GetNumPoints() do
-            print(rotationFrames[tab]:GetPoint(i))
-        end
     end
 end
 rotationFunc.rotationFrameOnDragStop = function(self)
@@ -411,7 +408,6 @@ rotationFunc.rotationFrameOnDragStop = function(self)
     SIR.optionFrames.xOffEditBox:SetText(xOff)
     SIR.optionFrames.yOffEditBox:SetText(yOff)
     self:ClearAllPoints()
-    print(xOff, yOff)
     self:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", xOff, yOff)
     self:SetSize(SIR.tabOptions[self.key]["WIDTH"], SIR.tabOptions[self.key]["HEIGHT"])
     self:Show()

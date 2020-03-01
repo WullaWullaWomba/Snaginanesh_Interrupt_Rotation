@@ -10,7 +10,8 @@ SIR.optionFrames = SIR.optionFrames or {}
 SIR.rotationFunc = SIR.rotationFunc or {}
 SIR.playerInfo = SIR.playerInfo or {}
 SIR.tabOptions = SIR.tabOptions or {}
-local cds = SIR.data.cds
+SIR.pets = {}
+
 local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(_, event, ...) f[event](...) end)
 
@@ -22,9 +23,16 @@ f:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 f:RegisterEvent("PLAYER_ENTERING_WORLD")
 f:RegisterEvent("PLAYER_LEAVING_WORLD")
 f:RegisterEvent("INSPECT_READY")
+f:RegisterEvent("UNIT_PET")
 
 f.GROUP_ROSTER_UPDATE = function()
 	SIR.groupInfoOnGroupRosterUpdate()
+end
+f.UNIT_PET = function(...)
+	local unit = ...
+	if unit and UnitGUID(unit.."pet") then
+		SIR.pets[UnitGUID(unit.."pet")] = UnitGUID(unit)
+	end
 end
 f.COMBAT_LOG_EVENT_UNFILTERED = function()
 	SIR.rotationFunc.onCombatLogEvent()
