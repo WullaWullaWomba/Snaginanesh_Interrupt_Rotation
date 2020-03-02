@@ -288,7 +288,7 @@ func.loadTab = function(title)
 		or optionFrames.generalTabButton, "RIGHT", -15, 0)
 	optionFrames.rotationTabButtons[numTabs]:SetScript("OnClick", function(self) func.rotationTabButtonOnClick(self) end)
 	optionFrames.rotationTabButtons[numTabs]:SetText(title)
-	--SIR.rotationFunc.aquireRotationTab()
+	SIR.rotationFunc.newRotationTab(numTabs)
 end
 func.updateGroupMemberButtons = function()
 	--done?!!

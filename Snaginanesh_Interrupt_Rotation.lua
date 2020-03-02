@@ -62,9 +62,9 @@ f.PLAYER_ENTERING_WORLD = function()
 		["COLOUREDNAME"] = SIR.util.getColouredNameByGUID(GUID),
 	}
 	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
-	SIR.optionFrames.generalTabButton:Click()
-	--SIR.func.load()
+	SIR.func.load()
 	SIR.groupInfoLoad()
+	SIR.optionFrames.generalTabButton:Click()
 end
 f.PLAYER_LOGOUT = function()
 end

@@ -16,7 +16,7 @@ local contains = SIR.util.contains
 local rotationFrames = {}
 local statusBars = {}
 local trackModes = {}
-local numGroup = 1
+local numGroup = -99
 
 local setBarOnUpdate = function(sb)
     sb:SetScript("OnUpdate", function(self, elapsed)

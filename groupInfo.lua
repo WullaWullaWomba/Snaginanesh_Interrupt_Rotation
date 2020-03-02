@@ -100,7 +100,6 @@ inspectNext = function()
 end
 SIR.groupInfoLoad = function()
     if not IsInGroup() then
-        numGroupMembers = 1
         SIR.groupInfo = {
             [SIR.playerInfo["GUID"]] = {
                 ["NAME"] = SIR.playerInfo["NAME"],
@@ -110,12 +109,9 @@ SIR.groupInfoLoad = function()
                 ["TALENTS"] = {},
             },
         }
-        SIR.rotationFunc.playerInit(SIR.playerInfo["GUID"], SIR.playerInfo["CLASS"])
-        SIR.rotationFunc.specUpdate(SIR.playerInfo["GUID"], SIR.playerInfo["CLASS"], nil, SIR.playerInfo["SPEC"])
         numGroupMembers = 1
     else
-        SIR.groupInfo = SnagiIntRotaSaved.groupInfo
-        -- numGroupMembers = 0
+        SIR.groupInfo = SnagiIntRotaSaved.groupInfo or {}
         SIR.groupInfo[SIR.playerInfo["GUID"]] = {
             ["NAME"] = SIR.playerInfo["NAME"],
             ["SERVER"] = SIR.playerInfo["REALMN"],
@@ -123,15 +119,12 @@ SIR.groupInfoLoad = function()
             ["SPEC"] =  SIR.playerInfo["SPEC"],
             ["TALENTS"] = {},
         }
+        numGroupMembers = 0
         for GUID, info in pairs(SIR.groupInfo) do
             if not UnitInParty(info["NAME"]) then
                 SIR.groupInfo[GUID] = nil
             else
-                -- numGroupMembers = numGroupMembers+1
-                SIR.rotationFunc.playerInit(GUID, info["CLASS"])
-                if info["SPEC"] then
-                    SIR.rotationFunc.specUpdate(GUID, info["CLASS"], nil, info["SPEC"])
-                end
+                numGroupMembers = numGroupMembers+1
             end
         end
     end
@@ -145,7 +138,8 @@ SIR.groupInfoLoad = function()
             end
         end
     end
-    SIR.groupInfoOnGroupRosterUpdate()
+    SIR.rotationFunc.updateNumGroup(numGroupMembers)
+    --SIR.groupInfoOnGroupRosterUpdate()
     inspectNext()
 end
 SIR.groupInfoSave = function()
