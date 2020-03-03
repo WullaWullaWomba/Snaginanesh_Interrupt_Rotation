@@ -194,7 +194,7 @@ rotationFunc.onCombatLogEvent = function ()
         end
     end
 end
-SIR.rotationFunc.addRotationMember = function(tab, GUID)
+rotationFunc.addRotationMember = function(tab, GUID)
     if not (trackModes[tab] == "ROTATION") then
         return
     end
@@ -255,17 +255,17 @@ rotationFunc.updateTrackMode = function(tab)
             for i=1, #SIR.tabOptions[tab]["ROTATION"] do
                 local GUID = SIR.tabOptions[tab]["ROTATION"][i]
                 if SIR.groupInfo[GUID] then
-                    rotationFunc.playerInit(GUID, SIR.groupInfo[GUID]["CLASS"])
+                    rotationFunc.playerInit(tab, GUID, SIR.groupInfo[GUID]["CLASS"])
                     if SIR.groupInfo[GUID]["SPEC"] then
-                        rotationFunc.specUpdate(GUID, SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo[GUID]["SPEC"])
+                        rotationFunc.specUpdate(tab, GUID, SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo[GUID]["SPEC"])
                     end
                 end
             end
 		elseif trackModes[tab] == "ALL" then
             for GUID, info in pairs(SIR.groupInfo) do
-                rotationFunc.playerInit(GUID, info["CLASS"])
+                rotationFunc.playerInit(tab, GUID, info["CLASS"])
                 if info["SPEC"] then
-                    rotationFunc.specUpdate(GUID, info["CLASS"], info["SPEC"])
+                    rotationFunc.specUpdate(tab, GUID, info["CLASS"], info["SPEC"])
                 end
             end
 		end
@@ -274,9 +274,9 @@ rotationFunc.updateTrackMode = function(tab)
         -- add all that havent been added yet
         for GUID, info in pairs(SIR.groupInfo) do
             if not contains(SIR.tabOptions[tab]["ROTATION"], GUID) then
-                rotationFunc.playerInit(GUID, info["CLASS"])
+                rotationFunc.playerInit(tab, GUID, info["CLASS"])
                 if info["SPEC"] then
-                    rotationFunc.specUpdate(GUID, info["CLASS"], info["SPEC"])
+                    rotationFunc.specUpdate(tab, GUID, info["CLASS"], info["SPEC"])
                 end
             end
         end
@@ -291,58 +291,32 @@ rotationFunc.updateTrackMode = function(tab)
         end
     end
 end
-rotationFunc.playerInit = function(GUID, class)
+rotationFunc.playerInit = function(tab, GUID, class)
     SIR.util.myPrint("rotationFunc.playerInit")
     if classWideInterrupts[class] then
-        for tab=1, #rotationFrames do
-            if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
-                and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
-                addStatusBar(tab, GUID, classWideInterrupts[class], class)
-            end
+        if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
+            and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
+            addStatusBar(tab, GUID, classWideInterrupts[class], class)
         end
     end
 end
-rotationFunc.specUpdate = function(GUID, class, newSpec)
+rotationFunc.playerInitAllTabs = function(GUID, class)
+    for tab=1, #rotationFrames do
+        rotationFunc.playerInit(tab, GUID, class)
+    end
+end
+rotationFunc.specUpdate = function(tab, GUID, class, newSpec)
     SIR.util.myPrint("rotationFunc.specUpdate")
     if not specInterrupts[newSpec] then
         rotationFunc.removePlayer(GUID)
     else
-        for tab=1, #statusBars do
-            updateOrAddStatusBar(tab, GUID, specInterrupts[newSpec], class)
-        end
+        updateOrAddStatusBar(tab, GUID, specInterrupts[newSpec], class)
     end
-    --[[ if classWideInterrupts[class] then
-        return
+end
+rotationFunc.specUpdateAllTabs = function(GUID, class, newSpec)
+    for tab=1, #rotationFrames do
+        rotationFunc.specUpdate(tab, GUID, class, newSpec)
     end
-    if oldSpec then
-        if specInterrupts[oldSpec] == specInterrupts[newSpec] then
-            return
-        end
-        if not specInterrupts[oldSpec] then
-            addStatusBar(tab, GUID, specInterrupts[spec])
-        elseif not specInterrupts[newSpec] then
-            for tab=1, #statusBars do
-                local currStatusBars = statusBars[tab]
-                for i, bar in ipairs(currStatusBars) do
-                    if bar.GUID == GUID then
-                        removeStatusBar(tab, i)
-                    end
-                end
-            end
-        else
-            for tab=1, #statusBars do
-                local currStatusBars = statusBars[tab]
-                for _, bar in ipairs(currStatusBars) do
-                    if bar.GUID == GUID and bar.spellID ~= specInterrupts[newSpec]then
-                        bar.spellID = specInterrupts[newSpec]
-                        bar.icon:SetTexture(select(3, GetSpellInfo(specInterrupts[newSpec])))
-                        bar.expirationTime = 0
-                        bar.currentTime = 0
-                    end
-                end
-            end
-        end
-    end ]]--
 end
 rotationFunc.removePlayer = function(GUID)
     SIR.util.myPrint("rotationFunc.removePlayer")

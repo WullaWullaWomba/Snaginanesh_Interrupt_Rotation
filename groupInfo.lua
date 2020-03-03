@@ -57,7 +57,7 @@ local setInitialInfo = function(GUID)
         ["CLASS"] = class,
         ["TALENTS"] = {},
     }
-    SIR.rotationFunc.playerInit(GUID)
+    SIR.rotationFunc.playerInitAllTabs(GUID)
     return true
 end
 
@@ -163,7 +163,7 @@ SIR.groupInfoOnInspect = function(...)
         end
     end
     if oldSpec ~= SIR.groupInfo[GUID]["SPEC"] then
-        SIR.rotationFunc.specUpdate(GUID, SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo[GUID]["SPEC"])
+        SIR.rotationFunc.specUpdateAllTabs(GUID, SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo[GUID]["SPEC"])
     end
     -- todo if talents changed
 end
