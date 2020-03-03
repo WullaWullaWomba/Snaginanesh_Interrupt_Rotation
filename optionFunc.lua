@@ -839,7 +839,7 @@ func.removeTabOnClick = function()
 	end
 	frameUtil.releaseTabButton(optionFrames.rotationTabButtons[#optionFrames.rotationTabButtons])
 	tremove(optionFrames.rotationTabButtons, #optionFrames.rotationTabButtons)
-	SIR.rotationFunc.releaseRotationTab(activeTab)
+	SIR.rotationFunc.removeRotationTab(activeTab)
 	if optionFrames.rotationTabButtons[activeTab] then
 		optionFrames.rotationTabButtons[activeTab]:Click()
 	elseif optionFrames.rotationTabButtons[activeTab-1] then
