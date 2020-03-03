@@ -232,7 +232,7 @@ optionFrames.transmissionOkayButton:SetScript("OnClick", function(self)
 	elseif text == "new rotation tab" then
 		optionFrames.createNewTabButton:Click()
 		SIR.tabOptions[numTabs]["ROTATION"] = self.rotation
-		SIR.tabOptions[numTabs]["TITLE"] = strsub(text, 7)
+		SIR.tabOptions[numTabs]["TITLE"] = strsub(text)
 		optionFrames.rotationTabButtons[numTabs]:SetText(SIR.tabOptions[numTabs]["TITLE"])
 		optionFrames.container:Show()
 		optionFrames.rotationTabButtons[numTabs]:Click()
