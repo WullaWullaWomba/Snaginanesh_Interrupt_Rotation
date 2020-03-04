@@ -119,12 +119,13 @@ SIR.groupInfoLoad = function()
             ["SPEC"] =  SIR.playerInfo["SPEC"],
             ["TALENTS"] = {},
         }
-        numGroupMembers = 0
+        numGroupMembers = 1
         for GUID, info in pairs(SIR.groupInfo) do
             if not UnitInParty(info["NAME"]) then
                 SIR.groupInfo[GUID] = nil
-            else
+            elseif GUID ~= SIR.playerInfo["GUID"] then
                 numGroupMembers = numGroupMembers+1
+                toBeInspectedActive[#toBeInspectedActive+1] = GUID
             end
         end
     end
@@ -139,7 +140,6 @@ SIR.groupInfoLoad = function()
         end
     end
     SIR.rotationFunc.updateNumGroup(numGroupMembers)
-    --SIR.groupInfoOnGroupRosterUpdate()
     inspectNext()
 end
 SIR.groupInfoSave = function()
@@ -185,7 +185,6 @@ SIR.groupInfoOnGroupRosterUpdate = function()
                     toBeInitialized[#toBeInitialized+1] = GUID
                 end
                 if GUID ~= SIR.playerInfo["GUID"] then
-                    --SIR.util.myPrint("adding ", SIR.groupInfo[GUID]["NAME"],"to be inspected")
                     toBeInspectedActive[#toBeInitialized+1] = GUID
                 end
             end

@@ -34,7 +34,7 @@ local setBarOnUpdate = function(sb)
     end)
 end
 local insertBar = function(tab, bars, bar)
-    SIR.util.myPrint("insertBar")
+    SIR.util.myPrint("insertBar", #bars)
     local insertAt = #bars+1
     if SIR.tabOptions[tab]["SORTMODE"] == "CD" then
         for i=#bars, 1, -1 do
@@ -66,6 +66,7 @@ local insertBar = function(tab, bars, bar)
             end
         end
     end
+    SIR.util.myPrint("insertAt", insertAt, bar)
     bar:SetPoint("TOPRIGHT", bars[insertAt-1] or rotationFrames[tab], "BOTTOMRIGHT",
     0, bars[insertAt-1] and SIR.tabOptions[tab]["SPACE"] or 0)
     if bars[insertAt] then
@@ -159,7 +160,7 @@ local removeStatusBar = function(tab, index)
             0, statusBars[tab][index-1] and SIR.tabOptions[tab]["SPACE"] or 0)
     end
     SIR.frameUtil.releaseStatusBar(statusBars[tab][index])
-    for i=index, #statusBars do
+    for i=index, #statusBars[tab] do
         statusBars[tab][i] = statusBars[tab][i+1]
     end
 end
@@ -182,7 +183,7 @@ rotationFunc.sortTab = function(tab)
 end
 rotationFunc.onCombatLogEvent = function ()
     local timestamp, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
-    if subEvent == "SPELL_CAST_SUCCESS" and cds[spellID] and sourceFlags%16 > 4 and SIR.groupInfo[sourceGUID] then
+    if subEvent == "SPELL_CAST_SUCCESS" and cds[spellID] and (sourceFlags%16 <= 4) and SIR.groupInfo[sourceGUID] then
         for tab=1, #statusBars do
             if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
                 and contains(SIR.tabOptions[tab]["ROTATION"], sourceGUID)) then

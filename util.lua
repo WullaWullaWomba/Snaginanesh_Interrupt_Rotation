@@ -10,16 +10,16 @@ SIR.optionFrames = SIR.optionFrames or {}
 local classColorsHex = SIR.data.classColorsHex
 local makeCopy
 makeCopy = function(input)
-        if type(input) == "table" then
-            local table = {}
-            for k, v in pairs(input) do
-                table[k] = makeCopy(v)
-            end
-            return table
-        else
-            return input
+    if type(input) == "table" then
+        local table = {}
+        for k, v in pairs(input) do
+            table[k] = makeCopy(v)
         end
+        return table
+    else
+        return input
     end
+end
 
 SIR.util = {
     ["contains"] = function(table, e)
