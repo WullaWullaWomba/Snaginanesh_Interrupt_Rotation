@@ -86,14 +86,15 @@ inspectNext = function()
 
     for i=#toBeInspectedActive, 1, -1  do
         local GUID = toBeInspectedActive[i]
-        toBeInspectedActive[i] = nil
-        toBeInspectedInactive[#toBeInspectedInactive+1] = GUID
-        local name = SIR.groupInfo[GUID]["NAME"]
-        --todo UnitInParty(name)
-        if CanInspect(name) and UnitIsConnected(name) and UnitInParty(name) then
-            --SIR.util.myPrint("NotifyInspect", name)
-            NotifyInspect(name)
-            break
+        if SIR.groupInfo[GUID] then
+            toBeInspectedActive[i] = nil
+            toBeInspectedInactive[#toBeInspectedInactive+1] = GUID
+            local name = SIR.groupInfo[GUID]["NAME"]
+            if CanInspect(name) and UnitIsConnected(name) and UnitInParty(name) then
+                --SIR.util.myPrint("NotifyInspect", name)
+                NotifyInspect(name)
+                break
+            end
         end
     end
     C_Timer.After(2.1, function() inspectNext() end)
