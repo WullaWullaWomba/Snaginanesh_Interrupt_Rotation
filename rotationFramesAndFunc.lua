@@ -182,39 +182,33 @@ rotationFunc.sortTab = function(tab)
 end
 rotationFunc.onCombatLogEvent = function ()
     local timestamp, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
-    if subEvent ~= "SPELL_CAST_SUCCESS" or not cds[spellID] or sourceFlags%16 > 4 or not SIR.groupInfo[sourceGUID] then
-        return
-    end
-    for tab=1, #statusBars do
-        if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
-            and contains(SIR.tabOptions[tab]["ROTATION"], sourceGUID)) then
-            updateOrAddStatusBar(tab, sourceGUID, spellID, SIR.groupInfo[sourceGUID]["CLASS"], timestamp)
+    if subEvent == "SPELL_CAST_SUCCESS" and cds[spellID] and sourceFlags%16 > 4 and SIR.groupInfo[sourceGUID] then
+        for tab=1, #statusBars do
+            if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
+                and contains(SIR.tabOptions[tab]["ROTATION"], sourceGUID)) then
+                updateOrAddStatusBar(tab, sourceGUID, spellID, SIR.groupInfo[sourceGUID]["CLASS"], timestamp)
+            end
         end
     end
 end
 rotationFunc.addRotationMember = function(tab, GUID)
-    if not (trackModes[tab] == "ROTATION") then
-        return
-    end
-    SIR.util.myPrint("rotationFunc.addPlayerToTab")
-    local class, spec = SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo[GUID]["SPEC"]
-    if not class then
-        SIR.util.myPrint("rotationFunc.addPlayerToTab", "no class")
-        return
-    end
-    local spellID = classWideInterrupts[class]
-    if not spellID and spec then
-        spellID = specInterrupts[spec]
-    end
-    if spellID then
-        addStatusBar(tab, GUID, spellID, class)
+    SIR.util.myPrint("rotationFunc.addRotationMember")
+    if (trackModes[tab] == "ROTATION") and SIR.groupInfo[GUID] then
+        local class, spec = SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo[GUID]["SPEC"]
+        local spellID = classWideInterrupts[class]
+        if not spellID and spec then
+            spellID = specInterrupts[spec]
+        end
+        if spellID then
+            addStatusBar(tab, GUID, spellID, class)
+        end
     end
 end
 rotationFunc.removeRotationMember = function(tab, GUID)
     if not (trackModes[tab] == "ROTATION") then
         return
     end
-    SIR.util.myPrint("rotationFunc.removePlayerFromTab")
+    SIR.util.myPrint("rotationFunc.removeRotationMember")
     for i, bar in ipairs(statusBars[tab]) do
         if bar.GUID == GUID then
             removeStatusBar(tab, i)

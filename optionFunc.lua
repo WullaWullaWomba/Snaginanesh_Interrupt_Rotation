@@ -341,23 +341,27 @@ func.updateRotationButtons = function()
 	end
 end
 func.removeRotationMember = function(GUID)
+	-- update groupMemberButton if available
 	for i=1, 40 do
-		if optionFrames.groupMemberButtons[i]:GetGUID() == GUID then
+		if optionFrames.groupMemberButtons[i].GUID == GUID then
 			optionFrames.groupMemberButtons[i].inRotation = false
 			optionFrames.groupMemberButtons[i]:UpdateTexture()
 			break
 		end
 	end
+
 	local rotationNum = #SIR.tabOptions[activeTab]["ROTATION"]
 	for i=1, rotationNum-1 do
-		if optionFrames.rotationButtons[i]:GetGUID() == GUID then
+		if optionFrames.rotationButtons[i].GUID == GUID then
 			for j=i, rotationNum-1 do
-				optionFrames.rotationButtons[j]:SetGUID(optionFrames.rotationButtons[j+1]:GetGUID())
+				optionFrames.rotationButtons[j].GUID = optionFrames.rotationButtons[j+1].GUID
 				optionFrames.rotationButtons[j]:SetText(optionFrames.rotationButtons[j+1]:GetText())
 			end
 			break
 		end
 	end
+	optionFrames.rotationButtons[rotationNum].GUID = ""
+	optionFrames.rotationButtons[rotationNum]:SetText("")
 	optionFrames.rotationButtons[rotationNum]:Hide()
 	for i=1, #SIR.tabOptions[activeTab]["ROTATION"] do
 		if SIR.tabOptions[activeTab]["ROTATION"][i] == GUID then
@@ -497,7 +501,7 @@ func.groupMemberOnClick = function(self)
 		rotation[#rotation+1] = GUID
 		local rotationButton = optionFrames.rotationButtons[#rotation]
 		rotationButton:SetText(self:GetText())
-		rotationButton:SetGUID(GUID)
+		rotationButton.GUID = GUID
 		rotationButton:Show()
 		self.inRotation = true
 		self:UpdateTexture()
@@ -762,7 +766,7 @@ func.rotationButtonOnClick = function(self, button)
 	end
 end
 func.removeMemberOnClick = function(self)
-	func.removeRotationMember(self:GetParent():GetGUID())
+	func.removeRotationMember(self:GetParent().GUID)
 end
 func.testButtonOnClick = function()
 	--[[
