@@ -182,15 +182,13 @@ rotationFunc.sortTab = function(tab)
 end
 rotationFunc.onCombatLogEvent = function ()
     local timestamp, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
-    if subEvent ~= "SPELL_CAST_SUCCESS" or not cds[spellID] or sourceFlags%16 > 4 then
+    if subEvent ~= "SPELL_CAST_SUCCESS" or not cds[spellID] or sourceFlags%16 > 4 or not SIR.groupInfo[sourceGUID] then
         return
     end
     for tab=1, #statusBars do
-        if SIR.groupInfo[sourceGUID] then
+        if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
+            and contains(SIR.tabOptions[tab]["ROTATION"], sourceGUID)) then
             updateOrAddStatusBar(tab, sourceGUID, spellID, SIR.groupInfo[sourceGUID]["CLASS"], timestamp)
-        else
-            -- should (basically) never happen?!
-            updateOrAddStatusBar(tab, sourceGUID, spellID, select(2, GetPlayerInfoByGUID(sourceGUID)), timestamp)
         end
     end
 end
