@@ -301,7 +301,8 @@ rotationFunc.specUpdate = function(tab, GUID, class, newSpec)
     SIR.util.myPrint("rotationFunc.specUpdate")
     if not specInterrupts[newSpec] then
         rotationFunc.removePlayer(GUID)
-    else
+    elseif trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
+        and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
         updateOrAddStatusBar(tab, GUID, specInterrupts[newSpec], class)
     end
 end
