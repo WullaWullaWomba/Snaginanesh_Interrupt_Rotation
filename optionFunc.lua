@@ -190,9 +190,9 @@ function ItemRefTooltip:SetHyperlink(link, ...)
 		optionFrames.transmissionRotationEditBox:SetText(rotationText)
 
 		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new tab")
-		for index, options in ipairs(SIR.tabOptions) do
+		for _, options in ipairs(SIR.tabOptions) do
 			if options["TITLE"] == title then
-				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "tab"..index.." - "..title)
+				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, title)
 				break
 			end
 		end
@@ -237,7 +237,7 @@ optionFrames.transmissionOkayButton:SetScript("OnClick", function(self)
 		optionFrames.rotationTabButtons[numTabs]:Click()
 	else
 		for i=1, #SIR.tabOptions do
-			if SIR.tabOptions[i]["TITLE"] == strsub(text, 7) then
+			if SIR.tabOptions[i]["TITLE"] == text then
 				SIR.tabOptions[i]["ROTATION"] = self.rotation
 				optionFrames.container:Show()
 				optionFrames.rotationTabButtons[i]:Click()
@@ -250,10 +250,10 @@ end)
 UIDropDownMenu_Initialize(optionFrames.transmissionDropdownMenu, function()--self, level, menuList)
 	local info = UIDropDownMenu_CreateInfo()
 	for i=1, numTabs do
-		info.text = "tab"..i.." - "..SIR.tabOptions[i]["TITLE"]
+		info.text = SIR.tabOptions[i]["TITLE"]
 		info.checked = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu) == info.text
 		info.func = function()
-				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "tab"..i.." - "..SIR.tabOptions[i]["TITLE"])
+				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, SIR.tabOptions[i]["TITLE"])
 			end
 		UIDropDownMenu_AddButton(info)
 	end
@@ -330,6 +330,7 @@ func.updateGroupMemberButtons = function()
     end
 end
 func.updateRotationButtons = function()
+	SIR.util.myPrint("func.updateRotationButtons")
 	local rotation = SIR.tabOptions[activeTab]["ROTATION"]
 	for i=#rotation+1, #optionFrames.rotationButtons do
 		optionFrames.rotationButtons[i]:Hide()
@@ -337,6 +338,7 @@ func.updateRotationButtons = function()
 	for i=1, #rotation do
 		optionFrames.rotationButtons[i]:SetGUID(rotation[i])
 		optionFrames.rotationButtons[i]:SetText(util.getColouredNameByGUID(rotation[i]))
+		optionFrames.rotationButtons[i]:Show()
 	end
 end
 func.removeRotationMember = function(GUID)
