@@ -49,6 +49,7 @@ local setInitialInfo = function(GUID)
                 remove(toBeInitialized, i)
             end
         end
+        return false
     end
     local _, class, _, _, _, name, server = GetPlayerInfoByGUID(GUID)
     if server then
