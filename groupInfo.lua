@@ -94,8 +94,8 @@ inspectNext = function()
 
     for i=#toBeInspectedActive, 1, -1  do
         local GUID = toBeInspectedActive[i]
+        toBeInspectedActive[i] = nil
         if SIR.groupInfo[GUID] then
-            toBeInspectedActive[i] = nil
             local name = SIR.groupInfo[GUID]["NAME"]
             if UnitInParty(name) then
                 toBeInspectedInactive[#toBeInspectedInactive+1] = GUID
@@ -179,11 +179,12 @@ SIR.groupInfoOnInspect = function(...)
     -- todo if talents changed
 end
 SIR.groupInfoOnGroupRosterUpdate = function()
-    --SIR.util.myPrint("SIR.groupInfoOnGroupRosterUpdate ", numGroupMembers)
+    SIR.util.myPrint("SIR.groupInfoOnGroupRosterUpdate ", numGroupMembers)
     local newNumGroupMembers = max(GetNumGroupMembers(), 1)
     if newNumGroupMembers == numGroupMembers then
         return
     end
+    SIR.util.myPrint("newNumGroupMembers", newNumGroupMembers)
     if newNumGroupMembers > numGroupMembers then
         --SIR.util.myPrint("newNumGroupMembers > numGroupMembers ", newNumGroupMembers)
         -- add new players
