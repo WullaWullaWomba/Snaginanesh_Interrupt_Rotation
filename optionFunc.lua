@@ -189,14 +189,13 @@ function ItemRefTooltip:SetHyperlink(link, ...)
 		end
 		optionFrames.transmissionRotationEditBox:SetText(rotationText)
 
-		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new rotation tab")
-		for index, option in ipairs(SIR.tabOptions) do
-			if option["TITLE"] == title then
+		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new tab")
+		for index, options in ipairs(SIR.tabOptions) do
+			if options["TITLE"] == title then
 				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "tab"..index.." - "..title)
 				break
 			end
 		end
-		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new rotation tab")
 
 		optionFrames.transmissionRotationLabelEditBox:SetText(title.."\n"..util.getColouredNameByGUID(source))
 		optionFrames.transmissionFrame:Show()
@@ -229,10 +228,10 @@ optionFrames.transmissionOkayButton:SetScript("OnClick", function(self)
 	local text = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu)
 	if not text then
 		return
-	elseif text == "new rotation tab" then
+	elseif text == "new tab" then
 		optionFrames.createNewTabButton:Click()
 		SIR.tabOptions[numTabs]["ROTATION"] = self.rotation
-		SIR.tabOptions[numTabs]["TITLE"] = text
+		SIR.tabOptions[numTabs]["TITLE"] = "new_tab"
 		optionFrames.rotationTabButtons[numTabs]:SetText(SIR.tabOptions[numTabs]["TITLE"])
 		optionFrames.container:Show()
 		optionFrames.rotationTabButtons[numTabs]:Click()
@@ -258,10 +257,10 @@ UIDropDownMenu_Initialize(optionFrames.transmissionDropdownMenu, function()--sel
 			end
 		UIDropDownMenu_AddButton(info)
 	end
-	info.text = "new rotation tab"
+	info.text = "new tab"
 	info.checked = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu) == info.text
 	info.func = function()
-		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new rotation tab")
+		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new tab")
 	end
 	UIDropDownMenu_AddButton(info)
 end)
