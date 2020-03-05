@@ -31,8 +31,7 @@ container:SetMovable(true)
 
 container:SetScript("OnDragStart", function() container:StartMoving() end)
 container:SetScript("OnDragStop", function() container:StopMovingOrSizing() end)
-container:SetScript("OnEvent", function(_, event, ...) container[event](...)
-end)
+
 local containerHeader = container:CreateTexture("$parentHeader", "ARTWORK")
 containerHeader:SetSize(440, 64)
 containerHeader:SetPoint("TOP", container, "TOP", 0, 25)

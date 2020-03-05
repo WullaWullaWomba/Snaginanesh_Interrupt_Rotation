@@ -6,7 +6,7 @@ SIR.frameUtil = SIR.frameUtil or {}
 SIR.rotationFrames = SIR.rotationFrames or {}
 SIR.func = SIR.func or {}
 SIR.optionFrames = SIR.optionFrames or {}
-
+SIR.test = false
 local classColorsHex = SIR.data.classColorsHex
 local makeCopy
 makeCopy = function(input)
@@ -36,7 +36,7 @@ SIR.util = {
         end
     end,
     ["myPrint"] = function(...)
-        --print(...)
+        if SIR.test then print(...) end
     end,
     ["setTextClassColor"] = function(text, class)
         if classColorsHex[class] then

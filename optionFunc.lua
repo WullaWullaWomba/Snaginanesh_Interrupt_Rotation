@@ -768,6 +768,9 @@ func.removeMemberOnClick = function(self)
 	func.removeRotationMember(self:GetParent().GUID)
 end
 func.testButtonOnClick = function()
+	SIR.test = not SIR.test
+	print("SIR.test set to:", SIR.test)
+	print("currently just enables/disables printing(debug) - will show test bars at some point")
 	--[[
 	if #testStatusBars == 0 then
 		local testClasses = {
