@@ -36,8 +36,6 @@ local containerHeader = container:CreateTexture("$parentHeader", "ARTWORK")
 containerHeader:SetSize(440, 64)
 containerHeader:SetPoint("TOP", container, "TOP", 0, 25)
 containerHeader:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
-containerHeader:SetScript("OnDragStart", function() container:StartMoving() end)
-containerHeader:SetScript("OnDragStop", function() container:StopMovingOrSizing() end)
 
 local containerHeaderText = container:CreateFontString("$parentHeaderText", "ARTWORK", "GameFontNormal")
 containerHeaderText:SetPoint("TOP", containerHeader, "TOP", 0, -14)
