@@ -139,7 +139,9 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 if moveTo ~= i then
                     -- adjust anchors
                     SIR.util.myPrint("moveTo", moveTo, "i", i)
-                    statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
+                    if statusBars[tab][i+1] then
+                        statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
+                    end
                     bar:SetPoint("TOPRIGHT", statusBars[tab][moveTo], "BOTTOMRIGHT", 0, -SIR.tabOptions[tab]["SPACE"])
                     if statusBars[tab][moveTo+1] then
                         statusBars[tab][moveTo+1]:SetPoint("TOPRIGHT", statusBars[tab][moveTo], "BOTTOMRIGHT",
