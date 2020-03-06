@@ -121,13 +121,18 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
             end
             -- resort / move bar to correct index if sortmode is by CD
             if SIR.tabOptions[tab]["SORTMODE"] == "CD" then
-                local moveTo = i
-                -- find the index to place the bar into
-                for j=i+1, #statusBars[tab] do
-                    if statusBars[tab][j].expirationTime < bar.expirationTime then
-                        moveTo = moveTo+1
-                    else
-                        break
+                local moveTo
+                if not timestamp then
+                    moveTo = 1
+                else
+                    moveTo = i
+                    -- find the index to place the bar into
+                    for j=i+1, #statusBars[tab] do
+                        if statusBars[tab][j].expirationTime < bar.expirationTime then
+                            moveTo = moveTo+1
+                        else
+                            break
+                        end
                     end
                 end
                 -- if the position changes
