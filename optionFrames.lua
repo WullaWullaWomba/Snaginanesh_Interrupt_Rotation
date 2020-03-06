@@ -41,6 +41,12 @@ local containerHeaderText = container:CreateFontString("$parentHeaderText", "ART
 containerHeaderText:SetPoint("TOP", containerHeader, "TOP", 0, -14)
 containerHeaderText:SetText("Snaginanesh Interrupt Rotation")
 
+local closeButton = CreateFrame("Button", "$parentRemove", container, "UIPanelCloseButton")
+closeButton:SetScript("OnClick", function() container:Hide() end)
+closeButton:SetPoint("BOTTOMRIGHT", container, "TOPRIGHT", 0, -15)
+closeButton:SetSize(40, 40)
+closeButton:Show()
+
 local generalTab = CreateFrame("Frame", _, container)
 generalTab:SetAllPoints()
 generalTab:Show()
