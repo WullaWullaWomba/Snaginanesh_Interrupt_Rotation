@@ -49,8 +49,6 @@ f.INSPECT_READY = function(...)
 	SIR.groupInfoOnInspect(...)
 end
 f.PLAYER_LOGIN = function()
-end
-f.PLAYER_ENTERING_WORLD = function()
 	local GUID = UnitGUID("player")
 	local _, class, _, _, _, name = GetPlayerInfoByGUID(GUID)
 	SIR.playerInfo = {
@@ -65,6 +63,9 @@ f.PLAYER_ENTERING_WORLD = function()
 	SIR.func.load()
 	SIR.groupInfoLoad()
 	SIR.optionFrames.generalTabButton:Click()
+end
+f.PLAYER_ENTERING_WORLD = function()
+
 end
 f.PLAYER_LOGOUT = function()
 end
