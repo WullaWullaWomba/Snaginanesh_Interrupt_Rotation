@@ -38,8 +38,9 @@ local insertBar = function(tab, bars, bar)
     local insertAt = #bars+1
     if SIR.tabOptions[tab]["SORTMODE"] == "CD" then
         for i=#bars, 1, -1 do
-            if bars[i].expirationTime < bar.expirationTime then
-                insertAt = i+1
+            if bars[i].expirationTime > bar.expirationTime then
+                insertAt = i
+            else
                 break
             end
         end
