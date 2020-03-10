@@ -272,7 +272,12 @@ end)
 ------------------------------------------------------------------------------------------------------------------------
 func.load = function()
     SIR.tabOptions = SnagiIntRotaSaved.tabOptions or {}
-    for i=1, #SIR.tabOptions do
+	for i=1, #SIR.tabOptions do
+		for k, default in pairs(defaultOptions) do
+			if SIR.tabOptions[i][k] == nil then
+				SIR.tabOptions[i][k] = default
+			end
+		end
         func.loadTab(SIR.tabOptions[i]["TITLE"])
     end
 end
