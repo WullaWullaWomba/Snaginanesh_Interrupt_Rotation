@@ -140,13 +140,14 @@ SIR.groupInfoLoad = function()
             end
         end
     end
+    SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"] = {
+        0, 0, 0, 0, 0, 0, 0
+    }
     for i=1, 7 do
         for j=1, 3 do
             if select(4, GetTalentInfo(i, j, 1, false)) then
                 SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"][i] = j
                 break
-            elseif j==3 then
-                SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"][i] = 0
             end
         end
     end
@@ -164,11 +165,13 @@ SIR.groupInfoOnInspect = function(...)
     end
     local oldSpec = SIR.groupInfo[GUID]["SPEC"]
     SIR.groupInfo[GUID]["SPEC"] = GetInspectSpecialization(SIR.groupInfo[GUID]["NAME"])
+    SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"] = {
+        0, 0, 0, 0, 0, 0, 0
+    }
     for i=1, 7 do
         for j=1, 3 do
-            local _, _, _, selected = GetTalentInfo(i, j, 1, true, SIR.groupInfo[GUID]["NAME"])
-            if selected then
-                SIR.groupInfo[GUID]["TALENTS"][i] = j
+            if select(4, GetTalentInfo(i, j, 1, true, SIR.groupInfo[GUID]["NAME"])) then
+                SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"][i] = j
                 break
             end
         end
@@ -215,6 +218,7 @@ SIR.groupInfoOnGroupRosterUpdate = function()
         end
     end
     numGroupMembers = newNumGroupMembers
+    SIR.util.myPrint("set numGroupMembers = newNumGroupMembers")
     SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
 end
 SLASH_MYINSPECT1 = "/myinspect"

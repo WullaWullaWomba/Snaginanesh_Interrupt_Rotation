@@ -142,7 +142,9 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 if moveTo ~= i then
                     -- adjust anchors
                     SIR.util.myPrint("moveTo", moveTo, "i", i)
-                    statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
+                    if statusBars[tab][i+1] then
+                        statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
+                    end
                     bar:SetPoint("TOPRIGHT", statusBars[tab][moveTo], "BOTTOMRIGHT", 0, -SIR.tabOptions[tab]["SPACE"])
                     if statusBars[tab][moveTo+1] then
                         statusBars[tab][moveTo+1]:SetPoint("TOPRIGHT", bar, "BOTTOMRIGHT",
@@ -179,7 +181,6 @@ local removeAllStatusBars = function(tab)
     end
     statusBars[tab] = {}
 end
-
 rotationFunc.sortTab = function(tab)
     SIR.util.myPrint("sortTab", tab)
     SIR.util.myPrint(statusBars[tab])
@@ -323,7 +324,7 @@ end
 rotationFunc.removePlayer = function(GUID)
     SIR.util.myPrint("rotationFunc.removePlayer")
     for tab=1, #statusBars do
-        for bar=1, #statusBars[tab] do
+        for bar=#statusBars[tab], 1, -1 do
             if statusBars[tab][bar].GUID == GUID then
                 removeStatusBar(tab, bar)
             end
