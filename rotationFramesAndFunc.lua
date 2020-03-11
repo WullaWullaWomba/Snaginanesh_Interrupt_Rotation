@@ -163,11 +163,13 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
 end
 local removeStatusBar = function(tab, index)
     SIR.util.myPrint("removeStatusBar")
+    SIR.util.myPrint("tab", tab, "index", index)
+    -- adjust anchor for "next" bar if present
     if statusBars[tab][index+1] then
-        statusBars[tab][index+1]:SetPoint("TOPRIGHT", statusBars[tab][index-1] or rotationFrames[tab], "BOTTOMRIGHT",
-            0, statusBars[tab][index-1] and SIR.tabOptions[tab]["SPACE"] or 0)
+        statusBars[tab][index+1]:SetPoint(statusBars[tab][index]:GetPoint(1))
     end
     SIR.frameUtil.releaseStatusBar(statusBars[tab][index])
+    -- update table
     for i=index, #statusBars[tab] do
         statusBars[tab][i] = statusBars[tab][i+1]
     end

@@ -198,7 +198,7 @@ SIR.groupInfoOnGroupRosterUpdate = function()
                 toBeInitialized[#toBeInitialized+1] = GUID
             end
         end
-        -- remove players that left
+        -- remove players that left (or all others if not in party)
     elseif IsInGroup() then
         for GUID, info in pairs(SIR.groupInfo) do
             if not UnitInParty(info["NAME"]) then
