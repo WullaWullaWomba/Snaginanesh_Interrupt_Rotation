@@ -122,8 +122,7 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
             end
             -- resort / move bar to correct index if sortmode is by CD
             if SIR.tabOptions[tab]["SORTMODE"] == "CD" then
-                rotationFunc.sortTab(tab)
-                --[[
+                --rotationFunc.sortTab(tab)
                 local moveTo
                 if not timestamp then
                     moveTo = 1
@@ -139,6 +138,7 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                     end
                 end
                 -- if the position changes
+                SIR.util.myPrint("moveTo", moveTo, "i", i)
                 if moveTo ~= i then
                     -- adjust anchors
                     SIR.util.myPrint("moveTo", moveTo, "i", i)
@@ -154,7 +154,6 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                     end
                     statusBars[tab][moveTo] = bar
                 end
-                ]]--
             end
             return
         end
