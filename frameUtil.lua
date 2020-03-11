@@ -4,10 +4,10 @@ SIR.data = SIR.data or {}
 SIR.util = SIR.util or {}
 SIR.frameUtil = SIR.frameUtil or {}
 SIR.rotationFrames = SIR.rotationFrames or {}
-SIR.func = SIR.func or {}
+SIR.optionFunc = SIR.optionFunc or {}
 SIR.optionFrames = SIR.optionFrames or {}
 
-local func = SIR.func
+local optionFunc = SIR.optionFunc
 
 local tabButtonPool = {}
 local rotationFramePool = {}
@@ -206,7 +206,7 @@ SIR.frameUtil = {
 		scb:Hide()
 		scb:SetSize(30, 30)
 		scb:SetHitRectInsets(-30, 0, 0, 0)
-		scb:SetScript("OnClick", function(self) func.sortCheckBoxOnClick(self) end)
+		scb:SetScript("OnClick", function(self) optionFunc.sortCheckBoxOnClick(self) end)
 		local label = scb:CreateFontString(_, "ARTWORK", "GameFontNormal")
 		label:SetPoint("RIGHT", scb, "LEFT", -5, 0)
 		label:SetText(text)
@@ -216,7 +216,7 @@ SIR.frameUtil = {
 		local ab = CreateFrame("Button", _, parent, "UIPanelButtonTemplate")
 		ab:SetSize(100, 40)
 		ab:SetText(text)
-		ab:SetScript("OnClick", function(self) func.menuButtonOnClick(self) end)
+		ab:SetScript("OnClick", function(self) optionFunc.menuButtonOnClick(self) end)
 		local arrow = ab:CreateTexture()
 		arrow:SetTexture("Interface\\MONEYFRAME\\Arrow-Left-Up")
 		arrow:SetSize(20, 40)
@@ -274,25 +274,25 @@ SIR.frameUtil = {
 		option.fromFontString:SetText("from:")
 		option.toFontString:SetText("to:")
 
-		option.checkBox:SetScript("OnClick", function(self) func.groupEnableOptionCheckBoxOnClick(self, option)
+		option.checkBox:SetScript("OnClick", function(self) optionFunc.groupEnableOptionCheckBoxOnClick(self, option)
 		end)
 		option.fromSlider:SetScript("OnMouseWheel", function(self, delta)
-			func.groupEnableOptionFromSliderOnMouseWheel(self, delta, option)
+			optionFunc.groupEnableOptionFromSliderOnMouseWheel(self, delta, option)
 		end)
 		option.fromSlider:SetScript("OnMouseUp", function(self)
-			func.groupEnableOptionFromSliderOnMouseUp(self, option)
+			optionFunc.groupEnableOptionFromSliderOnMouseUp(self, option)
 		end)
 		option.toSlider:SetScript("OnMouseWheel", function(self, delta)
-			func.groupEnableOptionToSliderOnMouseWheel(self, delta, option)
+			optionFunc.groupEnableOptionToSliderOnMouseWheel(self, delta, option)
 		end)
 		option.toSlider:SetScript("OnMouseUp", function(self)
-			func.groupEnableOptionToSliderOnMouseUp(self, option)
+			optionFunc.groupEnableOptionToSliderOnMouseUp(self, option)
 		end)
 		option.fromEditBox:SetScript("OnEnterPressed", function(self)
-			func.groupEnableOptionFromEditBoxOnEnterPressed(self, option)
+			optionFunc.groupEnableOptionFromEditBoxOnEnterPressed(self, option)
 		end)
 		option.toEditBox:SetScript("OnEnterPressed", function(self)
-			func.groupEnableOptionToEditBoxOnEnterPressed(self, option)
+			optionFunc.groupEnableOptionToEditBoxOnEnterPressed(self, option)
 		end)
 			return option
 	end

@@ -3,7 +3,7 @@ local _, SIR = ...
 SIR.util = SIR.util or {}
 SIR.frameUtil = SIR.frameUtil or {}
 SIR.rotationFunc = SIR.rotationFunc or {}
-SIR.func = SIR.func or {}
+SIR.optionFunc = SIR.optionFunc or {}
 SIR.optionFrames = SIR.optionFrames or {}
 SIR.tabOptions = SIR.tabOptions or {}
 SIR.groupInfo = SIR.groupInfo or {}
@@ -142,12 +142,10 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 if moveTo ~= i then
                     -- adjust anchors
                     SIR.util.myPrint("moveTo", moveTo, "i", i)
-                    if statusBars[tab][i+1] then
-                        statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
-                    end
+                    statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
                     bar:SetPoint("TOPRIGHT", statusBars[tab][moveTo], "BOTTOMRIGHT", 0, -SIR.tabOptions[tab]["SPACE"])
                     if statusBars[tab][moveTo+1] then
-                        statusBars[tab][moveTo+1]:SetPoint("TOPRIGHT", statusBars[tab][moveTo], "BOTTOMRIGHT",
+                        statusBars[tab][moveTo+1]:SetPoint("TOPRIGHT", bar, "BOTTOMRIGHT",
                         0, -SIR.tabOptions[tab]["SPACE"])
                     end
                     -- adjust table

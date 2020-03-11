@@ -5,12 +5,12 @@ SIR.data = SIR.data or {}
 SIR.util = SIR.util or {}
 SIR.frameUtil = SIR.frameUtil or {}
 SIR.rotationFrames = SIR.rotationFrames or {}
-SIR.func = SIR.func or {}
+SIR.optionFunc = SIR.optionFunc or {}
 SIR.optionFrames = SIR.optionFrames or {}
 
 local frameUtil = SIR.frameUtil
 local data = SIR.data
-local func = SIR.func
+local optionFunc = SIR.optionFunc
 local container = CreateFrame("Frame", "SnagiIntRotaContainer", UIParent)
 UISpecialFrames[#UISpecialFrames+1] = container:GetName() -- hide on escape - and maybe more <.<
 container:SetFrameStrata("DIALOG")
@@ -54,7 +54,7 @@ generalTab:Show()
 local generalTabButton = frameUtil.aquireTabButton(container)
 generalTabButton:SetPoint("TOPLEFT", container, "BOTTOMLEFT", 0, 8)
 generalTabButton:SetText("General")
-generalTabButton:SetScript("OnClick", function(self) func.generalTabButtonOnClick(self) end)
+generalTabButton:SetScript("OnClick", function(self) optionFunc.generalTabButtonOnClick(self) end)
 
 local rotationTab = CreateFrame("Frame", _, container)
 rotationTab:SetAllPoints()
@@ -151,7 +151,7 @@ testButton.tooltipText = "Generates some example statusbars."
 testButton:SetSize(100, 40)
 testButton:SetPoint("TOPLEFT", container, "TOPLEFT", 15, -15)
 testButton:SetText("Test")
-testButton:SetScript("OnClick", function() func.testButtonOnClick() end)
+testButton:SetScript("OnClick", function() optionFunc.testButtonOnClick() end)
 
 local menuButtons = {
     ["ENABLE"] = frameUtil.createMenuButton("Enable", rotationTab),
@@ -169,31 +169,31 @@ menuButtons["SORTING"]:SetPoint("TOPLEFT", menuButtons["DISPLAY"], "BOTTOMLEFT",
 local widthFontString, widthEditBox = frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 widthFontString:SetText("width:")
 widthEditBox:SetPoint("TOPLEFT", leftSideMenu, "TOPLEFT", 115, -35)
-widthEditBox:SetScript("OnEnterPressed", function(self) func.displayEditBoxOnEnter(self, "WIDTH") end)
+widthEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "WIDTH") end)
 widthEditBox:Hide()
 
 local heightFontString, heightEditBox = frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 heightFontString:SetText("height:")
 heightEditBox:SetPoint("TOP", widthEditBox, "BOTTOM", 0, -6)
-heightEditBox:SetScript("OnEnterPressed", function(self) func.displayEditBoxOnEnter(self, "HEIGHT") end)
+heightEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "HEIGHT") end)
 heightEditBox:Hide()
 
 local spaceFontString, spaceEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 spaceFontString:SetText("space:")
 spaceEditBox:SetPoint("TOP", heightEditBox, "BOTTOM", 0, -6)
-spaceEditBox:SetScript("OnEnterPressed", function(self) func.displayEditBoxOnEnter(self, "SPACE") end)
+spaceEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "SPACE") end)
 spaceEditBox:Hide()
 
 local xOffFontString, xOffEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 xOffFontString:SetText("x offset:")
 xOffEditBox:SetPoint("TOP", spaceEditBox, "BOTTOM", 0, -6)
-xOffEditBox:SetScript("OnEnterPressed", function(self) func.displayEditBoxOnEnter(self, "XOFF") end)
+xOffEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "XOFF") end)
 xOffEditBox:Hide()
 
 local yOffFontString, yOffEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 yOffFontString:SetText("y offset:")
 yOffEditBox:SetPoint("TOP", xOffEditBox, "BOTTOM", 0, -6)
-yOffEditBox:SetScript("OnEnterPressed", function(self) func.displayEditBoxOnEnter(self, "YOFF") end)
+yOffEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "YOFF") end)
 yOffEditBox:Hide()
 
 local titleFontString, titleEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["SEND"])
@@ -207,20 +207,20 @@ titleEditBox:SetPoint("TOP", leftSideMenu, "TOP", 0, -50)
 titleEditBox:SetScript("OnSpacePressed", function(self)
     self:SetText(gsub(self:GetText(), "%s","_"))
 end)
-titleEditBox:SetScript("OnEnterPressed", function(self) func.titleEditBoxOnEnterPressed(self) end)
+titleEditBox:SetScript("OnEnterPressed", function(self) optionFunc.titleEditBoxOnEnterPressed(self) end)
 
 local createNewTabButton = CreateFrame("Button", _, generalTab, "UIPanelButtonTemplate")
 createNewTabButton:SetSize(100, 40)
 createNewTabButton:SetPoint("BOTTOMRIGHT", generalTab, "BOTTOMRIGHT", -15, 15)
 createNewTabButton:SetText("New tab")
 createNewTabButton:SetScript("OnClick", function()
-	func.createNewTab()
+	optionFunc.createNewTab()
 end)
 local removeTabButton = CreateFrame("Button", "$parentRemoveTabButton", rotationTab, "UIPanelButtonTemplate")
 removeTabButton:SetSize(100, 40)
 removeTabButton:SetPoint("BOTTOMRIGHT", rotationTab, "BOTTOMRIGHT", -15, 15)
 removeTabButton:SetText("Remove tab")
-removeTabButton:SetScript("OnClick", function() func.removeTabOnClick() end)
+removeTabButton:SetScript("OnClick", function() optionFunc.removeTabOnClick() end)
 
 local enableClassSpecButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
 local enableGroupInstanceButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
@@ -231,14 +231,14 @@ enableGroupInstanceButton:SetSize(110, 40)
 enableGroupInstanceButton:SetText("group/instance")
 enableGroupInstanceButton:SetPoint("TOPLEFT", leftSideMenu, 23, -15)
 enableGroupInstanceButton:LockHighlight()
-enableGroupInstanceButton:SetScript("OnClick", function(self) func.enableGroupInstanceButtonOnClick(self) end)
+enableGroupInstanceButton:SetScript("OnClick", function(self) optionFunc.enableGroupInstanceButtonOnClick(self) end)
 
 enableClassSpecButton.tooltipText = "Select classes/specs on which to enable tracking."
 enableClassSpecButton:Hide()
 enableClassSpecButton:SetSize(93, 40)
 enableClassSpecButton:SetText("class/spec")
 enableClassSpecButton:SetPoint("LEFT", enableGroupInstanceButton, "RIGHT", 5, 0)
-enableClassSpecButton:SetScript("OnClick", function(self) func.enableClassSpecButtonOnClick(self) end)
+enableClassSpecButton:SetScript("OnClick", function(self) optionFunc.enableClassSpecButtonOnClick(self) end)
 
 local enableCheckBoxes = {}
 --Enable class/spec checkBoxes
@@ -258,7 +258,7 @@ for c=1, 12 do
 	local class = select(2, GetClassInfo(c))
 	local coords = CLASS_ICON_TCOORDS[class]
 	enableCheckBoxes[c][1].icon:SetTexCoord(unpack(coords))
-    enableCheckBoxes[c][1]:SetScript("OnClick", function(self) func.enableClassOnClick(self, c) end)
+    enableCheckBoxes[c][1]:SetScript("OnClick", function(self) optionFunc.enableClassOnClick(self, c) end)
 
 	for s=1, GetNumSpecializationsForClassID(c) do
 		local specID = data.classSpecIDs[c][s]
@@ -275,7 +275,7 @@ for c=1, 12 do
 		enableCheckBoxes[c][s+1].icon:SetTexture(icon)
 
 		enableCheckBoxes[c][s+1]:SetScript("OnClick", function(self)
-            func.enableSpecOnClick(self, c, s)
+            optionFunc.enableSpecOnClick(self, c, s)
 		end)
 	end
 end
@@ -307,7 +307,7 @@ for i=1, 4 do
 	sendRotationButtons[i]:SetSize(60, 40)
     sendRotationButtons[i]:SetText(data.chatTypes[i])
     sendRotationButtons[i].value = data.chatTypes[i]
-    sendRotationButtons[i]:SetScript("OnClick", function(self) func.sendRotationOnClick(self) end)
+    sendRotationButtons[i]:SetScript("OnClick", function(self) optionFunc.sendRotationOnClick(self) end)
 end
 
 local sendRotationFontString, whisperToEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["SEND"])
@@ -334,7 +334,7 @@ local groupMemberButtons = {}
 for i=1, 40 do
     groupMemberButtons[i] = frameUtil.createGroupMemberButton(rotationTab)
     groupMemberButtons[i]:SetPoint("TOPLEFT", groupMemberButtons[i-1] or rotationTab, "BOTTOMLEFT")
-    groupMemberButtons[i]:SetScript("OnClick", function(self) func.groupMemberOnClick(self) end)
+    groupMemberButtons[i]:SetScript("OnClick", function(self) optionFunc.groupMemberOnClick(self) end)
 end
 -- 3. Position groupMemberButtons
 for i=6, 36, 5 do
@@ -353,9 +353,9 @@ for i=1, 10 do
     rotationButtons[i] = frameUtil.createRotationButton(rotationTab)
     rotationButtons[i].value = i
     rotationButtons[i]:SetPoint("TOPLEFT", rotationButtons[i-1] or rotationTab, "BOTTOMLEFT")
-    rotationButtons[i]:SetScript("OnClick", function(self, button) func.rotationButtonOnClick(self, button) end)
+    rotationButtons[i]:SetScript("OnClick", function(self, button) optionFunc.rotationButtonOnClick(self, button) end)
     removeMemberButtons[i] = frameUtil.createRemoveMemberButton(rotationButtons[i])
-    removeMemberButtons[i]:SetScript("OnClick", function(self) func.removeMemberOnClick(self) end)
+    removeMemberButtons[i]:SetScript("OnClick", function(self) optionFunc.removeMemberOnClick(self) end)
 end
 rotationButtons[1]:ClearAllPoints()
 rotationButtons[1]:SetPoint("TOPRIGHT", -25, -25)

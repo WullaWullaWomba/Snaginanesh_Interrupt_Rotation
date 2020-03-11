@@ -5,7 +5,7 @@ SIR.data = SIR.data or {}
 SIR.util = SIR.util or {}
 SIR.frameUtil = SIR.frameUtil or {}
 SIR.rotationFrames = SIR.rotationFrames or {}
-SIR.func = SIR.func or {}
+SIR.optionFunc = SIR.optionFunc or {}
 SIR.optionFrames = SIR.optionFrames or {}
 SIR.rotationFunc = SIR.rotationFunc or {}
 SIR.playerInfo = SIR.playerInfo or {}
@@ -60,7 +60,7 @@ f.PLAYER_LOGIN = function()
 		["COLOUREDNAME"] = SIR.util.getColouredNameByGUID(GUID),
 	}
 	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
-	SIR.func.load()
+	SIR.optionFunc.load()
 	SIR.groupInfoLoad()
 	SIR.optionFrames.generalTabButton:Click()
 end
@@ -70,6 +70,6 @@ end
 f.PLAYER_LOGOUT = function()
 end
 f.PLAYER_LEAVING_WORLD = function()
-	SIR.func.save()
+	SIR.optionFunc.save()
 	SIR.groupInfoSave()
 end
