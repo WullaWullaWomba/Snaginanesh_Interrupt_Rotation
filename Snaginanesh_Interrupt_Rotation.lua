@@ -25,7 +25,8 @@ f:RegisterEvent("PLAYER_LEAVING_WORLD")
 f:RegisterEvent("INSPECT_READY")
 f:RegisterEvent("UNIT_PET")
 
-f.GROUP_ROSTER_UPDATE = function()
+f.GROUP_ROSTER_UPDATE = function(...)
+	SIR.util.myPrint("GROUP_ROSTER_UPDATE", ...)
 	SIR.groupInfoOnGroupRosterUpdate()
 end
 f.UNIT_PET = function(...)
