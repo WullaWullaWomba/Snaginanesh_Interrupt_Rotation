@@ -236,7 +236,7 @@ optionFrames.transmissionOkayButton:SetScript("OnClick", function(self)
 		optionFrames.container:Show()
 		optionFrames.rotationTabButtons[numTabs]:Click()
 	else
-		for _, tabOptions in ipairs(SIR.tabOptions) do
+		for i, tabOptions in ipairs(SIR.tabOptions) do
 			if tabOptions["TITLE"] == text then
 				tabOptions["ROTATION"] = self.rotation
 				optionFrames.container:Show()

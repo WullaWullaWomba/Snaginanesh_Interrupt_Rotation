@@ -7,6 +7,7 @@ local _, SIR = ...
 SIR.util = SIR.util or {}
 SIR.playerInfo = SIR.playerInfo or {}
 SIR.groupInfo = SIR.groupInfo or {}
+SIR.petInfo = SIR.petInfo or {}
 
 local reverseTable, remove = SIR.util.reverseTable, SIR.util.remove
 local toBeInitialized = {}
