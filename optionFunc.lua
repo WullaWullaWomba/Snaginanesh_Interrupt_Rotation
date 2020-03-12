@@ -236,9 +236,9 @@ optionFrames.transmissionOkayButton:SetScript("OnClick", function(self)
 		optionFrames.container:Show()
 		optionFrames.rotationTabButtons[numTabs]:Click()
 	else
-		for i=1, #SIR.tabOptions do
-			if SIR.tabOptions[i]["TITLE"] == text then
-				SIR.tabOptions[i]["ROTATION"] = self.rotation
+		for _, tabOptions in ipairs(SIR.tabOptions) do
+			if tabOptions["TITLE"] == text then
+				tabOptions["ROTATION"] = self.rotation
 				optionFrames.container:Show()
 				optionFrames.rotationTabButtons[i]:Click()
 				break
@@ -249,11 +249,11 @@ optionFrames.transmissionOkayButton:SetScript("OnClick", function(self)
 end)
 UIDropDownMenu_Initialize(optionFrames.transmissionDropdownMenu, function()--self, level, menuList)
 	local info = UIDropDownMenu_CreateInfo()
-	for i=1, numTabs do
-		info.text = SIR.tabOptions[i]["TITLE"]
+	for _, tabOptions in ipairs(SIR.tabOptions) do
+		info.text = tabOptions["TITLE"]
 		info.checked = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu) == info.text
 		info.optionFunc = function()
-				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, SIR.tabOptions[i]["TITLE"])
+				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, tabOptions["TITLE"])
 			end
 		UIDropDownMenu_AddButton(info)
 	end

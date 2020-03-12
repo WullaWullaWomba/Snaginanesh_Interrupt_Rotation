@@ -110,36 +110,15 @@ inspectNext = function()
     C_Timer.After(2.1, function() inspectNext() end)
 end
 SIR.groupInfoLoad = function()
-    if not IsInGroup() then
-        SIR.groupInfo = {
-            [SIR.playerInfo["GUID"]] = {
-                ["NAME"] = SIR.playerInfo["NAME"],
-                ["SERVER"] = SIR.playerInfo["REALMN"],
-                ["CLASS"] = SIR.playerInfo["CLASS"],
-                ["SPEC"] =  SIR.playerInfo["SPEC"],
-                ["TALENTS"] = {},
-            },
-        }
-        numGroupMembers = 1
-    else
-        SIR.groupInfo = SnagiIntRotaSaved.groupInfo or {}
-        SIR.groupInfo[SIR.playerInfo["GUID"]] = {
+    SIR.groupInfo = {
+        [SIR.playerInfo["GUID"]] = {
             ["NAME"] = SIR.playerInfo["NAME"],
             ["SERVER"] = SIR.playerInfo["REALMN"],
             ["CLASS"] = SIR.playerInfo["CLASS"],
             ["SPEC"] =  SIR.playerInfo["SPEC"],
             ["TALENTS"] = {},
-        }
-        numGroupMembers = 1
-        for GUID, info in pairs(SIR.groupInfo) do
-            if not UnitInParty(info["NAME"]) then
-                SIR.groupInfo[GUID] = nil
-            elseif GUID ~= SIR.playerInfo["GUID"] then
-                numGroupMembers = numGroupMembers+1
-                toBeInspectedActive[#toBeInspectedActive+1] = GUID
-            end
-        end
-    end
+        },
+    }
     SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"] = {
         0, 0, 0, 0, 0, 0, 0
     }
@@ -148,6 +127,17 @@ SIR.groupInfoLoad = function()
             if select(4, GetTalentInfo(i, j, 1, false)) then
                 SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"][i] = j
                 break
+            end
+        end
+    end
+    numGroupMembers = 1
+    if IsInGroup() then
+        for GUID, info in pairs(SIR.groupInfo) do
+            if not UnitInParty(info["NAME"]) then
+                SIR.groupInfo[GUID] = nil
+            elseif GUID ~= SIR.playerInfo["GUID"] then
+                numGroupMembers = numGroupMembers+1
+                toBeInspectedActive[#toBeInspectedActive+1] = GUID
             end
         end
     end
@@ -189,7 +179,6 @@ SIR.groupInfoOnGroupRosterUpdate = function()
     end
     SIR.util.myPrint("newNumGroupMembers", newNumGroupMembers)
     if newNumGroupMembers > numGroupMembers then
-        --SIR.util.myPrint("newNumGroupMembers > numGroupMembers ", newNumGroupMembers)
         -- add new players
         local groupType = "party"
         if IsInRaid() then
