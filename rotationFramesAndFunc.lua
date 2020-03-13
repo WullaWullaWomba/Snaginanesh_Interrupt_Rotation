@@ -120,42 +120,17 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 bar.currentTime = 0
                 bar.expirationTime = 0
             end
-            -- resort / move bar to correct index if sortmode is by CD
+            -- move bar to correct index if sortmode is by CD
             if SIR.tabOptions[tab]["SORTMODE"] == "CD" then
-                --rotationFunc.sortTab(tab)
-                local moveTo
-                if not timestamp then
-                    moveTo = 1
-                else
-                    moveTo = i
-                    -- find the index to place the bar into
-                    for j=i+1, #statusBars[tab] do
-                        if statusBars[tab][j].expirationTime < bar.expirationTime then
-                            moveTo = moveTo+1
-                        else
-                            break
-                        end
-                    end
+                -- (temporarily) remove bar
+                if statusBars[tab][i+1] then
+                    statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
                 end
-                -- if the position changes
-                SIR.util.myPrint("moveTo", moveTo, "i", i)
-                if moveTo ~= i then
-                    -- adjust anchors
-                    SIR.util.myPrint("moveTo", moveTo, "i", i)
-                    if statusBars[tab][i+1] then
-                        statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
-                    end
-                    bar:SetPoint("TOPRIGHT", statusBars[tab][moveTo], "BOTTOMRIGHT", 0, -SIR.tabOptions[tab]["SPACE"])
-                    if statusBars[tab][moveTo+1] then
-                        statusBars[tab][moveTo+1]:SetPoint("TOPRIGHT", bar, "BOTTOMRIGHT",
-                        0, -SIR.tabOptions[tab]["SPACE"])
-                    end
-                    -- adjust table
-                    for j=i, moveTo-1 do
-                        statusBars[tab][j] = statusBars[tab][j+1]
-                    end
-                    statusBars[tab][moveTo] = bar
+                for j=i, #statusBars[tab]-1 do
+                    statusBars[tab][j] = statusBars[tab][j+1]
                 end
+                -- insert bar again
+                insertBar(tab, statusBars[tab], bar)
             end
             return
         end
