@@ -36,7 +36,7 @@ SIR.util = {
         end
     end,
     ["myPrint"] = function(...)
-        if SIR.test then print(...) end
+        if SIR.playerInfo["NAME"] == "Addonmsg" or SIR.test then print(...) end
     end,
     ["setTextClassColor"] = function(text, class)
         if classColorsHex[class] then

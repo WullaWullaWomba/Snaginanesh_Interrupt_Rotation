@@ -126,7 +126,7 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 if statusBars[tab][i+1] then
                     statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
                 end
-                for j=i, #statusBars[tab]-1 do
+                for j=i, #statusBars[tab] do
                     statusBars[tab][j] = statusBars[tab][j+1]
                 end
                 -- insert bar again
