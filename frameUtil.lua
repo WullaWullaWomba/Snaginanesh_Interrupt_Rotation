@@ -294,6 +294,6 @@ SIR.frameUtil = {
 		option.toEditBox:SetScript("OnEnterPressed", function(self)
 			optionFunc.groupEnableOptionToEditBoxOnEnterPressed(self, option)
 		end)
-			return option
-	end
+		return option
+	end,
 }

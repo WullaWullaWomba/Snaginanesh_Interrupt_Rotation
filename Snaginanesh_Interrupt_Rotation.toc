@@ -6,7 +6,8 @@
 
 data.lua
 util.lua
-groupInfo.lua
+groupInfoAndFunc.lua
+petInfoAndFunc.lua
 frameUtil.lua
 optionFrames.lua
 optionFunc.lua

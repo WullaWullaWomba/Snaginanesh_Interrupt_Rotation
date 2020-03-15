@@ -23,7 +23,7 @@ SIR.playerInfo = SIR.playerInfo or {}
 local util = SIR.util
 local frameUtil = SIR.frameUtil
 local optionFrames = SIR.optionFrames
-local optionFunc = SIR.optionFunc
+local optionFunc = SIR.optionFunc or {}
 
 
 local contains, remove= util.contains, util.remove
@@ -270,21 +270,7 @@ end)
 -- ADDON FUNCTIONS
 
 ------------------------------------------------------------------------------------------------------------------------
-optionFunc.load = function()
-    SIR.tabOptions = SnagiIntRotaSaved.tabOptions or {}
-	for i=1, #SIR.tabOptions do
-		for k, default in pairs(defaultOptions) do
-			if SIR.tabOptions[i][k] == nil then
-				SIR.tabOptions[i][k] = default
-			end
-		end
-        optionFunc.loadTab(SIR.tabOptions[i]["TITLE"])
-    end
-end
-optionFunc.save = function()
-    SnagiIntRotaSaved.tabOptions = SIR.tabOptions
-end
-optionFunc.loadTab = function(title)
+local loadTab = function(title)
 	numTabs = numTabs+1
 	optionFrames.rotationTabButtons[numTabs] = frameUtil.aquireTabButton(optionFrames.container)
 	optionFrames.rotationTabButtons[numTabs].key = numTabs
@@ -296,9 +282,25 @@ optionFunc.loadTab = function(title)
 	optionFrames.rotationTabButtons[numTabs]:SetText(title)
 	SIR.rotationFunc.newRotationTab(numTabs)
 end
-optionFunc.updateGroupMemberButtons = function()
+
+local updateRotationButtons = function()
+	SIR.util.myPrint("updateRotationButtons")
+	local rotation = SIR.tabOptions[activeTab]["ROTATION"]
+	for i=#rotation+1, #optionFrames.rotationButtons do
+		optionFrames.rotationButtons[i]:Hide()
+	end
+	for i=1, #rotation do
+		optionFrames.rotationButtons[i]:SetGUID(rotation[i])
+		optionFrames.rotationButtons[i]:SetText(util.getColouredNameByGUID(rotation[i]))
+		optionFrames.rotationButtons[i]:Show()
+	end
+end
+
+
+
+local updateGroupMemberButtons = function()
 	--done?!!
-	SIR.util.myPrint("optionFunc.updateGroupMemberButtons")
+	SIR.util.myPrint("updateGroupMemberButtons")
 	if IsInGroup() then
 		local numGroup = GetNumGroupMembers()
 		for i=numGroup+1, 40 do
@@ -336,19 +338,8 @@ optionFunc.updateGroupMemberButtons = function()
 		optionFrames.groupMemberButtons[1]:Show()
     end
 end
-optionFunc.updateRotationButtons = function()
-	SIR.util.myPrint("optionFunc.updateRotationButtons")
-	local rotation = SIR.tabOptions[activeTab]["ROTATION"]
-	for i=#rotation+1, #optionFrames.rotationButtons do
-		optionFrames.rotationButtons[i]:Hide()
-	end
-	for i=1, #rotation do
-		optionFrames.rotationButtons[i]:SetGUID(rotation[i])
-		optionFrames.rotationButtons[i]:SetText(util.getColouredNameByGUID(rotation[i]))
-		optionFrames.rotationButtons[i]:Show()
-	end
-end
-optionFunc.removeRotationMember = function(GUID)
+
+local removeRotationMember = function(GUID)
 	-- update groupMemberButton if available
 	for i=1, 40 do
 		if optionFrames.groupMemberButtons[i].GUID == GUID then
@@ -379,14 +370,14 @@ optionFunc.removeRotationMember = function(GUID)
 	end
 	SIR.rotationFunc.removeRotationMember(activeTab, GUID)
 end
-optionFunc.makeTransmissionText = function()
+local makeTransmissionText = function()
 	local text = "[SnagiIntRota:] "..optionFrames.titleEditBox:GetText().." "
 	for _, member in ipairs(SIR.tabOptions[activeTab]["ROTATION"]) do
 		text = text..member.." "
 	end
 	return text
 end
-optionFunc.updateEnableMenu = function()
+local updateEnableMenu = function()
 	optionFrames.trackAllOption.checkBox:SetChecked(SIR.tabOptions[activeTab]["TRACKALLCHECKED"])
 	optionFrames.trackAllOption.fromSlider:SetValue(SIR.tabOptions[activeTab]["TRACKALLFROM"])
 	optionFrames.trackAllOption.toSlider:SetValue(SIR.tabOptions[activeTab]["TRACKALLTO"])
@@ -432,28 +423,37 @@ optionFunc.updateEnableMenu = function()
 		end
 	end
 end
-optionFunc.updateSendMenu = function()
+local updateSendMenu = function()
 	optionFrames.titleEditBox:SetText(SIR.tabOptions[activeTab]["TITLE"])
 end
-optionFunc.updateDisplayMenu = function()
+local updateDisplayMenu = function()
 	optionFrames.widthEditBox:SetText(SIR.tabOptions[activeTab]["WIDTH"])
 	optionFrames.heightEditBox:SetText(SIR.tabOptions[activeTab]["HEIGHT"])
 	optionFrames.spaceEditBox:SetText(SIR.tabOptions[activeTab]["SPACE"])
 	optionFrames.xOffEditBox:SetText(SIR.tabOptions[activeTab]["XOFF"])
 	optionFrames.yOffEditBox:SetText(SIR.tabOptions[activeTab]["YOFF"])
 end
-optionFunc.updateSortMenu = function()
+local updateSortMenu = function()
 	for k, cb in pairs(optionFrames.sortModeCheckBoxes) do
 		cb:SetChecked(k == SIR.tabOptions[activeTab]["SORTMODE"])
 	end
 end
-------------------------------------------------------------------------------------------------------------------------
 
--- FRAME SCRIPTS
 
-------------------------------------------------------------------------------------------------------------------------
--- optionFrames.groupMemberButtons
-
+optionFunc.load = function()
+    SIR.tabOptions = SnagiIntRotaSaved.tabOptions or {}
+	for i=1, #SIR.tabOptions do
+		for k, default in pairs(defaultOptions) do
+			if SIR.tabOptions[i][k] == nil then
+				SIR.tabOptions[i][k] = default
+			end
+		end
+        loadTab(SIR.tabOptions[i]["TITLE"])
+    end
+end
+optionFunc.save = function()
+    SnagiIntRotaSaved.tabOptions = SIR.tabOptions
+end
 optionFunc.generalTabButtonOnClick = function(self)
 	optionFrames.rotationTab:Hide()
 	optionFrames.generalTab:Show()
@@ -477,12 +477,12 @@ optionFunc.rotationTabButtonOnClick = function(self)
 	optionFrames.generalTabButton.inactiveTexture:Show()
 	self.inactiveTexture:Hide()
 	self.activeTexture:Show()
-	optionFunc.updateRotationButtons()
-	optionFunc.updateGroupMemberButtons()
-	optionFunc.updateSendMenu()
-	optionFunc.updateEnableMenu()
-	optionFunc.updateDisplayMenu()
-	optionFunc.updateSortMenu()
+	updateRotationButtons()
+	updateGroupMemberButtons()
+	updateSendMenu()
+	updateEnableMenu()
+	updateDisplayMenu()
+	updateSortMenu()
 	optionFrames.leftSideMenu:Show()
 end
 optionFunc.createNewTab = function()
@@ -517,7 +517,7 @@ optionFunc.groupMemberOnClick = function(self)
 		self:UpdateTexture()
 		SIR.rotationFunc.addRotationMember(activeTab, GUID)
 	else
-		optionFunc.removeRotationMember(GUID)
+		removeRotationMember(GUID)
 	end
 end
 optionFunc.enableGroupInstanceButtonOnClick = function(self)
@@ -676,7 +676,7 @@ optionFunc.groupEnableOptionToEditBoxOnEnterPressed = function(self, option)
 	SIR.rotationFunc.updateTrackMode(activeTab)
 end
 optionFunc.enableClassOnClick = function(self, c)
-local newBool = self:GetChecked()
+	local newBool = self:GetChecked()
 	SIR.tabOptions[activeTab]["CLASSENABLEOPTIONS"][c] = newBool
 	for i=1, #classSpecIDs[c] do
 		SIR.tabOptions[activeTab]["SPECENABLEOPTIONS"][classSpecIDs[c][i]] = newBool
@@ -776,7 +776,7 @@ optionFunc.rotationButtonOnClick = function(self, button)
 	end
 end
 optionFunc.removeMemberOnClick = function(self)
-	optionFunc.removeRotationMember(self:GetParent().GUID)
+	removeRotationMember(self:GetParent().GUID)
 end
 optionFunc.testButtonOnClick = function()
 	SIR.test = not SIR.test
@@ -886,6 +886,6 @@ optionFunc.titleEditBoxOnEnterPressed = function(self)
 	self:ClearFocus()
 end
 optionFunc.sendRotationOnClick = function(self)
-	SendChatMessage(optionFunc.makeTransmissionText(), self.value, _,
+	SendChatMessage(makeTransmissionText(), self.value, _,
 		optionFrames.whisperToEditBox:GetText())
 end

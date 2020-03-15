@@ -22,11 +22,11 @@ SIR.data = {
         [96231]=15,--Rebuke Paladin
         [6552]=15,--Pummel
         [106839]=15,--Skull Bash
-        [119910]=24,--Spell lock sac
         [19647]=24, --spell lock
         [119911]=24, --Optical Blast
         [115781]=24,--Optical blast
-        [132409]=24, --sac spell lock
+        [119910]=24, -- Spell Lock (WL with felhunter - source player)
+        [132409]=24, -- Spell lock (WL with felhunter sacrificed - source player)
         [171138]=24, --shadow lock
         [171139]=24, -- ^^
         [171140]=24, -- ^^
@@ -36,11 +36,12 @@ SIR.data = {
         [1766]=15,--Kick
         [116705]=15, --Spear hand strike
         [97547]=60, --Solar Beam
-        [78675]=60,--extra solar
+        [78675]=60, --extra solar
         --[31935]=15, --Avenger's Shield
         [183752]=15, --Consume Magic (DH)
         [15487]=45, -- Silence Priest
-        [187707]=15, --Muzzle
+        [187707]=15, -- Muzzle
+        -----------------------------------
     },
     ["specInterrupts"] = {
         -- Monk

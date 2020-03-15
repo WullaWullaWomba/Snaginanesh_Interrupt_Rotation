@@ -209,7 +209,7 @@ rotationFunc.updateNumGroup = function(num)
     end
 end
 rotationFunc.updateTrackMode = function(tab)
-    SIR.util.myPrint("updateTrackMode tab "..tab.." current mode: "..trackModes[tab])
+    SIR.util.myPrint("updateTrackMode tab", tab, "current mode:", trackModes[tab], "numGroup", numGroup)
     local old = trackModes[tab]
     if not SIR.tabOptions[tab]["SPECENABLEOPTIONS"][SIR.playerInfo["SPEC"]] then
         trackModes[tab] = "NONE"
@@ -287,7 +287,7 @@ end
 rotationFunc.specUpdate = function(tab, GUID, class, newSpec)
     SIR.util.myPrint("rotationFunc.specUpdate")
     if not specInterrupts[newSpec] then
-        rotationFunc.removePlayer(GUID)
+        rotationFunc.removeByGUID(GUID)
     elseif trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
         and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
         updateOrAddStatusBar(tab, GUID, specInterrupts[newSpec], class)
@@ -298,8 +298,8 @@ rotationFunc.specUpdateAllTabs = function(GUID, class, newSpec)
         rotationFunc.specUpdate(tab, GUID, class, newSpec)
     end
 end
-rotationFunc.removePlayer = function(GUID)
-    SIR.util.myPrint("rotationFunc.removePlayer")
+rotationFunc.removeByGUID = function(GUID)
+    SIR.util.myPrint("rotationFunc.removeByGUID")
     for tab=1, #statusBars do
         for bar=#statusBars[tab], 1, -1 do
             if statusBars[tab][bar].GUID == GUID then

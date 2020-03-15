@@ -20,7 +20,11 @@ makeCopy = function(input)
         return input
     end
 end
-
+local myToons = {
+    "Addonmsg",
+    "Metestpet",
+    "Trololololoo"
+}
 SIR.util = {
     ["contains"] = function(table, e)
         for i=1, #table do
@@ -36,7 +40,9 @@ SIR.util = {
         end
     end,
     ["myPrint"] = function(...)
-        if SIR.playerInfo["NAME"] == "Addonmsg" or SIR.test then print(...) end
+        if SIR.test or SIR.util.contains(myToons, SIR.playerInfo["NAME"]) then
+            print(...)
+        end
     end,
     ["setTextClassColor"] = function(text, class)
         if classColorsHex[class] then

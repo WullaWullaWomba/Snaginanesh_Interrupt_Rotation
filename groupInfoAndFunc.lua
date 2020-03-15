@@ -7,8 +7,8 @@ local _, SIR = ...
 SIR.util = SIR.util or {}
 SIR.playerInfo = SIR.playerInfo or {}
 SIR.groupInfo = SIR.groupInfo or {}
+SIR.groupInfoFunc = SIR.groupInfoFunc or {}
 SIR.petInfo = SIR.petInfo or {}
-
 local reverseTable, remove = SIR.util.reverseTable, SIR.util.remove
 local toBeInitialized = {}
 local toBeInspectedActive = {}
@@ -110,7 +110,8 @@ inspectNext = function()
     end
     C_Timer.After(2.1, function() inspectNext() end)
 end
-SIR.groupInfoLoad = function()
+
+SIR.groupInfoFunc.PLAYER_LOGIN = function()
     SIR.groupInfo = {
         [SIR.playerInfo["GUID"]] = {
             ["NAME"] = SIR.playerInfo["NAME"],
@@ -133,8 +134,9 @@ SIR.groupInfoLoad = function()
     end
     numGroupMembers = 1
     if IsInGroup() then
-        for GUID, info in pairs(SIR.groupInfo) do
+        for GUID, info in pairs(SnagiIntRotaSaved.groupInfo) do
             if not UnitInParty(info["NAME"]) then
+                SIR.util.myPrint(info["NAME"], "not UnitInParty")
                 SIR.groupInfo[GUID] = nil
             elseif GUID ~= SIR.playerInfo["GUID"] then
                 numGroupMembers = numGroupMembers+1
@@ -145,10 +147,10 @@ SIR.groupInfoLoad = function()
     SIR.rotationFunc.updateNumGroup(numGroupMembers)
     inspectNext()
 end
-SIR.groupInfoSave = function()
+SIR.groupInfoFunc.PLAYER_LEAVING_WORLD = function()
     SnagiIntRotaSaved.groupInfo = SIR.groupInfo
 end
-SIR.groupInfoOnInspect = function(...)
+SIR.groupInfoFunc.INSPECT_READY = function(...)
     recentInspectTimes[#recentInspectTimes+1] = GetTime()
     local GUID = ...
     if not GUID or (not SIR.groupInfo[GUID] and not setInitialInfo(GUID)) then
@@ -172,7 +174,7 @@ SIR.groupInfoOnInspect = function(...)
     end
     -- todo if talents changed
 end
-SIR.groupInfoOnGroupRosterUpdate = function()
+SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
     SIR.util.myPrint("SIR.groupInfoOnGroupRosterUpdate ", numGroupMembers)
     local newNumGroupMembers = max(GetNumGroupMembers(), 1)
     if newNumGroupMembers == numGroupMembers then
@@ -196,14 +198,14 @@ SIR.groupInfoOnGroupRosterUpdate = function()
         for GUID, info in pairs(SIR.groupInfo) do
             if not UnitInParty(info["NAME"]) then
                 SIR.groupInfo[GUID] = nil
-                SIR.rotationFunc.removePlayer(GUID)
+                SIR.rotationFunc.removeByGUID(GUID)
             end
         end
     else
         for GUID, _ in pairs(SIR.groupInfo) do
             if GUID ~= SIR.playerInfo["GUID"] then
                 SIR.groupInfo[GUID] = nil
-                SIR.rotationFunc.removePlayer(GUID)
+                SIR.rotationFunc.removeByGUID(GUID)
             end
         end
     end
@@ -211,6 +213,7 @@ SIR.groupInfoOnGroupRosterUpdate = function()
     SIR.util.myPrint("set numGroupMembers = newNumGroupMembers")
     SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
 end
+
 SLASH_MYINSPECT1 = "/myinspect"
 SlashCmdList["MYINSPECT"] = function()
 	printInspect()

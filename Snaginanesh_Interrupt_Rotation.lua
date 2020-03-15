@@ -25,18 +25,20 @@ f:RegisterEvent("PLAYER_LEAVING_WORLD")
 f:RegisterEvent("INSPECT_READY")
 f:RegisterEvent("UNIT_PET")
 
-f.GROUP_ROSTER_UPDATE = function(...)
-	SIR.util.myPrint("GROUP_ROSTER_UPDATE", ...)
-	SIR.groupInfoOnGroupRosterUpdate()
+f.GROUP_ROSTER_UPDATE = function()
+	SIR.groupInfoFunc.GROUP_ROSTER_UPDATE()
 end
 f.UNIT_PET = function(...)
-	local unit = ...
-	if unit and UnitGUID(unit.."pet") then
-		SIR.pets[UnitGUID(unit.."pet")] = UnitGUID(unit)
-	end
+	SIR.util.myPrint("UNIT_PET", ...)
+	SIR.petInfoFunc.UNIT_PET(...)
 end
+
 f.COMBAT_LOG_EVENT_UNFILTERED = function()
 	SIR.rotationFunc.onCombatLogEvent()
+	local _, subEvent  = CombatLogGetCurrentEventInfo()
+	if subEvent == "UNIT_DIED" then
+		SIR.util.myPrint(CombatLogGetCurrentEventInfo())
+	end
 end
 f.PLAYER_SPECIALIZATION_CHANGED = function()
 	SIR.playerInfo["SPEC"] = GetSpecializationInfo(GetSpecialization())
@@ -47,7 +49,7 @@ f.PLAYER_SPECIALIZATION_CHANGED = function()
 	end
 end
 f.INSPECT_READY = function(...)
-	SIR.groupInfoOnInspect(...)
+	SIR.groupInfoFunc.INSPECT_READY(...)
 end
 f.PLAYER_LOGIN = function()
 	local GUID = UnitGUID("player")
@@ -62,7 +64,7 @@ f.PLAYER_LOGIN = function()
 	}
 	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
 	SIR.optionFunc.load()
-	SIR.groupInfoLoad()
+	SIR.groupInfoFunc.PLAYER_LOGIN()
 	SIR.optionFrames.generalTabButton:Click()
 end
 f.PLAYER_ENTERING_WORLD = function()
@@ -72,5 +74,5 @@ f.PLAYER_LOGOUT = function()
 end
 f.PLAYER_LEAVING_WORLD = function()
 	SIR.optionFunc.save()
-	SIR.groupInfoSave()
+	SIR.groupInfoFunc.PLAYER_LEAVING_WORLD()
 end
