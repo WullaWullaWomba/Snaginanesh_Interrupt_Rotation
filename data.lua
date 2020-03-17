@@ -6,8 +6,6 @@ SIR.data = {
         --["Death Knight"] = 47528;
         ["DEMONHUNTER"] = 183752;
         --["Demon Hunter"] = 183752;
-        ["HUNTER"] = 147362;
-        --["Hunter"] = 147362;
         ["MAGE"] = 2139;
         --["Mage"] = 2139;
         ["ROGUE"] = 1766;
@@ -18,29 +16,30 @@ SIR.data = {
         --["Warrior"] = 6552;
     },
     ["cds"] = {
-        [47528]=15,--Mind Freeze DK
-        [96231]=15,--Rebuke Paladin
-        [6552]=15,--Pummel
-        [106839]=15,--Skull Bash
-        [19647]=24, --spell lock
-        [119911]=24, --Optical Blast
-        [115781]=24,--Optical blast
+        [47528]=15, -- Mind Freeze DK
+        [96231]=15, -- Rebuke Paladin
+        [6552]=15, -- Pummel
+        [106839]=15, -- Skull Bash
+        [19647]=24, -- Spell Lock
+        [119911]=24, -- Optical Blast
+        [115781]=24, -- Optical Blast
         [119910]=24, -- Spell Lock (WL with felhunter - source player)
         [132409]=24, -- Spell lock (WL with felhunter sacrificed - source player)
-        [171138]=24, --shadow lock
+        -- 196099 felhuner sacced
+        [171138]=24, -- Shadow lock
         [171139]=24, -- ^^
         [171140]=24, -- ^^
-        [57994]=12, --Wind shear
-        [147362]=24, --Counter Shot
-        [2139]=24, -- Counterspell
-        [1766]=15,--Kick
-        [116705]=15, --Spear hand strike
-        [97547]=60, --Solar Beam
-        [78675]=60, --extra solar
-        --[31935]=15, --Avenger's Shield
-        [183752]=15, --Consume Magic (DH)
-        [15487]=45, -- Silence Priest
-        [187707]=15, -- Muzzle
+        [57994]=12, --Wind shear (Shaman)
+        [147362]=24, --Counter Shot (Hunter - Marksman / Beastmaster)
+        [2139]=24, -- Counterspell (Mage)
+        [1766]=15, -- Kick (Rogue)
+        [116705]=15, --Spear hand strike (Monk)
+        [97547]=60, --Solar Beam (Druid - Boomkin)
+        [78675]=60, --extra solar (Druid - Boomkin)
+        --[31935]=15, --Avenger's Shield (Paladin - Prot)
+        [183752]=15, --Consume Magic (Demon hunter)
+        [15487]=45, -- Silence (Priest - SHadow)
+        [187707]=15, -- Muzzle (Hunter - Survival)
         -----------------------------------
     },
     ["specInterrupts"] = {
@@ -66,9 +65,9 @@ SIR.data = {
         [105] = nil, -- Restoration
 
         -- Warlock
-        [265] = 132409, -- Affliction
-        [266] = 132409, -- Demonology
-        [267] = 132409, -- Destruction
+        --[265] = 132409, -- Affliction
+        --[266] = 132409, -- Demonology
+        --[267] = 132409, -- Destruction
 
         -- Death Knight
         [250] = 47528, -- Blood
@@ -82,7 +81,7 @@ SIR.data = {
         -- Hunter
         [253] = 147362, -- Beast Mastery
         [254] = 147362, -- Marksmanship
-        [255] = 147362, -- Survival
+        [255] = 187707, -- Survival
 
         -- Mage
         [62] = 2139, -- Arcane

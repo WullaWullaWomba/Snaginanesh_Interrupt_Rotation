@@ -1,4 +1,5 @@
---luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID CombatLogGetCurrentEventInfo
+--luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID CombatLogGetCurrentEventInfo 
+--luacheck: globals UnitAura
 local _, SIR = ...
 SIR.util = SIR.util or {}
 SIR.frameUtil = SIR.frameUtil or {}
@@ -272,10 +273,18 @@ rotationFunc.updateTrackMode = function(tab)
 end
 rotationFunc.playerInit = function(tab, GUID, class)
     SIR.util.myPrint("rotationFunc.playerInit")
-    if classWideInterrupts[class] then
-        if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
-            and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
+    if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
+        and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
+        if classWideInterrupts[class] then
             addStatusBar(tab, GUID, classWideInterrupts[class], class)
+        elseif class == "WARLOCK" then
+            -- init warlock if felhunter pet / sacced
+            for i=1, 40 do
+                if select(10, UnitAura("player", i)) == 196099 then
+                    addStatusBar(tab, GUID, 132409, class)
+                end
+            end
+            -- todo else check for felhunter pet
         end
     end
 end
@@ -285,15 +294,18 @@ rotationFunc.playerInitAllTabs = function(GUID, class)
     end
 end
 rotationFunc.specUpdate = function(tab, GUID, class, newSpec)
-    SIR.util.myPrint("rotationFunc.specUpdate")
-    if not specInterrupts[newSpec] then
-        rotationFunc.removeByGUID(GUID)
-    elseif trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
-        and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
-        updateOrAddStatusBar(tab, GUID, specInterrupts[newSpec], class)
+    SIR.util.myPrint("rotationFunc.specUpdate", class, newSpec)
+    if class ~= "WARLOCK" then
+        if not specInterrupts[newSpec] then
+            rotationFunc.removeByGUID(GUID)
+        elseif trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
+            and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
+            updateOrAddStatusBar(tab, GUID, specInterrupts[newSpec], class)
+        end
     end
 end
 rotationFunc.specUpdateAllTabs = function(GUID, class, newSpec)
+    SIR.util.myPrint("rotationFunc.specUpdateAllTabs")
     for tab=1, #rotationFrames do
         rotationFunc.specUpdate(tab, GUID, class, newSpec)
     end
@@ -309,6 +321,7 @@ rotationFunc.removeByGUID = function(GUID)
     end
 end
 rotationFunc.newRotationTab = function(tab)
+    SIR.util.myPrint("rotationFunc.newRotationTab")
     local rotationFrame = SIR.frameUtil.aquireRotationFrame(SIR.optionFrames.container, tab)
     rotationFrame:ClearAllPoints()
     rotationFrame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT",

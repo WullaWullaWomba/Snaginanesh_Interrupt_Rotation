@@ -19,7 +19,7 @@ SIR.petInfoFunc.UNIT_PET = function(unitID)
         -- variable pet behaviour here
         local spellID
         if petType == "6" then
-            spellID = 1337 -- todo real value for fellhunter interrupt
+            spellID = 119910 -- todo real value for fellhunter interrupt
         else
             return
         end
