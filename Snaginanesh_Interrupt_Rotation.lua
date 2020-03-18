@@ -36,7 +36,8 @@ end
 f.COMBAT_LOG_EVENT_UNFILTERED = function()
 	SIR.rotationFunc.onCombatLogEvent()
 	local _, subEvent  = CombatLogGetCurrentEventInfo()
-	if SIR.test then 
+	--[[
+	if SIR.test then
 		local _, event, _, _, name, _, _, _, destName, _, _, spellID = CombatLogGetCurrentEventInfo()
 		local _, subEvent, _, _, n, _, _, _, destName, _, _, spellID  = CombatLogGetCurrentEventInfo()
 		print(name)
@@ -44,6 +45,7 @@ f.COMBAT_LOG_EVENT_UNFILTERED = function()
 			SIR.util.myPrint(event, name, destName, spellID)
 		end
 	end
+	]]--
 	if subEvent == "UNIT_DIED" then
 		SIR.util.myPrint(CombatLogGetCurrentEventInfo())
 	end

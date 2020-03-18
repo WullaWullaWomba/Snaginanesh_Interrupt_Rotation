@@ -1,4 +1,4 @@
---luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID CombatLogGetCurrentEventInfo 
+--luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID CombatLogGetCurrentEventInfo
 --luacheck: globals UnitAura
 local _, SIR = ...
 SIR.util = SIR.util or {}
@@ -278,13 +278,17 @@ rotationFunc.playerInit = function(tab, GUID, class)
         if classWideInterrupts[class] then
             addStatusBar(tab, GUID, classWideInterrupts[class], class)
         elseif class == "WARLOCK" then
+            -- todo else check for felhunter pet
+            if SIR.masterToPet[GUID] and string.match(string.sub(SIR.masterToPet[GUID], 20), "%d*") == "6" then
+                addStatusBar(tab, GUID, 119910, class)
+            else
             -- init warlock if felhunter pet / sacced
-            for i=1, 40 do
-                if select(10, UnitAura("player", i)) == 196099 then
-                    addStatusBar(tab, GUID, 132409, class)
+                for i=1, 40 do
+                    if select(10, UnitAura("player", i)) == 196099 then
+                        addStatusBar(tab, GUID, 132409, class)
+                    end
                 end
             end
-            -- todo else check for felhunter pet
         end
     end
 end
