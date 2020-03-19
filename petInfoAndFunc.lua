@@ -4,32 +4,35 @@ SIR.petInfo = {}
 local masterToPet = {}
 SIR.petInfoFunc = SIR.petInfoFunc or {}
 SIR.petInfoFunc.UNIT_PET = function(unitID)
-    SIR.util.myPrint("SIR.petUpdate")
     local GUID = UnitGUID(unitID)
     local oldPetGUID = masterToPet[GUID]
     local newPetGUID = UnitGUID(unitID.."pet")
     if oldPetGUID == newPetGUID then
         return
     end
+    SIR.util.myPrint("SIR.petUpdate not same pet")
     if oldPetGUID then
         SIR.petInfo[oldPetGUID] = nil
         if SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["CLASS"] == "WARLOCK"
             and string.match(string.sub(oldPetGUID, 20), "%d*") == "6" then
-            SIR.rotationFunc.removeByGUID(GUID)
+            SIR.rotationFunc.removeSpellAllTabs(GUID, 119910)
         end
     end
     if newPetGUID then
-        local petType = string.match(string.sub(newPetGUID, 20), "%d*")
+        local _, petIDstart = string.find(newPetGUID, "Pet-".."%d*".."-".."%d*".."-".."%d*".."-".."%d*".."-".."%d*")
+        SIR.util.myPrint(petIDstart)
+        SIR.util.myPrint(string.sub(newPetGUID, petIDstart))
+        local petType = string.match(string.sub(newPetGUID, petIDstart), "%d*")
+        SIR.util.myPrint(newPetGUID)
+        SIR.util.myPrint(petType)
         -- variable pet behaviour here
-        local spellID
-        if petType == "6" then
-            spellID = 119910 -- todo real value for fellhunter interrupt
+        if petType == "417" then
+            SIR.rotationFunc.addSpellAllTabs(GUID, 119910)  -- todo real value for fellhunter interrupt
         else
             return
         end
         SIR.petInfo[newPetGUID] = GUID
         masterToPet[GUID] = newPetGUID
-        --SIR.rotationFunc.addPetBar(GUID, newPetGUID, spellID)
     else
         masterToPet[GUID] = nil
     end

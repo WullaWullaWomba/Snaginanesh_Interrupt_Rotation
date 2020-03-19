@@ -29,7 +29,6 @@ f.GROUP_ROSTER_UPDATE = function()
 	SIR.groupInfoFunc.GROUP_ROSTER_UPDATE()
 end
 f.UNIT_PET = function(...)
-	SIR.util.myPrint("UNIT_PET", ...)
 	SIR.petInfoFunc.UNIT_PET(...)
 end
 
