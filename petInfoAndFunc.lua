@@ -60,6 +60,8 @@ SIR.petInfoFunc.PLAYER_LOGIN = function()
         end
     end
 end
+SIR.petInfoFunc.newGroupMember = function(unitID)
+end
 SIR.petInfoFunc.removePlayerPet = function(GUID)
     local petGUID = masterToPet[GUID]
     if petGUID then

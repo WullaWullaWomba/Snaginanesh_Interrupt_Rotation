@@ -107,8 +107,7 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
     SIR.util.myPrint("updateOrAddStatusBar")
     -- update if a bar for the player exists
     for i, bar in ipairs(statusBars[tab]) do
-        if bar.GUID == GUID then
-            bar.spellID = spellID
+        if bar.GUID == GUID and bar.spellID == spellID then
             if timestamp then
                 bar.currentTime = timestamp
                 if spellID == 15487 and SIR.groupInfo[GUID]["TALENTS"][4] == 1 then
@@ -340,12 +339,12 @@ rotationFunc.playerInit = function(tab, GUID, class)
     if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
         and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
         if classWideInterrupts[class] then
-            addStatusBar(tab, GUID, classWideInterrupts[class], class)
+            updateOrAddStatusBar(tab, GUID, classWideInterrupts[class], class)
         elseif class == "WARLOCK" then
         -- init warlock if felhunter pet / sacced (having felhunter handled in petInfoAndFunc)
             for i=1, 40 do
                 if select(10, UnitAura("player", i)) == 196099 then
-                    addStatusBar(tab, GUID, 132409, class)
+                    updateOrAddStatusBar(tab, GUID, 132409, class)
                 end
             end
         end
@@ -356,21 +355,23 @@ rotationFunc.playerInitAllTabs = function(GUID, class)
         rotationFunc.playerInit(tab, GUID, class)
     end
 end
-rotationFunc.specUpdate = function(tab, GUID, class, newSpec)
-    SIR.util.myPrint("rotationFunc.specUpdate", class, newSpec)
-    if class ~= "WARLOCK" then
-        if not specInterrupts[newSpec] then
+rotationFunc.specUpdate = function(tab, GUID, oldSpec)
+    SIR.util.myPrint("rotationFunc.specUpdate", SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo["SPEC"])
+    if oldSpec then
+        
+    end
+    if not specInterrupts[SIR.groupInfo["SPEC"]] then
             rotationFunc.removeByGUID(GUID)
         elseif trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
             and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
-            updateOrAddStatusBar(tab, GUID, specInterrupts[newSpec], class)
-        end
+            -- todo remove old and add new or update existing
+            updateOrAddStatusBar(tab, GUID, specInterrupts[SIR.groupInfo["SPEC"]], SIR.groupInfo[GUID]["CLASS"])
     end
 end
-rotationFunc.specUpdateAllTabs = function(GUID, class, newSpec)
+rotationFunc.specUpdateAllTabs = function(GUID, oldSpec)
     SIR.util.myPrint("rotationFunc.specUpdateAllTabs")
     for tab=1, #rotationFrames do
-        rotationFunc.specUpdate(tab, GUID, class, newSpec)
+        rotationFunc.specUpdate(tab, GUID, oldSpec)
     end
 end
 rotationFunc.addSpellAllTabs = function(GUID, spellID, class)

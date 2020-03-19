@@ -66,6 +66,7 @@ local setInitialInfo = function(GUID)
         ["CLASS"] = class,
         ["TALENTS"] = {},
     }
+    --todo could add duplicate with since the person might already have been interrupting right after joining
     SIR.rotationFunc.playerInitAllTabs(GUID)
     return true
 end
@@ -170,7 +171,7 @@ SIR.groupInfoFunc.INSPECT_READY = function(...)
         end
     end
     if oldSpec ~= SIR.groupInfo[GUID]["SPEC"] then
-        SIR.rotationFunc.specUpdateAllTabs(GUID, SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo[GUID]["SPEC"])
+        SIR.rotationFunc.specUpdateAllTabs(GUID, oldSpec)
     end
     -- todo if talents changed
 end
