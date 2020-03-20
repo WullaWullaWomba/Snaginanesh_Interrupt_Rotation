@@ -70,7 +70,6 @@ local setInitialInfo = function(GUID)
     SIR.rotationFunc.playerInitAllTabs(GUID)
     return true
 end
-
 local inspectNext
 inspectNext = function()
 	for i = #recentInspectTimes, 1, -1 do
@@ -200,6 +199,9 @@ SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
             if not UnitInParty(info["NAME"]) then
                 SIR.groupInfo[GUID] = nil
                 SIR.rotationFunc.removeByGUID(GUID)
+                if SIR.masterToPet[GUID] then
+                    SIR.rotationFunc.removeByGUID(SIR.masterToPet[GUID])
+                end
             end
         end
     else
@@ -207,6 +209,9 @@ SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
             if GUID ~= SIR.playerInfo["GUID"] then
                 SIR.groupInfo[GUID] = nil
                 SIR.rotationFunc.removeByGUID(GUID)
+                if SIR.masterToPet[GUID] then
+                    SIR.rotationFunc.removeByGUID(SIR.masterToPet[GUID])
+                end
             end
         end
     end

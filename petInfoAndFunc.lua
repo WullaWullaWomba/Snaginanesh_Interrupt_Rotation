@@ -3,6 +3,10 @@ local _, SIR = ...
 SIR.petToMaster = SIR.petToMaster or {}
 SIR.masterToPet = SIR.masterToPet or {}
 SIR.petInfoFunc = SIR.petInfoFunc or {}
+
+local getPetID = function(GUID)
+    return string.match(string.sub(GUID, select(2, string.find(GUID, "%d+-%d+-%d+-%d+-%d"))), "%d+")
+end
 SIR.petInfoFunc.UNIT_PET = function(unitID)
     local GUID = UnitGUID(unitID)
     local oldPetGUID = SIR.masterToPet[GUID]
@@ -19,17 +23,9 @@ SIR.petInfoFunc.UNIT_PET = function(unitID)
         end
     end
     if newPetGUID then
-        local _, petIDstart = string.find(newPetGUID, "Pet-".."%d*".."-".."%d*".."-".."%d*".."-".."%d*".."-".."%d*")
-        SIR.util.myPrint(petIDstart)
-        SIR.util.myPrint(string.sub(newPetGUID, petIDstart))
-        local petType = string.match(string.sub(newPetGUID, petIDstart), "%d*")
-        SIR.util.myPrint(newPetGUID)
-        SIR.util.myPrint(petType)
         -- variable pet behaviour here
-        if petType == "417" then
+        if getPetID(newPetGUID) == "417" then
             SIR.rotationFunc.addSpellAllTabs(GUID, 119910)  -- todo real value for fellhunter interrupt
-        else
-            return
         end
         SIR.petToMaster[newPetGUID] = GUID
         SIR.masterToPet[GUID] = newPetGUID
