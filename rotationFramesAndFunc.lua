@@ -358,7 +358,6 @@ end
 rotationFunc.specUpdate = function(tab, GUID, oldSpec)
     SIR.util.myPrint("rotationFunc.specUpdate", SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo["SPEC"])
     if oldSpec then
-        
     end
     if not specInterrupts[SIR.groupInfo["SPEC"]] then
             rotationFunc.removeByGUID(GUID)
@@ -400,6 +399,3 @@ rotationFunc.removeByGUID = function(GUID)
         end
     end
 end
-
-
-56.17229,10.22095
