@@ -154,7 +154,7 @@ end
 SIR.groupInfoFunc.INSPECT_READY = function(...)
     recentInspectTimes[#recentInspectTimes+1] = GetTime()
     local GUID = ...
-    if not GUID or (not SIR.groupInfo[GUID] and not setInitialInfo(GUID)) then
+    if not GUID or not SIR.groupInfo[GUID] then
         return
     end
     local oldSpec = SIR.groupInfo[GUID]["SPEC"]

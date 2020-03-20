@@ -402,3 +402,4 @@ rotationFunc.removeByGUID = function(GUID)
 end
 
 
+56.17229,10.22095
