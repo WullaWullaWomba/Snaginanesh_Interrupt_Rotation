@@ -65,9 +65,9 @@ SIR.data = {
         [105] = nil, -- Restoration
 
         -- Warlock
-        --[265] = 132409, -- Affliction
-        --[266] = 132409, -- Demonology
-        --[267] = 132409, -- Destruction
+        [265] = nil, -- Affliction
+        [266] = nil, -- Demonology
+        [267] = nil, -- Destruction
 
         -- Death Knight
         [250] = 47528, -- Blood

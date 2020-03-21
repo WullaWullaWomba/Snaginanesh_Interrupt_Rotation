@@ -342,13 +342,6 @@ rotationFunc.playerInit = function(tab, GUID, class)
         and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
         if classWideInterrupts[class] then
             updateOrAddStatusBar(tab, GUID, classWideInterrupts[class], class)
-        elseif class == "WARLOCK" then
-        -- init warlock if felhunter pet / sacced (having felhunter handled in petInfoAndFunc)
-            for i=1, 40 do
-                if select(10, UnitAura("player", i)) == 196099 then
-                    updateOrAddStatusBar(tab, GUID, 132409, class)
-                end
-            end
         end
     end
 end
@@ -359,13 +352,16 @@ rotationFunc.playerInitAllTabs = function(GUID, class)
 end
 rotationFunc.specUpdate = function(tab, GUID, oldSpec)
     SIR.util.myPrint("rotationFunc.specUpdate", SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo["SPEC"])
-    if oldSpec and specInterrupts[oldSpec] then
-        rotationFunc.removeSpellAllTabs(GUID, specInterrupts[oldSpec])
+    local oldInt = oldSpec and specInterrupts[oldSpec]
+    local newInt = SIR.groupInfo[GUID]["SPEC"] and specInterrupts[SIR.groupInfo[GUID]["SPEC"]]
+    if oldInt == newInt then
+        return
     end
-    if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
-        and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
-        -- todo remove old and add new or update existing
-        updateOrAddStatusBar(tab, GUID, specInterrupts[SIR.groupInfo["SPEC"]], SIR.groupInfo[GUID]["CLASS"])
+    if oldInt then
+        rotationFunc.removeSpellAllTabs(GUID, oldInt)
+    end
+    if newInt then
+        rotationFunc.addSpellAllTabs(GUID, newInt, SIR.groupInfo[GUID]["CLASS"])
     end
 end
 rotationFunc.specUpdateAllTabs = function(GUID, oldSpec)

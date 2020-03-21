@@ -16,7 +16,7 @@ local toBeInspectedInactive = {}
 local recentInspectTimes = {}
 local numGroupMembers = -99
 
-local printInspect = function()
+local printGroupInfo = function()
     print("----------------------------------------")
     print("SIR.groupInfo :")
     local count = 0
@@ -190,6 +190,7 @@ SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
         for i=1, newNumGroupMembers do
             local GUID = UnitGUID(groupType..i)
             if GUID and (not SIR.groupInfo[GUID]) then
+                SIR.petInfoFunc.newGroupMember(GUID, groupType..i)
                 toBeInitialized[#toBeInitialized+1] = GUID
             end
         end
@@ -198,20 +199,16 @@ SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
         for GUID, info in pairs(SIR.groupInfo) do
             if not UnitInParty(info["NAME"]) then
                 SIR.groupInfo[GUID] = nil
+                SIR.petInfoFunc.removePlayerPet(GUID)
                 SIR.rotationFunc.removeByGUID(GUID)
-                if SIR.masterToPet[GUID] then
-                    SIR.rotationFunc.removeByGUID(SIR.masterToPet[GUID])
-                end
             end
         end
     else
         for GUID, _ in pairs(SIR.groupInfo) do
             if GUID ~= SIR.playerInfo["GUID"] then
                 SIR.groupInfo[GUID] = nil
+                SIR.petInfoFunc.removePlayerPet(GUID)
                 SIR.rotationFunc.removeByGUID(GUID)
-                if SIR.masterToPet[GUID] then
-                    SIR.rotationFunc.removeByGUID(SIR.masterToPet[GUID])
-                end
             end
         end
     end
@@ -220,7 +217,7 @@ SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
     SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
 end
 
-SLASH_MYINSPECT1 = "/myinspect"
+SLASH_MYINSPECT1 = "/sirgroupinfo"
 SlashCmdList["MYINSPECT"] = function()
-	printInspect()
+	printGroupInfo()
 end
