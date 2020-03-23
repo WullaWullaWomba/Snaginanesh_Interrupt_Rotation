@@ -225,8 +225,9 @@ SIR.data = {
         [12] = {577, 581,}, -- Havoc Vengeance
     },
     ["petSpellsByID"] = {
-        [417] = { --felhunter
-
+        --felhunter
+        [417] = {
+            119910,
         },
     },
 }

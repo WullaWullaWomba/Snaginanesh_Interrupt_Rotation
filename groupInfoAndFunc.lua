@@ -2,7 +2,7 @@
 --luacheck: globals GetSpecializationInfo GetSpecialization CanInspect UnitIsConnected InspectFrame
 --luacheck: globals GetNumGroupMembers IsInGroup IsInRaid UnitIsDeadOrGhost
 --luacheck: globals GetTime C_Timer max UnitGUID UnitInParty unpack
---luacheck: globals SLASH_MYINSPECT1 SlashCmdList SnagiIntRotaSaved
+--luacheck: globals SLASH_SIRGROUPINFO1 SlashCmdList SnagiIntRotaSaved
 local _, SIR = ...
 SIR.util = SIR.util or {}
 SIR.playerInfo = SIR.playerInfo or {}
@@ -217,7 +217,7 @@ SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
     SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
 end
 
-SLASH_MYINSPECT1 = "/sirgroupinfo"
-SlashCmdList["MYINSPECT"] = function()
+SLASH_SIRGROUPINFO1 = "/sirgroupinfo"
+SlashCmdList["SIRGROUPINFO"] = function()
 	printGroupInfo()
 end
