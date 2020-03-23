@@ -24,7 +24,14 @@ f:RegisterEvent("PLAYER_ENTERING_WORLD")
 f:RegisterEvent("PLAYER_LEAVING_WORLD")
 f:RegisterEvent("INSPECT_READY")
 f:RegisterEvent("UNIT_PET")
-
+f:RegisterEvent("PARTY_MEMBER_ENABLE")
+f:RegisterEvent("PARTY_MEMBER_DISABLE")
+f.PARTY_MEMBER_ENABLE = function(...)
+	SIR.util.myPrint("PARTY_MEMBER_ENABLE", ...)
+end
+f.PARTY_MEMBER_DISABLE = function(...)
+	SIR.util.myPrint("PARTY_MEMBER_DISABLE", ...)
+end
 f.GROUP_ROSTER_UPDATE = function()
 	SIR.groupInfoFunc.GROUP_ROSTER_UPDATE()
 end
@@ -34,20 +41,21 @@ end
 
 f.COMBAT_LOG_EVENT_UNFILTERED = function()
 	SIR.rotationFunc.onCombatLogEvent()
-	local _, subEvent  = CombatLogGetCurrentEventInfo()
-	--[[
-	if SIR.test then
-		local _, event, _, _, name, _, _, _, destName, _, _, spellID = CombatLogGetCurrentEventInfo()
-		local _, subEvent, _, _, n, _, _, _, destName, _, _, spellID  = CombatLogGetCurrentEventInfo()
-		print(name)
-		if name == UnitName("player") or destName == UnitName("player") then
-			SIR.util.myPrint(event, name, destName, spellID)
+	-- 196099 (felhunter sac aura spellID)
+	local _, event, _, sourceGUID, _, _, sourceFlags, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
+	if spellID == 196099 and (sourceFlags%16 <= 4) then
+		if event == "SPELL_AURA_APPLIED" then
+			SIR.rotationFunc.addSpellAllTabs(sourceGUID, 132409, SIR.groupInfo[sourceGUID]["CLASS"])
+		elseif event == "SPELL_AURA_REMOVED" then
+			SIR.rotationFunc.removeSpellAllTabs(sourceGUID, 132409)
 		end
 	end
-	]]--
+
+	--[[
 	if subEvent == "UNIT_DIED" then
 		SIR.util.myPrint(CombatLogGetCurrentEventInfo())
 	end
+	--]]
 end
 f.PLAYER_SPECIALIZATION_CHANGED = function()
 	SIR.util.myPrint("PLAYER_SPECIALIZATION_CHANGED")

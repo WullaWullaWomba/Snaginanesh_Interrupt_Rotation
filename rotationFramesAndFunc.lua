@@ -358,10 +358,10 @@ rotationFunc.specUpdate = function(tab, GUID, oldSpec)
         return
     end
     if oldInt then
-        rotationFunc.removeSpellAllTabs(GUID, oldInt)
+        rotationFunc.removeSpell(tab, GUID, oldInt)
     end
     if newInt then
-        rotationFunc.addSpellAllTabs(GUID, newInt, SIR.groupInfo[GUID]["CLASS"])
+        rotationFunc.addSpell(tab, GUID, newInt, SIR.groupInfo[GUID]["CLASS"])
     end
 end
 rotationFunc.specUpdateAllTabs = function(GUID, oldSpec)

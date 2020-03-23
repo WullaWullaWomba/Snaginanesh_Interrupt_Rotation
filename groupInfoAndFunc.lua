@@ -190,7 +190,7 @@ SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
         for i=1, newNumGroupMembers do
             local GUID = UnitGUID(groupType..i)
             if GUID and (not SIR.groupInfo[GUID]) then
-                SIR.petInfoFunc.newGroupMember(GUID, groupType..i)
+                SIR.petInfoFunc.UNIT_PET(groupType..i)
                 toBeInitialized[#toBeInitialized+1] = GUID
             end
         end
