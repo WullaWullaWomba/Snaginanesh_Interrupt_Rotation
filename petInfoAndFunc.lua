@@ -13,7 +13,8 @@ local addPet = function(GUID, petGUID)
     SIR.masterToPet[GUID] = petGUID
     for _, spell in ipairs(SIR.data.petSpellsByID[getPetID(petGUID)] or {}) do
         SIR.util.myPrint("trying to add spell", spell, SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["CLASS"])
-        SIR.rotationFunc.addSpellAllTabs(GUID, spell, SIR.groupInfo[GUID]["CLASS"]
+        SIR.rotationFunc.addSpellAllTabs(GUID, spell, 
+            SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["CLASS"]
             or select(2, GetPlayerInfoByGUID(GUID))
             or SIR.util.myPrint("no class found - default WL")
             or "WARLOCK")
@@ -84,14 +85,14 @@ SIR.petInfoFunc.PLAYER_LOGIN = function()
         if not IsInRaid() then
             groupType = "party"
             numGroup = numGroup -1
-            SIR.petInfoFunc.UNITPET("player")
+            SIR.petInfoFunc.UNIT_PET("player")
             if hasAura("player", 196099) then
                 local GUID = UnitGUID("player")
                 SIR.rotationFunc.addSpellAllTabs(GUID, 132409, "WARLOCK")
             end
         end
         for i=1, numGroup do
-            SIR.petInfoFunc.UNITPET(groupType..i)
+            SIR.petInfoFunc.UNIT_PET(groupType..i)
             if hasAura(groupType..i, 196099) then
                 local GUID = UnitGUID(groupType..i)
                 SIR.rotationFunc.addSpellAllTabs(GUID, 132409, "WARLOCK")
