@@ -40,17 +40,16 @@ f.UNIT_PET = function(...)
 end
 
 f.COMBAT_LOG_EVENT_UNFILTERED = function()
-	SIR.rotationFunc.onCombatLogEvent()
 	-- 196099 (felhunter sac aura spellID)
-	local _, event, _, sourceGUID, _, _, sourceFlags, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
-	if spellID == 196099 and (sourceFlags%16 <= 4) then
-		if event == "SPELL_AURA_APPLIED" then
-			SIR.rotationFunc.addSpellAllTabs(sourceGUID, 132409, SIR.groupInfo[sourceGUID]["CLASS"])
-		elseif event == "SPELL_AURA_REMOVED" then
-			SIR.rotationFunc.removeSpellAllTabs(sourceGUID, 132409)
-		end
+	local timestamp, subEvent, _, sourceGUID, _, _, sourceFlags, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
+	-- if source not in party return
+	if sourceFlags%16 > 4 then
+		return
 	end
-
+	SIR.rotationFunc.onCombatLogEvent(timestamp, subEvent, sourceGUID, spellID)
+	if spellID == 196099 then
+		SIR.petInfoFunc.onCombatLogEvent(subEvent, sourceGUID)
+	end
 	--[[
 	if subEvent == "UNIT_DIED" then
 		SIR.util.myPrint(CombatLogGetCurrentEventInfo())
@@ -81,8 +80,9 @@ f.PLAYER_LOGIN = function()
 		["COLOUREDNAME"] = SIR.util.getColouredNameByGUID(GUID),
 	}
 	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
-	SIR.optionFunc.load()
+	SIR.optionFunc.PLAYER_LOGIN()
 	SIR.groupInfoFunc.PLAYER_LOGIN()
+	SIR.petInfoFunc.PLAYER_LOGIN()
 	SIR.optionFrames.generalTabButton:Click()
 end
 f.PLAYER_ENTERING_WORLD = function()

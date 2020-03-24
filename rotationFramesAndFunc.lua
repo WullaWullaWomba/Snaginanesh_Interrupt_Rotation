@@ -221,9 +221,8 @@ rotationFunc.rotationFrameOnDragStop = function(self)
     self:Show()
 end
 
-rotationFunc.onCombatLogEvent = function ()
-    local timestamp, subEvent, _, sourceGUID, _, sourceFlags, _, _, _, _, _, spellID  = CombatLogGetCurrentEventInfo()
-    if subEvent == "SPELL_CAST_SUCCESS" and cds[spellID] and (sourceFlags%16 <= 4) and SIR.groupInfo[sourceGUID] then
+rotationFunc.onCombatLogEvent = function (timestamp, subEvent, sourceGUID, spellID)
+    if subEvent == "SPELL_CAST_SUCCESS" and cds[spellID] and SIR.groupInfo[sourceGUID] then
         for tab=1, #statusBars do
             if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
                 and contains(SIR.tabOptions[tab]["ROTATION"], sourceGUID)) then

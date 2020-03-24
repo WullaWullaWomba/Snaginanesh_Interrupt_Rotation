@@ -135,10 +135,8 @@ SIR.groupInfoFunc.PLAYER_LOGIN = function()
     numGroupMembers = 1
     if IsInGroup() then
         for GUID, info in pairs(SnagiIntRotaSaved.groupInfo) do
-            if not UnitInParty(info["NAME"]) then
-                SIR.util.myPrint(info["NAME"], "not UnitInParty")
-                SIR.groupInfo[GUID] = nil
-            elseif GUID ~= SIR.playerInfo["GUID"] then
+            if UnitInParty(info["NAME"]) and GUID ~= SIR.playerInfo["GUID"] then
+                SIR.groupInfo[GUID] = info
                 numGroupMembers = numGroupMembers+1
                 toBeInspectedActive[#toBeInspectedActive+1] = GUID
             end
