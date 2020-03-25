@@ -57,7 +57,6 @@ SIR.petInfoFunc.onCombatLogEvent = function(subEvent, sourceGUID)
     end
 end
 SIR.petInfoFunc.playerInitByUnitID = function(unitID)
-
 end
 SIR.petInfoFunc.UNIT_PET = function(unitID)
     -- if old pet ~= new pet
