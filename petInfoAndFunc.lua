@@ -13,7 +13,7 @@ local addPet = function(GUID, petGUID)
     SIR.masterToPet[GUID] = petGUID
     for _, spell in ipairs(SIR.data.petSpellsByID[getPetID(petGUID)] or {}) do
         SIR.util.myPrint("trying to add spell", spell, SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["CLASS"])
-        SIR.rotationFunc.addSpellAllTabs(GUID, spell, 
+        SIR.rotationFunc.addSpellAllTabs(GUID, spell,
             SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["CLASS"]
             or select(2, GetPlayerInfoByGUID(GUID))
             or SIR.util.myPrint("no class found - default WL")
@@ -56,7 +56,6 @@ SIR.petInfoFunc.onCombatLogEvent = function(subEvent, sourceGUID)
     end
 end
 SIR.petInfoFunc.playerInitByUnitID = function(unitID)
-
 end
 SIR.petInfoFunc.UNIT_PET = function(unitID)
     -- if old pet ~= new pet
