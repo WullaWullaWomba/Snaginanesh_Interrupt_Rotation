@@ -9,16 +9,14 @@ local getPetID = function(GUID)
     return tonumber(string.match(string.sub(GUID, select(2, string.find(GUID, "%d+-%d+-%d+-%d+-%d"))), "%d+"))
 end
 local addPet = function(GUID, petGUID)
+    SIR.util.myPrint("addPet1", GUID, SIR.groupInfo[GUID])
+    print("addPet2", GUID, SIR.groupInfo[GUID])
     SIR.petToMaster[petGUID] = GUID
     SIR.masterToPet[GUID] = petGUID
     for _, spell in ipairs(SIR.data.petSpellsByID[getPetID(petGUID)] or {}) do
-        -- todo make sure SIR.groupInfo[GUID] is set before
-        SIR.util.myPrint("trying to add spell", spell, SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["CLASS"])
-        SIR.rotationFunc.addSpellAllTabs(GUID, spell,
-            SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["CLASS"]
-            or select(2, GetPlayerInfoByGUID(GUID))
-            or SIR.util.myPrint("no class found - default WL")
-            or "WARLOCK")
+        -- todo potential "danger", if gorupinfo for the guid hasn't been added yet/removed already?
+        print("addPet3", GUID, SIR.groupInfo[GUID])
+        SIR.rotationFunc.addSpellAllTabs(GUID, spell, SIR.groupInfo[GUID]["CLASS"])
     end
 end
 local removePet = function(GUID, petGUID)

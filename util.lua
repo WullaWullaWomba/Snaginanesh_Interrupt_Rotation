@@ -1,4 +1,4 @@
---luacheck: globals GetPlayerInfoByGUID
+--luacheck: globals GetPlayerInfoByGUID IsInGroup GetNumGroupMembers IsInRaid
 local _, SIR = ...
 SIR.data = SIR.data or {}
 SIR.util = SIR.util or {}
@@ -38,6 +38,22 @@ SIR.util = {
     ["remove"] = function(table, i)
         for j=i, #table do
             table[j] = table[j+1]
+        end
+    end,
+    ["iterateGroup"] = function(func)
+        if IsInGroup() then
+            local groupType = "raid"
+            local numGroup = GetNumGroupMembers()
+            if not IsInRaid() then
+                groupType = "party"
+                numGroup = numGroup -1
+                func("player")
+            end
+            for i=1, numGroup do
+                func(groupType..i)
+            end
+        else
+            func("player")
         end
     end,
     ["myPrint"] = function(...)

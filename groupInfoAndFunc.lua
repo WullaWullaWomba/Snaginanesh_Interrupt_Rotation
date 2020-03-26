@@ -44,6 +44,7 @@ local printGroupInfo = function()
     print("----------------------------------------")
 end
 local setInitialInfo = function(GUID)
+    SIR.util.myPrint("setInitialInfo", GUID)
     if SIR.groupInfo[GUID] then
         for i=1, #toBeInitialized do
             if toBeInitialized[i] == GUID then
@@ -58,6 +59,7 @@ local setInitialInfo = function(GUID)
             server = SIR.playerInfo["REALMN"];
         end
     else
+        SIR.util.myPrint("setInitialInfo no server")
         return false
     end
     SIR.groupInfo[GUID] = {
@@ -66,7 +68,7 @@ local setInitialInfo = function(GUID)
         ["CLASS"] = class,
         ["TALENTS"] = {},
     }
-    --todo could add duplicate with since the person might already have been interrupting right after joining
+    SIR.util.myPrint("SIR.groupInfo[GUID] =", SIR.groupInfo[GUID])
     SIR.rotationFunc.playerInitAllTabs(GUID)
     return true
 end
@@ -142,6 +144,11 @@ SIR.groupInfoFunc.PLAYER_LOGIN = function()
             end
         end
     end
+    SIR.util.iterateGroup(
+        function(unitID)
+            setInitialInfo(UnitGUID(unitID))
+        end
+    )
     SIR.rotationFunc.updateNumGroup(numGroupMembers)
     inspectNext()
 end
