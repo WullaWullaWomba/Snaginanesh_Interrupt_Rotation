@@ -30,6 +30,7 @@ end
 local hasAura = function(unitID, spellID)
     for i=1, 40 do
         if select(10, UnitAura(unitID, i)) == spellID then
+            SIR.util.myPrint("hasAura", UnitAura(unitID, i))
             return true
         end
     end
@@ -49,7 +50,10 @@ local printPetInfo = function()
 end
 SIR.petInfoFunc.onCombatLogEvent = function(subEvent, sourceGUID)
     if subEvent == "SPELL_AURA_APPLIED" then
-        SIR.rotationFunc.addSpellAllTabs(sourceGUID, 132409, SIR.groupInfo[sourceGUID]["CLASS"])
+        if getPetID(SIR.masterToPet[sourceGUID]) == 417 then
+            SIR.rotationFunc.replaceSpell(sourceGUID, 119910, 132409)
+            --SIR.rotationFunc.addSpellAllTabs(sourceGUID, 132409, SIR.groupInfo[sourceGUID]["CLASS"])
+        end
     elseif subEvent == "SPELL_AURA_REMOVED" then
         SIR.rotationFunc.removeSpellAllTabs(sourceGUID, 132409)
     end
@@ -80,10 +84,13 @@ SIR.petInfoFunc.PLAYER_LOGIN = function()
     SIR.util.iterateGroup(
         function(unitID)
             SIR.petInfoFunc.UNIT_PET(unitID)
+            -- todo distinguish between different grimoires on login
+            --[[
             if hasAura(unitID, 196099) then
                 local GUID = UnitGUID(unitID)
                 SIR.rotationFunc.addSpellAllTabs(GUID, 132409, "WARLOCK")
             end
+            ]]--
         end
     )
 end

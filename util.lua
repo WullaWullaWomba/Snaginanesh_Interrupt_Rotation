@@ -69,7 +69,7 @@ SIR.util = {
             if type(class) == "string" then
                 return text
             else
-                print("SIR - util.lua - class must be a string")
+                SIR.util.myPrint("SIR - util.setTextClassColor - class must be a string")
                 return text
             end
         end

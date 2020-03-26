@@ -395,6 +395,15 @@ rotationFunc.removeSpellAllTabs = function(GUID, spellID)
         rotationFunc.removeSpell(tab, GUID, spellID)
     end
 end
+rotationFunc.replaceSpell = function(GUID, oldSpellID, newSpellID)
+    for _, bars in ipairs(statusBars) do
+        for _, bar in ipairs(bars) do
+            if bar.GUID == GUID and bar.spellID == oldSpellID then
+                bar.spellID = newSpellID
+            end
+        end
+    end
+end
 rotationFunc.removeByGUID = function(GUID)
     SIR.util.myPrint("rotationFunc.removeByGUID")
     for tab=1, #statusBars do
