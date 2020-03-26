@@ -77,32 +77,15 @@ SIR.petInfoFunc.UNIT_PET = function(unitID)
     end
 end
 SIR.petInfoFunc.PLAYER_LOGIN = function()
-    if IsInGroup() then
-        local groupType = "raid"
-        local numGroup = GetNumGroupMembers()
-        if not IsInRaid() then
-            groupType = "party"
-            numGroup = numGroup -1
-            SIR.petInfoFunc.UNIT_PET("player")
-            if hasAura("player", 196099) then
-                local GUID = UnitGUID("player")
+    SIR.util.iterateGroup(
+        function(unitID)
+            SIR.petInfoFunc.UNIT_PET(unitID)
+            if hasAura(unitID, 196099) then
+                local GUID = UnitGUID(unitID)
                 SIR.rotationFunc.addSpellAllTabs(GUID, 132409, "WARLOCK")
             end
         end
-        for i=1, numGroup do
-            SIR.petInfoFunc.UNIT_PET(groupType..i)
-            if hasAura(groupType..i, 196099) then
-                local GUID = UnitGUID(groupType..i)
-                SIR.rotationFunc.addSpellAllTabs(GUID, 132409, "WARLOCK")
-            end
-        end
-    else
-        SIR.petInfoFunc.UNIT_PET("player")
-        if hasAura("player", 196099) then
-            local GUID = UnitGUID("player")
-            SIR.rotationFunc.addSpellAllTabs(GUID, 132409, "WARLOCK")
-        end
-    end
+    )
 end
 SIR.petInfoFunc.removePlayerPet = function(GUID)
     SIR.util.myPrint("SIR.petInfoFunc.removePlayerPet", GUID)
