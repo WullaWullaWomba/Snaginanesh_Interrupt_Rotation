@@ -163,7 +163,7 @@ SIR.groupInfoFunc.INSPECT_READY = function(...)
     end
     local oldSpec = SIR.groupInfo[GUID]["SPEC"]
     SIR.groupInfo[GUID]["SPEC"] = GetInspectSpecialization(SIR.groupInfo[GUID]["NAME"])
-    SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"] = {
+    SIR.groupInfo[GUID]["TALENTS"] = {
         0, 0, 0, 0, 0, 0, 0
     }
     for i=1, 7 do
