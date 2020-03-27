@@ -9,13 +9,10 @@ local getPetID = function(GUID)
     return tonumber(string.match(string.sub(GUID, select(2, string.find(GUID, "%d+-%d+-%d+-%d+-%d"))), "%d+"))
 end
 local addPet = function(GUID, petGUID)
-    SIR.util.myPrint("addPet1", GUID, SIR.groupInfo[GUID])
-    print("addPet2", GUID, SIR.groupInfo[GUID])
     SIR.petToMaster[petGUID] = GUID
     SIR.masterToPet[GUID] = petGUID
     for _, spell in ipairs(SIR.data.petSpellsByID[getPetID(petGUID)] or {}) do
         -- todo potential "danger", if gorupinfo for the guid hasn't been added yet/removed already?
-        print("addPet3", GUID, SIR.groupInfo[GUID])
         SIR.rotationFunc.addSpellAllTabs(GUID, spell, SIR.groupInfo[GUID]["CLASS"])
     end
 end
@@ -27,6 +24,7 @@ local removePet = function(GUID, petGUID)
     SIR.petToMaster[petGUID] = nil
     SIR.masterToPet[GUID] = nil
 end
+--[[
 local hasAura = function(unitID, spellID)
     for i=1, 40 do
         if select(10, UnitAura(unitID, i)) == spellID then
@@ -36,6 +34,7 @@ local hasAura = function(unitID, spellID)
     end
     return false
 end
+]]--
 local printPetInfo = function()
     print("----------------------------------------")
     print("SIR.petToMaster :")
@@ -57,8 +56,6 @@ SIR.petInfoFunc.onCombatLogEvent = function(subEvent, sourceGUID)
     elseif subEvent == "SPELL_AURA_REMOVED" then
         SIR.rotationFunc.removeSpellAllTabs(sourceGUID, 132409)
     end
-end
-SIR.petInfoFunc.playerInitByUnitID = function(unitID)
 end
 SIR.petInfoFunc.UNIT_PET = function(unitID)
     -- if old pet ~= new pet
