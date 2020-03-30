@@ -169,7 +169,7 @@ SIR.groupInfoFunc.INSPECT_READY = function(...)
     for i=1, 7 do
         for j=1, 3 do
             if select(4, GetTalentInfo(i, j, 1, true, SIR.groupInfo[GUID]["NAME"])) then
-                SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"][i] = j
+                SIR.groupInfo[GUID]["TALENTS"][i] = j
                 break
             end
         end
