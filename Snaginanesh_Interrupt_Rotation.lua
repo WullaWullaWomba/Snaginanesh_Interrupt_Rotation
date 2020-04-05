@@ -57,8 +57,10 @@ f.COMBAT_LOG_EVENT_UNFILTERED = function()
 end
 f.PLAYER_SPECIALIZATION_CHANGED = function()
 	SIR.util.myPrint("PLAYER_SPECIALIZATION_CHANGED")
+	local oldSpec = SIR.playerInfo["SPEC"]
 	SIR.playerInfo["SPEC"] = GetSpecializationInfo(GetSpecialization())
 	SIR.groupInfo[SIR.playerInfo["GUID"]]["SPEC"] = SIR.playerInfo["SPEC"]
+	SIR.rotationFunc.specUpdateAllTabs(SIR.playerInfo["GUID"], oldSpec)
 	-- todo update talents
 	for i=1, #SIR.tabOptions do
 		SIR.rotationFunc.updateTrackMode(i)

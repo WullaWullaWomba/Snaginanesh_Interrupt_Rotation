@@ -58,7 +58,7 @@ SIR.util = {
     end,
     ["myPrint"] = function(...)
         if SIR.test or SIR.util.contains(myToons, SIR.playerInfo["NAME"]) then
-            print(...)
+            print("__", ...)
         end
     end,
     ["setTextClassColor"] = function(text, class)
