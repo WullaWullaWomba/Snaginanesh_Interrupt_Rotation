@@ -97,6 +97,9 @@ SIR.util = {
     end,
     ["getColouredNameByGUID"] = function(GUID)
         local _, class, _, _, _, name = GetPlayerInfoByGUID(GUID)
-        return "\124cFF"..classColorsHex[class]..name.."\124r"
+        if name then
+            return "\124cFF"..classColorsHex[class]..name.."\124r"
+        end
+        return ""
     end
 }

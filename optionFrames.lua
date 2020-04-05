@@ -31,7 +31,6 @@ container:SetMovable(true)
 
 container:SetScript("OnDragStart", function() container:StartMoving() end)
 container:SetScript("OnDragStop", function() container:StopMovingOrSizing() end)
-container:SetScript("OnShow", function() optionFunc.containerOnShow() end)
 local containerHeader = container:CreateTexture("$parentHeader", "ARTWORK")
 containerHeader:SetSize(440, 64)
 containerHeader:SetPoint("TOP", container, "TOP", 0, 25)
@@ -59,7 +58,7 @@ generalTabButton:SetScript("OnClick", function(self) optionFunc.generalTabButton
 local rotationTab = CreateFrame("Frame", _, container)
 rotationTab:SetAllPoints()
 rotationTab:Hide()
-
+rotationTab:SetScript("OnShow", function() SIR.optionFunc.rotationTabOnShow() end)
 local rotationTabButtons = {}
 
 local leftSideMenu = CreateFrame("Frame", _ , container)

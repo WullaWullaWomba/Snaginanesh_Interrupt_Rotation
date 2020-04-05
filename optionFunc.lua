@@ -454,14 +454,14 @@ optionFunc.PLAYER_LOGIN = function()
     end
 end
 optionFunc.GROUP_ROSTER_UPDATE = function()
-	if optionFrames.container:IsShown() then
+	if optionFrames.rotationTab:IsShown() then
 		updateGroupMemberButtons()
 	end
 end
 optionFunc.save = function()
     SnagiIntRotaSaved.tabOptions = SIR.tabOptions
 end
-optionFunc.containerOnShow = function()
+optionFunc.rotationTabOnShow = function()
 	updateGroupMemberButtons()
 end
 optionFunc.generalTabButtonOnClick = function(self)
