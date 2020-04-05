@@ -332,7 +332,9 @@ local updateGroupMemberButtons = function()
 			optionFrames.groupMemberButtons[i]:Hide()
 		end
 		optionFrames.groupMemberButtons[1]:SetGUID(SIR.playerInfo["GUID"])
-		optionFrames.groupMemberButtons[1].inRotation =contains(SIR.tabOptions[activeTab]["ROTATION"], SIR.playerInfo["GUID"])
+		optionFrames.groupMemberButtons[1].inRotation
+		=contains(SIR.tabOptions[activeTab]["ROTATION"],
+		SIR.playerInfo["GUID"])
 		optionFrames.groupMemberButtons[1]:UpdateTexture()
 		optionFrames.groupMemberButtons[1]:SetText(SIR.playerInfo["COLOUREDNAME"])
 		optionFrames.groupMemberButtons[1]:Show()
@@ -451,8 +453,16 @@ optionFunc.PLAYER_LOGIN = function()
         loadTab(SIR.tabOptions[i]["TITLE"])
     end
 end
+optionFunc.GROUP_ROSTER_UPDATE = function()
+	if optionFrames.container:IsShown() then
+		updateGroupMemberButtons()
+	end
+end
 optionFunc.save = function()
     SnagiIntRotaSaved.tabOptions = SIR.tabOptions
+end
+optionFunc.containerOnShow = function()
+	updateGroupMemberButtons()
 end
 optionFunc.generalTabButtonOnClick = function(self)
 	optionFrames.rotationTab:Hide()

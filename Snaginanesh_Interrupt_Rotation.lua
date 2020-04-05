@@ -33,6 +33,7 @@ f.PARTY_MEMBER_DISABLE = function(...)
 end
 f.GROUP_ROSTER_UPDATE = function()
 	SIR.groupInfoFunc.GROUP_ROSTER_UPDATE()
+	SIR.optionFunc.GROUP_ROSTER_UPDATE()
 end
 f.UNIT_PET = function(...)
 	SIR.petInfoFunc.UNIT_PET(...)
