@@ -36,7 +36,9 @@ f.GROUP_ROSTER_UPDATE = function()
 	SIR.optionFunc.GROUP_ROSTER_UPDATE()
 end
 f.UNIT_PET = function(...)
-	SIR.petInfoFunc.UNIT_PET(...)
+	if ... then
+		SIR.petInfoFunc.UNIT_PET(...)
+	end
 end
 
 f.COMBAT_LOG_EVENT_UNFILTERED = function()
