@@ -349,24 +349,32 @@ rotationFunc.playerInitAllTabs = function(GUID, class)
         rotationFunc.playerInit(tab, GUID, class)
     end
 end
-rotationFunc.specUpdate = function(tab, GUID, oldSpec)
+rotationFunc.specUpdate = function(tab, GUID, newSpec)
     SIR.util.myPrint("rotationFunc.specUpdate", SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo["SPEC"])
-    local oldInt = oldSpec and specInterrupts[oldSpec]
-    local newInt = SIR.groupInfo[GUID]["SPEC"] and specInterrupts[SIR.groupInfo[GUID]["SPEC"]]
-    if oldInt == newInt then
+    if SIR.groupInfo[GUID]["CLASS"] == "WARLOCK" then
         return
     end
-    if oldInt then
-        rotationFunc.removeSpell(tab, GUID, oldInt)
-    end
-    if newInt then
-        rotationFunc.addSpell(tab, GUID, newInt, SIR.groupInfo[GUID]["CLASS"])
+    local newInt = specInterrupts[newSpec]
+    for tab, bars in ipairs(statusBars) do
+        local found = false
+        for i, bar in ipairs(bars) do
+            if bar.GUID == GUID then
+                if bar.spellID ~= newInt then
+                    removeStatusBar(tab, i)     
+                else
+                    found = true
+                end
+            end
+        end
+        if newInt and not found then
+            addStatusBar(tab, GUID, newInt, SIR.groupInfo[GUID]["CLASS"])
+        end
     end
 end
-rotationFunc.specUpdateAllTabs = function(GUID, oldSpec)
+rotationFunc.specUpdateAllTabs = function(GUID, newSpec)
     SIR.util.myPrint("rotationFunc.specUpdateAllTabs")
     for tab=1, #rotationFrames do
-        rotationFunc.specUpdate(tab, GUID, oldSpec)
+        rotationFunc.specUpdate(tab, GUID, newSpec)
     end
 end
 rotationFunc.addSpell = function(tab, GUID, spellID, class)

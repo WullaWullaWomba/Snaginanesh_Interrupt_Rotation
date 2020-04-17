@@ -175,7 +175,7 @@ SIR.groupInfoFunc.INSPECT_READY = function(...)
         end
     end
     if oldSpec ~= SIR.groupInfo[GUID]["SPEC"] then
-        SIR.rotationFunc.specUpdateAllTabs(GUID, oldSpec)
+        SIR.rotationFunc.specUpdateAllTabs(GUID, SIR.groupInfo[GUID]["SPEC"])
     end
     -- todo if talents changed
 end
@@ -221,7 +221,9 @@ SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
     SIR.util.myPrint("set numGroupMembers = newNumGroupMembers")
     SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
 end
-
+SIR.groupInfoFunc.updateActiveStatus = function(...)
+    -- todo
+end
 SLASH_SIRGROUPINFO1 = "/sirgroupinfo"
 SlashCmdList["SIRGROUPINFO"] = function()
 	printGroupInfo()

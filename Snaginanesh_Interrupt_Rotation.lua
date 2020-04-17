@@ -25,11 +25,19 @@ f:RegisterEvent("PLAYER_LEAVING_WORLD")
 f:RegisterEvent("INSPECT_READY")
 f:RegisterEvent("PARTY_MEMBER_ENABLE")
 f:RegisterEvent("PARTY_MEMBER_DISABLE")
+f:RegisterEvent("UNIT_HEALTH")
+
 f.PARTY_MEMBER_ENABLE = function(...)
 	SIR.util.myPrint("PARTY_MEMBER_ENABLE", ...)
+	SIR.groupInfoFunc.updateActiveStatus(...)
 end
 f.PARTY_MEMBER_DISABLE = function(...)
 	SIR.util.myPrint("PARTY_MEMBER_DISABLE", ...)
+	SIR.groupInfoFunc.updateActiveStatus(...)
+end
+f.UNIT_HEALTH = function(...)
+	SIR.util.myPrint("UNIT_HEALTH", ...)
+	SIR.groupInfoFunc.updateActiveStatus(...)
 end
 f.GROUP_ROSTER_UPDATE = function()
 	SIR.groupInfoFunc.GROUP_ROSTER_UPDATE()
@@ -60,10 +68,9 @@ f.COMBAT_LOG_EVENT_UNFILTERED = function()
 end
 f.PLAYER_SPECIALIZATION_CHANGED = function()
 	SIR.util.myPrint("PLAYER_SPECIALIZATION_CHANGED")
-	local oldSpec = SIR.playerInfo["SPEC"]
 	SIR.playerInfo["SPEC"] = GetSpecializationInfo(GetSpecialization())
 	SIR.groupInfo[SIR.playerInfo["GUID"]]["SPEC"] = SIR.playerInfo["SPEC"]
-	SIR.rotationFunc.specUpdateAllTabs(SIR.playerInfo["GUID"], oldSpec)
+	SIR.rotationFunc.specUpdateAllTabs(SIR.playerInfo["GUID"], SIR.playerInfo["SPEC"])
 	-- todo update talents
 	for i=1, #SIR.tabOptions do
 		SIR.rotationFunc.updateTrackMode(i)

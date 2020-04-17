@@ -6,7 +6,9 @@ SIR.masterToPet = SIR.masterToPet or {}
 SIR.petInfoFunc = SIR.petInfoFunc or {}
 
 local getPetID = function(GUID)
-    return tonumber(string.match(string.sub(GUID, select(2, string.find(GUID, "%d+-%d+-%d+-%d+-%d"))), "%d+"))
+    if GUID then
+        return tonumber(string.match(string.sub(GUID, select(2, string.find(GUID, "%d+-%d+-%d+-%d+-%d"))), "%d+"))
+    end
 end
 local addPet = function(GUID, petGUID)
     SIR.petToMaster[petGUID] = GUID
