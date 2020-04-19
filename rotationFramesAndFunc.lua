@@ -93,6 +93,10 @@ local addStatusBar = function(tab, GUID, spellID, class, timestamp)
     statusBar.leftText:SetText(SIR.petToMaster[GUID]
         or (SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["NAME"])
         or "noname")
+    -- todo remove
+    if SIR.groupInfo[GUID]["NAME"] == "Leiye" then
+        print("SIR - Leiye addStatusBar - spellID:", spellID)
+    end
     if timestamp then
         statusBar.currentTime = timestamp
         statusBar.expirationTime = timestamp+cds[spellID]
