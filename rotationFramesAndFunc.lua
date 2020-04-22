@@ -12,6 +12,7 @@ SIR.groupInfo = SIR.groupInfo or {}
 local specInterrupts, classWideInterrupts = SIR.data.specInterrupts, SIR.data.classWideInterrupts
 local classColorsRGB = SIR.data.classColorsRGB
 local cds = SIR.data.cds
+local duplicateSpellIDs = SIR.data.duplicateSpellIDs
 local rotationFunc = SIR.rotationFunc
 local contains = SIR.util.contains
 local rotationFrames = {}
@@ -94,8 +95,8 @@ local addStatusBar = function(tab, GUID, spellID, class, timestamp)
         or (SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["NAME"])
         or "noname")
     -- todo remove
-    if SIR.groupInfo[GUID]["NAME"] == "Leiye" then
-        print("SIR - Leiye addStatusBar - spellID:", spellID)
+    if SIR.groupInfo[GUID]["NAME"] == "Leiye" or SIR.groupInfo[GUID]["NAME"] == "Zoucka" then
+        print("SIR - Leiye/Zoucka addStatusBar - spellID:", spellID)
     end
     if timestamp then
         statusBar.currentTime = timestamp
@@ -227,6 +228,7 @@ end
 
 rotationFunc.onCombatLogEvent = function (timestamp, subEvent, sourceGUID, spellID)
     if subEvent == "SPELL_CAST_SUCCESS" and cds[spellID] and SIR.groupInfo[sourceGUID] then
+        spellID = duplicateSpellIDs[spellID] or spellID
         for tab=1, #statusBars do
             if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
                 and contains(SIR.tabOptions[tab]["ROTATION"], sourceGUID)) then
@@ -281,7 +283,8 @@ rotationFunc.updateTrackMode = function(tab)
     local old = trackModes[tab]
     if not SIR.tabOptions[tab]["SPECENABLEOPTIONS"][SIR.playerInfo["SPEC"]] then
         trackModes[tab] = "NONE"
-	elseif SIR.tabOptions[tab]["TRACKALLCHECKED"] and SIR.tabOptions[tab]["TRACKALLFROM"]<= numGroup
+    elseif SIR.tabOptions[tab]["TRACKALLCHECKED"]
+        and SIR.tabOptions[tab]["TRACKALLFROM"]<= numGroup
         and numGroup <= SIR.tabOptions[tab]["TRACKALLTO"] then
 		trackModes[tab] = "ALL"
 	elseif SIR.tabOptions[tab]["TRACKROTATIONCHECKED"] and SIR.tabOptions[tab]["TRACKROTATIONFROM"]<= numGroup

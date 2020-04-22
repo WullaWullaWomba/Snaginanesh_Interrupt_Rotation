@@ -42,6 +42,9 @@ SIR.data = {
         [187707]=15, -- Muzzle (Hunter - Survival)
         -----------------------------------
     },
+    ["duplicateSpellIDs"] = {
+        [78675] = 97547, -- solar beam
+    },
     ["specInterrupts"] = {
         -- Monk
         [268] = 116705, -- Brewmaster
