@@ -36,7 +36,7 @@ f.PARTY_MEMBER_DISABLE = function(...)
 	SIR.groupInfoFunc.updateActiveStatus(...)
 end
 f.UNIT_HEALTH = function(...)
-	SIR.util.myPrint("UNIT_HEALTH", ...)
+	-- SIR.util.myPrint("UNIT_HEALTH", ...)
 	SIR.groupInfoFunc.updateActiveStatus(...)
 end
 f.GROUP_ROSTER_UPDATE = function()

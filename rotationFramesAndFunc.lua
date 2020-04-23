@@ -278,7 +278,13 @@ rotationFunc.updateNumGroup = function(num)
         rotationFunc.updateTrackMode(i)
     end
 end
-rotationFunc.updateTrackMode = function(tab)
+rotationFunc.updateTrackMode = function(tab)^
+    SIR.util.myPrint("allChecked", SIR.tabOptions[tab]["TRACKALLCHECKED"], "from ", SIR.tabOptions[tab]["TRACKALLFROM"]
+    SIR.util.myPrint("tab", tab)
+    , "to", SIR.tabOptions[tab]["TRACKALLTO"])
+    SIR.util.myPrint("rotationChecked", SIR.tabOptions[tab]["TRACKROTATIONCHECKED"]
+    , "from", SIR.tabOptions[tab]["TRACKROTATIONFROM"]
+    , "to", SIR.tabOptions[tab]["TRACKROTATIONTO"])
     SIR.util.myPrint("updateTrackMode tab", tab, "current mode:", trackModes[tab], "numGroup", numGroup)
     local old = trackModes[tab]
     if not SIR.tabOptions[tab]["SPECENABLEOPTIONS"][SIR.playerInfo["SPEC"]] then
@@ -287,7 +293,8 @@ rotationFunc.updateTrackMode = function(tab)
         and SIR.tabOptions[tab]["TRACKALLFROM"]<= numGroup
         and numGroup <= SIR.tabOptions[tab]["TRACKALLTO"] then
 		trackModes[tab] = "ALL"
-	elseif SIR.tabOptions[tab]["TRACKROTATIONCHECKED"] and SIR.tabOptions[tab]["TRACKROTATIONFROM"]<= numGroup
+    elseif SIR.tabOptions[tab]["TRACKROTATIONCHECKED"]
+        and SIR.tabOptions[tab]["TRACKROTATIONFROM"]<= numGroup
         and numGroup <= SIR.tabOptions[tab]["TRACKROTATIONTO"] then
         trackModes[tab] = "ROTATION"
 	else
