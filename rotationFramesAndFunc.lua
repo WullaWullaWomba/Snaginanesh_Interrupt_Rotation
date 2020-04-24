@@ -278,9 +278,9 @@ rotationFunc.updateNumGroup = function(num)
         rotationFunc.updateTrackMode(i)
     end
 end
-rotationFunc.updateTrackMode = function(tab)^
-    SIR.util.myPrint("allChecked", SIR.tabOptions[tab]["TRACKALLCHECKED"], "from ", SIR.tabOptions[tab]["TRACKALLFROM"]
+rotationFunc.updateTrackMode = function(tab)
     SIR.util.myPrint("tab", tab)
+    SIR.util.myPrint("allChecked", SIR.tabOptions[tab]["TRACKALLCHECKED"], "from ", SIR.tabOptions[tab]["TRACKALLFROM"]
     , "to", SIR.tabOptions[tab]["TRACKALLTO"])
     SIR.util.myPrint("rotationChecked", SIR.tabOptions[tab]["TRACKROTATIONCHECKED"]
     , "from", SIR.tabOptions[tab]["TRACKROTATIONFROM"]
@@ -365,23 +365,26 @@ rotationFunc.playerInitAllTabs = function(GUID, class)
 end
 rotationFunc.specUpdate = function(tab, GUID, newSpec)
     SIR.util.myPrint("rotationFunc.specUpdate", SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo["SPEC"])
-    if SIR.groupInfo[GUID]["CLASS"] == "WARLOCK" then
-        return
-    end
-    local newInt = specInterrupts[newSpec]
-    for tab, bars in ipairs(statusBars) do
-        local found = false
-        for i, bar in ipairs(bars) do
-            if bar.GUID == GUID then
-                if bar.spellID ~= newInt then
-                    removeStatusBar(tab, i)     
-                else
-                    found = true
+    if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
+    and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
+        if SIR.groupInfo[GUID]["CLASS"] == "WARLOCK" then
+            return
+        end
+        local newInt = specInterrupts[newSpec]
+        for tab, bars in ipairs(statusBars) do
+            local found = false
+            for i, bar in ipairs(bars) do
+                if bar.GUID == GUID then
+                    if bar.spellID ~= newInt then
+                        removeStatusBar(tab, i)     
+                    else
+                        found = true
+                    end
                 end
             end
-        end
-        if newInt and not found then
-            addStatusBar(tab, GUID, newInt, SIR.groupInfo[GUID]["CLASS"])
+            if newInt and not found then
+                addStatusBar(tab, GUID, newInt, SIR.groupInfo[GUID]["CLASS"])
+            end
         end
     end
 end
