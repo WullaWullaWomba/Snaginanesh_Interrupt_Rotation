@@ -49,6 +49,7 @@ local setInitialInfo = function(GUID)
         for i=1, #toBeInitialized do
             if toBeInitialized[i] == GUID then
                 remove(toBeInitialized, i)
+                break
             end
         end
         return false
