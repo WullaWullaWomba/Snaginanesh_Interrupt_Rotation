@@ -25,6 +25,7 @@ local myToons = {
     "Metestpet",
     "Trololololoo",
     "Megokick",
+    "Zoucka",
 }
 SIR.util = {
     ["contains"] = function(table, e)

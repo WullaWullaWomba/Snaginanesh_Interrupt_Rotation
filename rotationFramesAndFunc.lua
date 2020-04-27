@@ -94,10 +94,6 @@ local addStatusBar = function(tab, GUID, spellID, class, timestamp)
     statusBar.leftText:SetText(SIR.petToMaster[GUID]
         or (SIR.groupInfo[GUID] and SIR.groupInfo[GUID]["NAME"])
         or "noname")
-    -- todo remove
-    if SIR.groupInfo[GUID]["NAME"] == "Leiye" or SIR.groupInfo[GUID]["NAME"] == "Zoucka" then
-        print("SIR - Leiye/Zoucka addStatusBar - spellID:", spellID)
-    end
     if timestamp then
         statusBar.currentTime = timestamp
         statusBar.expirationTime = timestamp+cds[spellID]
@@ -165,6 +161,13 @@ local removeAllStatusBars = function(tab)
     end
     statusBars[tab] = {}
 end
+local isTrackedGUID = function(tab, GUID)
+	if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
+        and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
+        return true
+    end
+    return false
+end
 
 rotationFunc.newRotationTab = function(tab)
     SIR.util.myPrint("rotationFunc.newRotationTab")
@@ -188,6 +191,7 @@ rotationFunc.removeRotationTab = function(tab)
         statusBars[i] = statusBars[i+1]
     end
 end
+
 rotationFunc.updateDisplay = function(tab, value)
     SIR.util.myPrint("rotationFunc.updateDisplay")
     if value == "WIDTH" then
@@ -230,8 +234,7 @@ rotationFunc.onCombatLogEvent = function (timestamp, subEvent, sourceGUID, spell
     if subEvent == "SPELL_CAST_SUCCESS" and cds[spellID] and SIR.groupInfo[sourceGUID] then
         spellID = duplicateSpellIDs[spellID] or spellID
         for tab=1, #statusBars do
-            if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
-                and contains(SIR.tabOptions[tab]["ROTATION"], sourceGUID)) then
+            if isTrackedGUID(tab, sourceGUID) then
                 updateOrAddStatusBar(tab, sourceGUID, spellID, SIR.groupInfo[sourceGUID]["CLASS"], timestamp)
             end
         end
@@ -351,11 +354,8 @@ end
 
 rotationFunc.playerInit = function(tab, GUID, class)
     SIR.util.myPrint("rotationFunc.playerInit")
-    if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
-        and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
-        if classWideInterrupts[class] then
-            updateOrAddStatusBar(tab, GUID, classWideInterrupts[class], class)
-        end
+    if isTrackedGUID(tab, GUID) and classWideInterrupts[class] then
+        updateOrAddStatusBar(tab, GUID, classWideInterrupts[class], class)
     end
 end
 rotationFunc.playerInitAllTabs = function(GUID, class)
@@ -365,26 +365,23 @@ rotationFunc.playerInitAllTabs = function(GUID, class)
 end
 rotationFunc.specUpdate = function(tab, GUID, newSpec)
     SIR.util.myPrint("rotationFunc.specUpdate", SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo["SPEC"])
-    if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
-    and contains(SIR.tabOptions[tab]["ROTATION"], GUID)) then
+    if isTrackedGUID(tab, GUID) then
         if SIR.groupInfo[GUID]["CLASS"] == "WARLOCK" then
             return
         end
         local newInt = specInterrupts[newSpec]
-        for tab, bars in ipairs(statusBars) do
-            local found = false
-            for i, bar in ipairs(bars) do
-                if bar.GUID == GUID then
-                    if bar.spellID ~= newInt then
-                        removeStatusBar(tab, i)     
-                    else
-                        found = true
-                    end
+        local found = false
+        for i, bar in ipairs(statusBars[tab]) do
+            if bar.GUID == GUID then
+                if bar.spellID ~= newInt then
+                    removeStatusBar(tab, i)
+                else
+                    found = true
                 end
             end
-            if newInt and not found then
-                addStatusBar(tab, GUID, newInt, SIR.groupInfo[GUID]["CLASS"])
-            end
+        end
+        if newInt and not found then
+            addStatusBar(tab, GUID, newInt, SIR.groupInfo[GUID]["CLASS"])
         end
     end
 end
@@ -394,9 +391,9 @@ rotationFunc.specUpdateAllTabs = function(GUID, newSpec)
         rotationFunc.specUpdate(tab, GUID, newSpec)
     end
 end
+
 rotationFunc.addSpell = function(tab, GUID, spellID, class)
-    if trackModes[tab] == "ALL" or (trackModes[tab] == "ROTATION"
-        and contains(SIR.tabOptions[tab]["ROTATION"], SIR.petToMaster[GUID] or GUID)) then
+    if isTrackedGUID(tab, SIR.petToMaster[GUID] or GUID) then
         updateOrAddStatusBar(tab, GUID, spellID, class)
     end
 end

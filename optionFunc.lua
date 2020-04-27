@@ -441,7 +441,6 @@ local updateSortMenu = function()
 	end
 end
 
-
 optionFunc.PLAYER_LOGIN = function()
     SIR.tabOptions = SnagiIntRotaSaved.tabOptions or {}
 	for i=1, #SIR.tabOptions do

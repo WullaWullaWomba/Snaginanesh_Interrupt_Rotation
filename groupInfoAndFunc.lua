@@ -1,7 +1,7 @@
 --luacheck: globals CreateFrame GetTalentInfo GetPlayerInfoByGUID GetInspectSpecialization NotifyInspect
 --luacheck: globals GetSpecializationInfo GetSpecialization CanInspect UnitIsConnected InspectFrame
 --luacheck: globals GetNumGroupMembers IsInGroup IsInRaid UnitIsDeadOrGhost
---luacheck: globals GetTime C_Timer max UnitGUID UnitInParty unpack
+--luacheck: globals GetTime C_Timer max UnitGUID UnitInParty unpack CombatLogGetCurrentEventInfo
 --luacheck: globals SLASH_SIRGROUPINFO1 SlashCmdList SnagiIntRotaSaved
 local _, SIR = ...
 SIR.util = SIR.util or {}
@@ -222,8 +222,15 @@ SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
     SIR.util.myPrint("set numGroupMembers = newNumGroupMembers")
     SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
 end
-SIR.groupInfoFunc.updateActiveStatus = function(...)
+SIR.groupInfoFunc.PARTY_MEMBER_ENABLE = function(...)
     -- todo
+end
+SIR.groupInfoFunc.PARTY_MEMBER_DISABLE = function(...)
+end
+SIR.groupInfoFunc.UNIT_HEALTH = function(...)
+end
+SIR.groupInfoFunc.UNIT_DIED = function (GUID)
+    SIR.util.myPrint("groupInfoFunc.UnitDied ...", GUID)
 end
 SLASH_SIRGROUPINFO1 = "/sirgroupinfo"
 SlashCmdList["SIRGROUPINFO"] = function()

@@ -29,15 +29,15 @@ f:RegisterEvent("UNIT_HEALTH")
 
 f.PARTY_MEMBER_ENABLE = function(...)
 	SIR.util.myPrint("PARTY_MEMBER_ENABLE", ...)
-	SIR.groupInfoFunc.updateActiveStatus(...)
+	SIR.groupInfoFunc.PARTY_MEMBER_ENABLE(...)
 end
 f.PARTY_MEMBER_DISABLE = function(...)
 	SIR.util.myPrint("PARTY_MEMBER_DISABLE", ...)
-	SIR.groupInfoFunc.updateActiveStatus(...)
+	SIR.groupInfoFunc.PARTY_MEMBER_DISABLE(...)
 end
 f.UNIT_HEALTH = function(...)
 	-- SIR.util.myPrint("UNIT_HEALTH", ...)
-	SIR.groupInfoFunc.updateActiveStatus(...)
+	SIR.groupInfoFunc.UNIT_HEALTH(...)
 end
 f.GROUP_ROSTER_UPDATE = function()
 	SIR.groupInfoFunc.GROUP_ROSTER_UPDATE()
@@ -51,7 +51,8 @@ end
 
 f.COMBAT_LOG_EVENT_UNFILTERED = function()
 	-- 196099 (felhunter sac aura spellID)
-	local timestamp, subEvent, _, sourceGUID, _, _, sourceFlags, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
+	local timestamp, subEvent,_ , sourceGUID, _, _, sourceFlags, destGUID, _, _, _, spellID
+		= CombatLogGetCurrentEventInfo()
 	-- if source not in party return
 	if sourceFlags%16 > 4 then
 		return
@@ -60,11 +61,9 @@ f.COMBAT_LOG_EVENT_UNFILTERED = function()
 	if spellID == 196099 then
 		SIR.petInfoFunc.onCombatLogEvent(subEvent, sourceGUID)
 	end
-	--[[
 	if subEvent == "UNIT_DIED" then
-		SIR.util.myPrint(CombatLogGetCurrentEventInfo())
+		SIR.groupInfoFunc.UNIT_DIED(destGUID)
 	end
-	--]]
 end
 f.PLAYER_SPECIALIZATION_CHANGED = function()
 	SIR.util.myPrint("PLAYER_SPECIALIZATION_CHANGED")
