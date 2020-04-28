@@ -321,7 +321,7 @@ rotationFunc.updateTrackMode = function(tab)
                 if SIR.groupInfo[GUID] then
                     rotationFunc.playerInit(tab, GUID, SIR.groupInfo[GUID]["CLASS"])
                     if SIR.groupInfo[GUID]["SPEC"] then
-                        rotationFunc.specUpdate(tab, GUID, SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo[GUID]["SPEC"])
+                        rotationFunc.specUpdate(tab, GUID, SIR.groupInfo[GUID]["SPEC"])
                     end
                 end
             end
@@ -329,7 +329,7 @@ rotationFunc.updateTrackMode = function(tab)
             for GUID, info in pairs(SIR.groupInfo) do
                 rotationFunc.playerInit(tab, GUID, info["CLASS"])
                 if info["SPEC"] then
-                    rotationFunc.specUpdate(tab, GUID, info["CLASS"], info["SPEC"])
+                    rotationFunc.specUpdate(tab, GUID, info["SPEC"])
                 end
             end
 		end
@@ -340,7 +340,7 @@ rotationFunc.updateTrackMode = function(tab)
             if not contains(SIR.tabOptions[tab]["ROTATION"], GUID) then
                 rotationFunc.playerInit(tab, GUID, info["CLASS"])
                 if info["SPEC"] then
-                    rotationFunc.specUpdate(tab, GUID, info["CLASS"], info["SPEC"])
+                    rotationFunc.specUpdate(tab, GUID, info["SPEC"])
                 end
             end
         end
@@ -368,7 +368,8 @@ rotationFunc.playerInitAllTabs = function(GUID, class)
     end
 end
 rotationFunc.specUpdate = function(tab, GUID, newSpec)
-    SIR.util.myPrint("rotationFunc.specUpdate", SIR.groupInfo[GUID]["CLASS"], SIR.groupInfo["SPEC"])
+    SIR.util.myPrint("rotationFunc.specUpdate", SIR.groupInfo[GUID]["CLASS"], "old", SIR.groupInfo["SPEC"],
+        "new", newSpec, SIR.groupInfo["NAME"])
     if isTrackedGUID(tab, GUID) then
         if SIR.groupInfo[GUID]["CLASS"] == "WARLOCK" then
             return
@@ -378,6 +379,7 @@ rotationFunc.specUpdate = function(tab, GUID, newSpec)
         for i, bar in ipairs(statusBars[tab]) do
             if bar.GUID == GUID then
                 if bar.spellID ~= newInt then
+                    SIR.util.myPrint("bar.spellID", bar.spellID, "newInt", newInt)
                     removeStatusBar(tab, i)
                 else
                     found = true
@@ -387,6 +389,7 @@ rotationFunc.specUpdate = function(tab, GUID, newSpec)
         if newInt and not found then
             addStatusBar(tab, GUID, newInt, SIR.groupInfo[GUID]["CLASS"])
         end
+        SIR.util.myPrint("newInt", newInt, "found", found)
     end
 end
 rotationFunc.specUpdateAllTabs = function(GUID, newSpec)
@@ -396,15 +399,14 @@ rotationFunc.specUpdateAllTabs = function(GUID, newSpec)
     end
 end
 rotationFunc.updateActiveColour = function(GUID)
-    for _, bars in ipairs(statusBar) do
+    for _, bars in ipairs(statusBars) do
         for _, bar in ipairs(bars) do
             if bar.GUID == GUID then
-                bar:SetStatusBarColor(
-                    SIR.groupInfo[GUID]["ALIVE"]
-                    and SIR.groupInfo[GUID]["ENABLED"]
-                    and unpack(classColorsRGB[class])
-                    or 0.3, 0.3, 0.3
-                )
+                if SIR.groupInfo[GUID]["ALIVE"] and SIR.groupInfo[GUID]["ENABLED"] then
+                    bar:SetStatusBarColor(unpack(classColorsRGB[SIR.groupInfo[GUID]["CLASS"]]))
+                else
+                    bar:SetStatusBarColor(0.3, 0.3, 0.3)
+                end
             end
         end
     end

@@ -130,6 +130,8 @@ SIR.groupInfoFunc.PLAYER_LOGIN = function()
             ["CLASS"] = SIR.playerInfo["CLASS"],
             ["SPEC"] =  SIR.playerInfo["SPEC"],
             ["TALENTS"] = {},
+            ["ALIVE"] = not UnitIsDeadOrGhost("player"),
+            ["ENABLED"] = true,
         },
     }
     SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"] = {
@@ -187,6 +189,7 @@ SIR.groupInfoFunc.INSPECT_READY = function(...)
         SIR.rotationFunc.specUpdateAllTabs(GUID, SIR.groupInfo[GUID]["SPEC"])
     end
     -- todo if talents changed
+    --SIR.util.myPrint(SIR.groupInfo[GUID]["NAME"], "inspected")
 end
 SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
     SIR.util.myPrint("SIR.groupInfoOnGroupRosterUpdate ", numGroupMembers)
@@ -234,14 +237,14 @@ SIR.groupInfoFunc.PARTY_MEMBER_ENABLE = function(...)
     local GUID = UnitGUID(...)
     if GUID and SIR.groupInfo[GUID] then
         SIR.groupInfo[GUID]["ENABLED"] = true
-        SIR.rotationFunc.updateActiveStatus(GUID)
+        SIR.rotationFunc.updateActiveColour(GUID)
     end
 end
 SIR.groupInfoFunc.PARTY_MEMBER_DISABLE = function(...)
     local GUID = UnitGUID(...)
     if GUID and SIR.groupInfo[GUID] then
         SIR.groupInfo[GUID]["ENABLED"] = false
-        SIR.rotationFunc.updateActiveStatus(GUID)
+        SIR.rotationFunc.updateActiveColour(GUID)
     end
 end
 SIR.groupInfoFunc.UNIT_HEALTH = function(...)
@@ -250,7 +253,7 @@ SIR.groupInfoFunc.UNIT_HEALTH = function(...)
         if SIR.groupInfo[GUID]["ALIVE"] == false then
             numDead = numDead-1
             SIR.groupInfo[GUID]["ALIVE"] = true
-            SIR.rotationFunc.updateActiveStatus(GUID)
+            SIR.rotationFunc.updateActiveColour(GUID)
         end
     end
     -- todo unregister UNIT_HEALTH if no one is dead
@@ -260,7 +263,7 @@ SIR.groupInfoFunc.UNIT_DIED = function (GUID)
         SIR.groupInfo[GUID]["ALIVE"] = false
         numDead = numDead+1
         -- todo register UNIT_HEALTH
-        SIR.rotationFunc.updateActiveStatus(GUID)
+        SIR.rotationFunc.updateActiveColour(GUID)
     end
 end
 SLASH_SIRGROUPINFO1 = "/sirgroupinfo"
