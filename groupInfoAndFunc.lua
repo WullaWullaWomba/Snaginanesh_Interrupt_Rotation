@@ -15,7 +15,7 @@ local toBeInspectedActive = {}
 local toBeInspectedInactive = {}
 local recentInspectTimes = {}
 local numGroupMembers = -99
-
+local numDead = 0
 local printGroupInfo = function()
     print("----------------------------------------")
     print("SIR.groupInfo :")
@@ -55,19 +55,28 @@ local setInitialInfo = function(GUID)
         return false
     end
     local _, class, _, _, _, name, server = GetPlayerInfoByGUID(GUID)
+    local alive, connected
     if server then
         if server == "" then
             server = SIR.playerInfo["REALMN"];
+            alive = not UnitIsDeadOrGhost(name)
+            connected = UnitIsConnected(name)
+        else
+            alive = not UnitIsDeadOrGhost(name.."-"..server)
+            connected = UnitIsConnected(name.."-"..server)
         end
     else
         SIR.util.myPrint("setInitialInfo no server")
         return false
     end
+
     SIR.groupInfo[GUID] = {
         ["NAME"] = name,
         ["SERVER"] = server,
         ["CLASS"] = class,
         ["TALENTS"] = {},
+        ["ALIVE"] = alive,
+        ["ENABLED"] = connected, -- todo if possible actually check (additionally to connected)
     }
     SIR.util.myPrint("SIR.groupInfo[GUID] =", SIR.groupInfo[GUID])
     SIR.rotationFunc.playerInitAllTabs(GUID)
@@ -113,7 +122,6 @@ inspectNext = function()
     end
     C_Timer.After(2.1, function() inspectNext() end)
 end
-
 SIR.groupInfoFunc.PLAYER_LOGIN = function()
     SIR.groupInfo = {
         [SIR.playerInfo["GUID"]] = {
@@ -223,14 +231,37 @@ SIR.groupInfoFunc.GROUP_ROSTER_UPDATE = function()
     SIR.rotationFunc.updateNumGroup(newNumGroupMembers)
 end
 SIR.groupInfoFunc.PARTY_MEMBER_ENABLE = function(...)
-    -- todo
+    local GUID = UnitGUID(...)
+    if GUID and SIR.groupInfo[GUID] then
+        SIR.groupInfo[GUID]["ENABLED"] = true
+        SIR.rotationFunc.updateActiveStatus(GUID)
+    end
 end
 SIR.groupInfoFunc.PARTY_MEMBER_DISABLE = function(...)
+    local GUID = UnitGUID(...)
+    if GUID and SIR.groupInfo[GUID] then
+        SIR.groupInfo[GUID]["ENABLED"] = false
+        SIR.rotationFunc.updateActiveStatus(GUID)
+    end
 end
 SIR.groupInfoFunc.UNIT_HEALTH = function(...)
+    local GUID = UnitGUID(...)
+    if GUID and SIR.groupInfo[GUID] then
+        if SIR.groupInfo[GUID]["ALIVE"] == false then
+            numDead = numDead-1
+            SIR.groupInfo[GUID]["ALIVE"] = true
+            SIR.rotationFunc.updateActiveStatus(GUID)
+        end
+    end
+    -- todo unregister UNIT_HEALTH if no one is dead
 end
 SIR.groupInfoFunc.UNIT_DIED = function (GUID)
-    SIR.util.myPrint("groupInfoFunc.UnitDied ...", GUID)
+    if SIR.groupInfo[GUID] then
+        SIR.groupInfo[GUID]["ALIVE"] = false
+        numDead = numDead+1
+        -- todo register UNIT_HEALTH
+        SIR.rotationFunc.updateActiveStatus(GUID)
+    end
 end
 SLASH_SIRGROUPINFO1 = "/sirgroupinfo"
 SlashCmdList["SIRGROUPINFO"] = function()

@@ -88,7 +88,11 @@ local addStatusBar = function(tab, GUID, spellID, class, timestamp)
     statusBar.icon:SetTexture(select(3, GetSpellInfo(spellID)))
     statusBar.GUID = GUID
     statusBar.spellID = spellID
-    statusBar:SetStatusBarColor(unpack(classColorsRGB[class]))
+    if SIR.groupInfo[GUID]["ALIVE"] and SIR.groupInfo[GUID]["ENABLED"] then
+        statusBar:SetStatusBarColor(unpack(classColorsRGB[class]))
+    else
+        statusBar:SetStatusBarColor(0.3, 0.3, 0.3)
+    end
     statusBar:SetSize(SIR.tabOptions[tab]["WIDTH"]-SIR.tabOptions[tab]["HEIGHT"], SIR.tabOptions[tab]["HEIGHT"])
     statusBar.icon:SetSize(SIR.tabOptions[tab]["HEIGHT"], SIR.tabOptions[tab]["HEIGHT"])
     statusBar.leftText:SetText(SIR.petToMaster[GUID]
@@ -389,6 +393,20 @@ rotationFunc.specUpdateAllTabs = function(GUID, newSpec)
     SIR.util.myPrint("rotationFunc.specUpdateAllTabs")
     for tab=1, #rotationFrames do
         rotationFunc.specUpdate(tab, GUID, newSpec)
+    end
+end
+rotationFunc.updateActiveColour = function(GUID)
+    for _, bars in ipairs(statusBar) do
+        for _, bar in ipairs(bars) do
+            if bar.GUID == GUID then
+                bar:SetStatusBarColor(
+                    SIR.groupInfo[GUID]["ALIVE"]
+                    and SIR.groupInfo[GUID]["ENABLED"]
+                    and unpack(classColorsRGB[class])
+                    or 0.3, 0.3, 0.3
+                )
+            end
+        end
     end
 end
 
