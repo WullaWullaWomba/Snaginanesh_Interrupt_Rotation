@@ -11,6 +11,7 @@ local toBeInspectedInactive = {}
 local recentInspectTimes = {}
 local numGroupMembers = -99
 local numDead = 0
+
 local printGroupInfo = function()
     print("----------------------------------------")
     print("SIR.groupInfo :")
@@ -71,7 +72,7 @@ local setInitialInfo = function(GUID)
         ["CLASS"] = class,
         ["TALENTS"] = {},
         ["ALIVE"] = alive,
-        ["ENABLED"] = connected, -- todo if possible actually check (additionally to connected)
+        ["ENABLED"] = true, -- todo if possible actually check (additionally to connected - testing with true for debug)
     }
     SIR.util.myPrint("SIR.groupInfo[GUID] =", SIR.groupInfo[GUID])
     SIR.rotationFunc.playerInitAllTabs(GUID)
