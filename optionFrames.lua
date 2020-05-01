@@ -1,16 +1,11 @@
 --luacheck: globals CreateFrame UIParent UISpecialFrames UIDropDownMenu_SetWidth GetClassInfo CLASS_ICON_TCOORDS
 --luacheck: globals GetNumSpecializationsForClassID GetSpecializationInfoByID gsub unpack
 local _, SIR = ...
-SIR.data = SIR.data or {}
-SIR.util = SIR.util or {}
-SIR.frameUtil = SIR.frameUtil or {}
-SIR.rotationFrames = SIR.rotationFrames or {}
-SIR.optionFunc = SIR.optionFunc or {}
-SIR.optionFrames = SIR.optionFrames or {}
 
 local frameUtil = SIR.frameUtil
 local data = SIR.data
 local optionFunc = SIR.optionFunc
+
 local container = CreateFrame("Frame", "SnagiIntRotaContainer", UIParent)
 UISpecialFrames[#UISpecialFrames+1] = container:GetName() -- hide on escape - and maybe more <.<
 container:SetFrameStrata("DIALOG")

@@ -1,9 +1,6 @@
 --luacheck: globals UnitGUID GetNumGroupMembers IsInGroup IsInRaid SlashCmdList SLASH_SIRPETINFO1 GetPlayerInfoByGUID
 --luacheck: globals UnitAura
 local _, SIR = ...
-SIR.petToMaster = SIR.petToMaster or {}
-SIR.masterToPet = SIR.masterToPet or {}
-SIR.petInfoFunc = SIR.petInfoFunc or {}
 
 local getPetID = function(GUID)
     if GUID then

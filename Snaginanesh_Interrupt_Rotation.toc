@@ -4,6 +4,7 @@
 ## Version: 0.2
 ## SavedVariables: SnagiIntRotaSaved
 
+Snaginanesh_Interrupt_Rotation.lua
 data.lua
 util.lua
 groupInfoAndFunc.lua
@@ -12,4 +13,3 @@ frameUtil.lua
 optionFrames.lua
 optionFunc.lua
 rotationFramesAndFunc.lua
-Snaginanesh_Interrupt_Rotation.lua

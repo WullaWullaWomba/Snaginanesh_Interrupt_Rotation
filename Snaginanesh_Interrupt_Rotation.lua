@@ -1,31 +1,17 @@
 --luacheck: globals CreateFrame UnitGUID GetSpecializationInfo GetSpecialization UnitClass IsInGroup
 --luacheck: globals CombatLogGetCurrentEventInfo SnagiIntRotaSaved GetRealmName GetPlayerInfoByGUID
 local _, SIR = ...
-SIR.data = SIR.data or {}
-SIR.util = SIR.util or {}
-SIR.frameUtil = SIR.frameUtil or {}
-SIR.rotationFrames = SIR.rotationFrames or {}
-SIR.optionFunc = SIR.optionFunc or {}
-SIR.optionFrames = SIR.optionFrames or {}
-SIR.rotationFunc = SIR.rotationFunc or {}
+SIR.data, SIR.util, SIR.frameUtil = {}, {}, {}
+SIR.optionFrames, SIR.optionFunc, SIR.tabOptions = {}, {}, {}
+SIR.rotationFrames, SIR.rotationFunc = {}, {}
+SIR.groupInfo, SIR.groupInfoFunc = {}, {}
+SIR.petToMaster, SIR.masterToPet, SIR.petInfoFunc = {}, {}, {}
 SIR.playerInfo = SIR.playerInfo or {}
-SIR.tabOptions = SIR.tabOptions or {}
-SIR.pets = {}
+SIR.test = false
 
 local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(_, event, ...) f[event](...) end)
-
-f:RegisterEvent("PLAYER_LOGOUT")
 f:RegisterEvent("PLAYER_LOGIN")
-f:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-f:RegisterEvent("GROUP_ROSTER_UPDATE")
-f:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-f:RegisterEvent("PLAYER_ENTERING_WORLD")
-f:RegisterEvent("PLAYER_LEAVING_WORLD")
-f:RegisterEvent("INSPECT_READY")
-f:RegisterEvent("PARTY_MEMBER_ENABLE")
-f:RegisterEvent("PARTY_MEMBER_DISABLE")
-f:RegisterEvent("UNIT_HEALTH")
 
 f.PARTY_MEMBER_ENABLE = function(...)
 	SIR.util.myPrint("PARTY_MEMBER_ENABLE", ...)
@@ -95,6 +81,16 @@ f.PLAYER_LOGIN = function()
 	SIR.petInfoFunc.PLAYER_LOGIN()
 	SIR.optionFrames.generalTabButton:Click()
 	f:RegisterEvent("UNIT_PET")
+	f:RegisterEvent("PLAYER_LOGOUT")
+	f:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	f:RegisterEvent("GROUP_ROSTER_UPDATE")
+	f:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	f:RegisterEvent("PLAYER_ENTERING_WORLD")
+	f:RegisterEvent("PLAYER_LEAVING_WORLD")
+	f:RegisterEvent("INSPECT_READY")
+	f:RegisterEvent("PARTY_MEMBER_ENABLE")
+	f:RegisterEvent("PARTY_MEMBER_DISABLE")
+	f:RegisterEvent("UNIT_HEALTH")
 end
 f.PLAYER_ENTERING_WORLD = function()
 

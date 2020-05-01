@@ -1,13 +1,6 @@
 --luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID CombatLogGetCurrentEventInfo
 --luacheck: globals UnitAura
 local _, SIR = ...
-SIR.util = SIR.util or {}
-SIR.frameUtil = SIR.frameUtil or {}
-SIR.rotationFunc = SIR.rotationFunc or {}
-SIR.optionFunc = SIR.optionFunc or {}
-SIR.optionFrames = SIR.optionFrames or {}
-SIR.tabOptions = SIR.tabOptions or {}
-SIR.groupInfo = SIR.groupInfo or {}
 
 local specInterrupts, classWideInterrupts = SIR.data.specInterrupts, SIR.data.classWideInterrupts
 local classColorsRGB = SIR.data.classColorsRGB

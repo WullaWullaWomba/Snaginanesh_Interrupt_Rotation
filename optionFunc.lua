@@ -12,18 +12,10 @@ local _, SIR = ...
 --_, _ = ...
 
 local classSpecIDs = SIR.data.classSpecIDs
-SIR.data = SIR.data or {}
-SIR.util = SIR.util or {}
-SIR.frameUtil = SIR.frameUtil or {}
-SIR.rotationFrames = SIR.rotationFrames or {}
-SIR.optionFunc = SIR.optionFunc or {}
-SIR.optionFrames = SIR.optionFrames or {}
-SIR.rotationFunc = SIR.rotationFunc or {}
-SIR.playerInfo = SIR.playerInfo or {}
 local util = SIR.util
 local frameUtil = SIR.frameUtil
 local optionFrames = SIR.optionFrames
-local optionFunc = SIR.optionFunc or {}
+local optionFunc = SIR.optionFunc
 
 
 local contains, remove= util.contains, util.remove

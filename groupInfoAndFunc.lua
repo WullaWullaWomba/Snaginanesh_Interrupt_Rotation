@@ -4,11 +4,6 @@
 --luacheck: globals GetTime C_Timer max UnitGUID UnitInParty unpack CombatLogGetCurrentEventInfo
 --luacheck: globals SLASH_SIRGROUPINFO1 SlashCmdList SnagiIntRotaSaved
 local _, SIR = ...
-SIR.util = SIR.util or {}
-SIR.playerInfo = SIR.playerInfo or {}
-SIR.groupInfo = SIR.groupInfo or {}
-SIR.groupInfoFunc = SIR.groupInfoFunc or {}
-SIR.petInfo = SIR.petInfo or {}
 local reverseTable, remove = SIR.util.reverseTable, SIR.util.remove
 local toBeInitialized = {}
 local toBeInspectedActive = {}
