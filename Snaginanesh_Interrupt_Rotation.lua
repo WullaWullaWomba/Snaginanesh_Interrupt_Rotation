@@ -4,9 +4,9 @@ local _, SIR = ...
 SIR.data, SIR.util, SIR.frameUtil = {}, {}, {}
 SIR.optionFrames, SIR.optionFunc, SIR.tabOptions = {}, {}, {}
 SIR.rotationFrames, SIR.rotationFunc = {}, {}
+SIR.playerInfo = {}
 SIR.groupInfo, SIR.groupInfoFunc = {}, {}
 SIR.petToMaster, SIR.masterToPet, SIR.petInfoFunc = {}, {}, {}
-SIR.playerInfo = SIR.playerInfo or {}
 SIR.test = false
 
 local f = CreateFrame("Frame")

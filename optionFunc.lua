@@ -900,10 +900,10 @@ optionFunc.sendRotationOnClick = function(self)
 		optionFrames.whisperToEditBox:GetText())
 end
 optionFunc.playSoundCheckBoxOnClick = function(self)
-	SIR.tabOptions[activeTab]["PLAYSOUND"] = self.GetChecked()
+	SIR.tabOptions[activeTab]["PLAYSOUND"] = self:GetChecked()
 end
 optionFunc.repeatSoundCheckBoxOnClick = function(self)
-	SIR.tabOptions[activeTab]["REPEATSOUND"] = self.GetChecked()
+	SIR.tabOptions[activeTab]["REPEATSOUND"] = self:GetChecked()
 end
 optionFunc.soundPathEditBoxOnEnterPressed = function(self)
 	SIR.tabOptions[activeTab]["SOUNDPATH"] = self:GetText() or ""

@@ -1,5 +1,5 @@
 --luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID CombatLogGetCurrentEventInfo
---luacheck: globals UnitAura
+--luacheck: globals UnitAura PlaySoundFile
 local _, SIR = ...
 
 local specInterrupts, classWideInterrupts = SIR.data.specInterrupts, SIR.data.classWideInterrupts
@@ -131,9 +131,15 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 end
                 -- insert bar again
                 insertBar(tab, statusBars[tab], bar)
+                SIR.util.myPrint("SIR.tabOptions[tab][\"PLAYSOUND\"]" , SIR.tabOptions[tab]["PLAYSOUND"]
+                , "statusBars[tab][1].GUID", statusBars[tab][1].GUID
+                , "SIR.playerInfo[\"GUID\"]", SIR.playerInfo["GUID"]
+                , "SIR.tabOptions[tab][\"REPEATSOUND\"]", SIR.tabOptions[tab]["REPEATSOUND"])
                 if SIR.tabOptions[tab]["PLAYSOUND"]
                     and statusBars[tab][1].GUID == SIR.playerInfo["GUID"]
                     and (SIR.tabOptions[tab]["REPEATSOUND"] or not statusBars[tab][1].soundPlayed) then
+
+                    SIR.util.myPrint("trying to play sound")
                     PlaySoundFile(SIR.tabOptions[tab]["SOUNDPATH"])
                     statusBars[tab][1].soundPlayed = true
                 end
