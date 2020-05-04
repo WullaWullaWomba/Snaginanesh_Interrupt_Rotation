@@ -131,7 +131,14 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 end
                 -- insert bar again
                 insertBar(tab, statusBars[tab], bar)
+                if SIR.tabOptions[tab]["PLAYSOUND"]
+                    and statusBars[tab][1].GUID == SIR.playerInfo["GUID"]
+                    and (SIR.tabOptions[tab]["REPEATSOUND"] or not statusBars[tab][1].soundPlayed) then
+                    PlaySoundFile(SIR.tabOptions[tab]["SOUNDPATH"])
+                    statusBars[tab][1].soundPlayed = true
+                end
             end
+            bar.soundPlayed = false
             return
         end
     end

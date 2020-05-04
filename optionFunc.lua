@@ -128,7 +128,10 @@ local defaultOptions = {
 	["TRACKROTATIONTO"] = 40,
 	["TRACKALLFROM"] = 2,
 	["TRACKALLTO"] = 5,
-	["SORTMODE"] = "CD"
+	["SORTMODE"] = "CD",
+	["PLAYSOUND"] = false,
+	["REPEATSOUND"] = false,
+	["SOUNDPATH"] = "Interface\\AddOns\\Snaginanesh_Interrupt_Rotation\\Sounds\\next.ogg",
 }
 
 local toggleOptions = function()
@@ -432,6 +435,11 @@ local updateSortMenu = function()
 		cb:SetChecked(k == SIR.tabOptions[activeTab]["SORTMODE"])
 	end
 end
+local updateSoundMenu = function()
+	optionFrames.playSoundCheckBox:SetChecked(SIR.tabOptions[activeTab]["PLAYSOUND"])
+	optionFrames.repeatSoundCheckBox:SetChecked(SIR.tabOptions[activeTab]["REPEATSOUND"])
+	optionFrames.soundPathEditBox:SetText(SIR.tabOptions[activeTab]["SOUNDPATH"])
+end
 
 optionFunc.PLAYER_LOGIN = function()
     SIR.tabOptions = SnagiIntRotaSaved.tabOptions or {}
@@ -484,6 +492,7 @@ optionFunc.rotationTabButtonOnClick = function(self)
 	updateEnableMenu()
 	updateDisplayMenu()
 	updateSortMenu()
+	updateSoundMenu()
 	optionFrames.leftSideMenu:Show()
 end
 optionFunc.createNewTab = function()
@@ -889,4 +898,13 @@ end
 optionFunc.sendRotationOnClick = function(self)
 	SendChatMessage(makeTransmissionText(), self.value, _,
 		optionFrames.whisperToEditBox:GetText())
+end
+optionFunc.playSoundCheckBoxOnClick = function(self)
+	SIR.tabOptions[activeTab]["PLAYSOUND"] = self.GetChecked()
+end
+optionFunc.repeatSoundCheckBoxOnClick = function(self)
+	SIR.tabOptions[activeTab]["REPEATSOUND"] = self.GetChecked()
+end
+optionFunc.soundPathEditBoxOnEnterPressed = function(self)
+	SIR.tabOptions[activeTab]["SOUNDPATH"] = self:GetText() or ""
 end

@@ -152,6 +152,7 @@ local menuButtons = {
     ["SEND"] = frameUtil.createMenuButton("Send", rotationTab),
     ["DISPLAY"] = frameUtil.createMenuButton("Display", rotationTab),
     ["SORTING"] = frameUtil.createMenuButton("Sorting", rotationTab),
+    ["SOUND"] = frameUtil.createMenuButton("Sound", rotationTab),
 }
 menuButtons["ENABLE"].tooltipText = "Select when & what to track."
 menuButtons["ENABLE"]:SetPoint("TOPLEFT", testButton, "BOTTOMLEFT", 0, -5)
@@ -159,6 +160,7 @@ menuButtons["SEND"].tooltipText = "Send your currently selected\124ntab's rotati
 menuButtons["SEND"]:SetPoint("TOPLEFT", menuButtons["ENABLE"], "BOTTOMLEFT", 0, -5)
 menuButtons["DISPLAY"]:SetPoint("TOPLEFT", menuButtons["SEND"], "BOTTOMLEFT", 0, -5)
 menuButtons["SORTING"]:SetPoint("TOPLEFT", menuButtons["DISPLAY"], "BOTTOMLEFT", 0, -5)
+menuButtons["SOUND"]:SetPoint("TOPLEFT", menuButtons["SORTING"], "BOTTOMLEFT", 0, -5)
 
 local widthFontString, widthEditBox = frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
 widthFontString:SetText("width:")
@@ -363,6 +365,32 @@ sortModeCheckBoxes["CD"]:SetPoint("TOPLEFT", leftSideMenu, "TOP", 0, -50)
 
 sortModeCheckBoxes["ROTATION"].value = "ROTATION"
 sortModeCheckBoxes["ROTATION"]:SetPoint("TOP", sortModeCheckBoxes["CD"], "BOTTOM", 0, -5)
+local playSoundCheckBox = CreateFrame("CheckButton", _, menuButtons["SOUND"], "ChatConfigBaseCheckButtonTemplate")
+playSoundCheckBox:SetSize(30, 30)
+playSoundCheckBox:SetPoint("TOPLEFT", leftSideMenu, "TOPLEFT", 115, -35)
+playSoundCheckBox:SetScript("OnClick", function(self) optionFunc.playSoundCheckBoxOnClick(self) end)
+local playSoundLabel = playSoundCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
+playSoundLabel:SetPoint("LEFT", playSoundCheckBox, "RIGHT", -5, 0)
+playSoundLabel:SetText("play sound")
+
+local repeatSoundCheckBox = CreateFrame("CheckButton", _, menuButtons["SOUND"], "ChatConfigBaseCheckButtonTemplate")
+repeatSoundCheckBox:SetSize(30, 30)
+repeatSoundCheckBox:SetPoint("TOPLEFT", playSoundCheckBox, "BOTTOMLEFT", 0, -10)
+repeatSoundCheckBox:SetScript("OnClick", function(self) optionFunc.repeatSoundCheckBoxOnClick(self) end)
+local repeatSoundLabel = repeatSoundCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
+repeatSoundLabel:SetPoint("LEFT", repeatSoundLabel, "RIGHT", -5, 0)
+repeatSoundLabel:SetText("repeat sound")
+
+local soundPathFontString, soundPathEditBox = frameUtil.createFontStringEditBox(menuButtons["SOUND"])
+soundPathFontString:SetText("Sound path:")
+soundPathFontString:SetSize(76, 30)
+soundPathFontString:ClearAllPoints()
+soundPathFontString:SetPoint("TOP", soundPathEditBox, "BOTTOM", 0, -15)
+soundPathEditBox:SetSize(150, 30)
+soundPathEditBox:SetPoint("TOPLEFT", repeatSoundCheckBox, "BOTTOMLEFT", 0, -10)
+soundPathEditBox:SetMaxLetters(50)
+soundPathEditBox:SetScript("OnEnterPressed", function(self) optionFunc.soundPathEditBoxOnEnterPressed(self) end)
+
 
 SIR.optionFrames = {
     --single frames
@@ -403,4 +431,7 @@ SIR.optionFrames = {
     ["sendRotationButtons"] = sendRotationButtons,
     ["sortModeCheckBoxes"] = sortModeCheckBoxes,
     ["enableCheckBoxes"] = enableCheckBoxes,
+    ["playSoundCheckBox"] = playSoundCheckBox,
+    ["repeatSoundCheckBox"] = repeatSoundCheckBox,
+    ["soundPathEditBox"] = soundPathEditBox,
 }
