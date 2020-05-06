@@ -233,6 +233,7 @@ SIR.groupInfoFunc.PARTY_MEMBER_ENABLE = function(...)
     local GUID = UnitGUID(...)
     if GUID and SIR.groupInfo[GUID] then
         SIR.groupInfo[GUID]["ENABLED"] = true
+        SIR.groupInfo[GUID]["ALIVE"] = not UnitIsDeadOrGhost(...)
         SIR.rotationFunc.updateActiveColour(GUID)
     end
 end
