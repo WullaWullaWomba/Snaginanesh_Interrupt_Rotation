@@ -178,7 +178,19 @@ local isTrackedGUID = function(tab, GUID)
     end
     return false
 end
-
+local getBarColour = function(GUID)
+    local colour
+    if SIR.generalOptions["GREYOUTDEAD"] and not SIR.groupInfo[GUID]["ALIVE"] then
+        colour = {0.3, 0.3, 0.3}
+    elseif SIR.generalOptions["GREYOUTDISC"] and not SIR.groupInfo[GUID]["CONNECTED"] then
+        colour = {0.3, 0.3, 0.3}
+    elseif SIR.generalOptions["GREYOUTDIFFAREA"] and SIR.groupInfo[GUID]["DIFFAREA"] then
+        colour = {0.3, 0.3, 0.3}
+    else
+        colour = classColorsRGB[SIR.groupInfo[GUID]["CLASS"]]
+    end
+    return unpack(colour)
+end
 rotationFunc.newRotationTab = function(tab)
     SIR.util.myPrint("rotationFunc.newRotationTab")
     local rotationFrame = SIR.frameUtil.aquireRotationFrame(SIR.optionFrames.container, tab)
@@ -404,16 +416,20 @@ rotationFunc.specUpdateAllTabs = function(GUID, newSpec)
         rotationFunc.specUpdate(tab, GUID, newSpec)
     end
 end
-rotationFunc.updateActiveColour = function(GUID)
+rotationFunc.updateGreyOutForGUID = function(GUID)
     for _, bars in ipairs(statusBars) do
         for _, bar in ipairs(bars) do
             if bar.GUID == GUID then
-                if SIR.groupInfo[GUID]["ALIVE"] and SIR.groupInfo[GUID]["ENABLED"] then
-                    bar:SetStatusBarColor(unpack(classColorsRGB[SIR.groupInfo[GUID]["CLASS"]]))
-                else
-                    bar:SetStatusBarColor(0.3, 0.3, 0.3)
-                end
+                 bar:SetStatusBarColor(getBarColour(GUID))
             end
+        end
+    end
+end
+
+SIR.rotationFunc.updateGreyOut = function()
+    for _, bars in ipairs(statusBars) do
+        for _, bar in ipairs(bars) do
+            bar:SetStatusBarColor(getBarColour(bar.GUID))
         end
     end
 end

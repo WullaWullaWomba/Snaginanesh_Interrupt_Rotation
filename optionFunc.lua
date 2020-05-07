@@ -374,6 +374,11 @@ local makeTransmissionText = function()
 	end
 	return text
 end
+local updateGreyOutCheckBoxes = function()
+	optionFrames.greyOutDeadCheckBox:SetChecked(generalOptions["GREYOUTDEAD"])
+	optionFrames.greyOutDiscCheckBox:SetChecked(generalOptions["GREYOUTDISC"])
+	optionFrames.greyOutDiffAreaCheckBox:SetChecked(generalOptions["GREYOUTDIFFAREA"])
+end
 local updateEnableMenu = function()
 	optionFrames.trackAllOption.checkBox:SetChecked(SIR.tabOptions[activeTab]["TRACKALLCHECKED"])
 	optionFrames.trackAllOption.fromSlider:SetValue(SIR.tabOptions[activeTab]["TRACKALLFROM"])
@@ -473,6 +478,7 @@ optionFunc.generalTabButtonOnClick = function(self)
 	self.inactiveTexture:Hide()
 	self.activeTexture:Show()
 	optionFrames.leftSideMenu:Hide()
+	updateGreyOutCheckBoxes()
 end
 optionFunc.rotationTabButtonOnClick = function(self)
 	activeTab = self.key
@@ -908,3 +914,17 @@ end
 optionFunc.soundPathEditBoxOnEnterPressed = function(self)
 	SIR.tabOptions[activeTab]["SOUNDPATH"] = self:GetText() or ""
 end
+
+optionFunc.greyOutDeadCheckBoxOnClick = function(self)
+	SIR.generalOptions["GREYOUTDEAD"] = self.getChecked()
+	SIR.rotationFunc.updateGreyOut()
+end
+optionFunc.greyOutDiscCheckBoxOnClick = function(self)
+	SIR.generalOptions["GREYOUTDISC"] = self.getChecked()
+	SIR.rotationFunc.updateGreyOut()
+end
+optionFunc.greyOutDiffAreaCheckBoxOnClick = function(self)
+	SIR.generalOptions["GREYOUTDIFFAREA"] = self.getChecked()
+	SIR.rotationFunc.updateGreyOut()
+end
+

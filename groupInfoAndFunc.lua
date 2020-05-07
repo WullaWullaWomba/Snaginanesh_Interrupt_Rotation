@@ -233,15 +233,17 @@ SIR.groupInfoFunc.PARTY_MEMBER_ENABLE = function(...)
     local GUID = UnitGUID(...)
     if GUID and SIR.groupInfo[GUID] then
         SIR.groupInfo[GUID]["ENABLED"] = true
+        SIR.groupInfo[GUID]["CONNECTED"] = true
         SIR.groupInfo[GUID]["ALIVE"] = not UnitIsDeadOrGhost(...)
-        SIR.rotationFunc.updateActiveColour(GUID)
+        SIR.rotationFunc.updateGreyOutForGUID(GUID)
     end
 end
 SIR.groupInfoFunc.PARTY_MEMBER_DISABLE = function(...)
     local GUID = UnitGUID(...)
     if GUID and SIR.groupInfo[GUID] then
+        SIR.groupInfo[GUID]["CONNECTED"] = UnitIsConnected(...)
         SIR.groupInfo[GUID]["ENABLED"] = false
-        SIR.rotationFunc.updateActiveColour(GUID)
+        SIR.rotationFunc.updateGreyOutForGUID(GUID)
     end
 end
 SIR.groupInfoFunc.UNIT_HEALTH = function(...)
@@ -250,7 +252,7 @@ SIR.groupInfoFunc.UNIT_HEALTH = function(...)
         if SIR.groupInfo[GUID]["ALIVE"] == false then
             numDead = numDead-1
             SIR.groupInfo[GUID]["ALIVE"] = true
-            SIR.rotationFunc.updateActiveColour(GUID)
+            SIR.rotationFunc.updateGreyOutForGUID(GUID)
         end
     end
     -- todo unregister UNIT_HEALTH if no one is dead
@@ -260,7 +262,7 @@ SIR.groupInfoFunc.UNIT_DIED = function (GUID)
         SIR.groupInfo[GUID]["ALIVE"] = false
         numDead = numDead+1
         -- todo register UNIT_HEALTH
-        SIR.rotationFunc.updateActiveColour(GUID)
+        SIR.rotationFunc.updateGreyOutForGUID(GUID)
     end
 end
 SLASH_SIRGROUPINFO1 = "/sirgroupinfo"

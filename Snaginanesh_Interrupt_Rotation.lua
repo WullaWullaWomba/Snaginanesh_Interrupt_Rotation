@@ -2,7 +2,7 @@
 --luacheck: globals CombatLogGetCurrentEventInfo SnagiIntRotaSaved GetRealmName GetPlayerInfoByGUID
 local _, SIR = ...
 SIR.data, SIR.util, SIR.frameUtil = {}, {}, {}
-SIR.optionFrames, SIR.optionFunc, SIR.tabOptions = {}, {}, {}
+SIR.optionFrames, SIR.optionFunc, SIR.tabOptions, SIR.generalOptions = {}, {}, {}, {}
 SIR.rotationFrames, SIR.rotationFunc = {}, {}
 SIR.playerInfo = {}
 SIR.groupInfo, SIR.groupInfoFunc = {}, {}

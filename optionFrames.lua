@@ -50,6 +50,51 @@ generalTabButton:SetPoint("TOPLEFT", container, "BOTTOMLEFT", 0, 8)
 generalTabButton:SetText("General")
 generalTabButton:SetScript("OnClick", function(self) optionFunc.generalTabButtonOnClick(self) end)
 
+
+local greyOutDeadCheckBox = CreateFrame("CheckButton", _, generalTab, "ChatConfigBaseCheckButtonTemplate")
+greyOutDeadCheckBox:SetSize(30, 30)
+greyOutDeadCheckBox:SetPoint("TOPLEFT", generalTab, "TOPLEFT", 10, -100)
+greyOutDeadCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDeadCheckBoxOnClick(self) end)
+
+local greyOutDeadLabel = greyOutDeadCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
+greyOutDeadLabel:SetPoint("BOTTOM", greyOutDeadCheckBox, "TOP", 0, 0)
+greyOutDeadLabel:SetText("dead")
+greyOutDeadCheckBox:Hide()
+
+local greyOutDiscCheckBox = CreateFrame("CheckButton", _, generalTab, "ChatConfigBaseCheckButtonTemplate")
+greyOutDiscCheckBox:SetSize(30, 30)
+greyOutDiscCheckBox:SetPoint("LEFT", greyOutDeadCheckBox, "RIGHT", 10, 0)
+greyOutDiscCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDiscCheckBoxOnClick(self) end)
+
+local greyOutDiscLabel = greyOutDiscCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
+greyOutDiscLabel:SetPoint("BOTTOM", greyOutDiscCheckBox, "TOP", 0, 0)
+greyOutDiscLabel:SetText("disconnected")
+greyOutDiscCheckBox:Hide()
+
+local greyOutDiffAreaCheckBox = CreateFrame("CheckButton", _, generalTab, "ChatConfigBaseCheckButtonTemplate")
+greyOutDiffAreaCheckBox:SetSize(30, 30)
+greyOutDiffAreaCheckBox:SetPoint("LEFT", greyOutDiscCheckBox, "RIGHT", 10, 0)
+greyOutDiffAreaCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDiffAreaCheckBoxOnClick(self) end)
+
+local greyOutDiffAreaLabel = greyOutDiffAreaCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
+greyOutDiffAreaLabel:SetPoint("BOTTOM", greyOutDiffAreaCheckBox, "TOP", 0, 0)
+greyOutDiffAreaLabel:SetText("different area")
+greyOutDiffAreaCheckBox:Hide()
+
+local createNewTabButton = CreateFrame("Button", _, generalTab, "UIPanelButtonTemplate")
+createNewTabButton:SetSize(100, 40)
+createNewTabButton:SetPoint("BOTTOMRIGHT", generalTab, "BOTTOMRIGHT", -15, 15)
+createNewTabButton:SetText("New tab")
+createNewTabButton:SetScript("OnClick", function()
+	optionFunc.createNewTab()
+end)
+local removeTabButton = CreateFrame("Button", "$parentRemoveTabButton", rotationTab, "UIPanelButtonTemplate")
+removeTabButton:SetSize(100, 40)
+removeTabButton:SetPoint("BOTTOMRIGHT", rotationTab, "BOTTOMRIGHT", -15, 15)
+removeTabButton:SetText("Remove tab")
+removeTabButton:SetScript("OnClick", function() optionFunc.removeTabOnClick() end)
+
+
 local rotationTab = CreateFrame("Frame", _, container)
 rotationTab:SetAllPoints()
 rotationTab:Hide()
@@ -204,19 +249,6 @@ titleEditBox:SetScript("OnSpacePressed", function(self)
     self:SetText(gsub(self:GetText(), "%s","_"))
 end)
 titleEditBox:SetScript("OnEnterPressed", function(self) optionFunc.titleEditBoxOnEnterPressed(self) end)
-
-local createNewTabButton = CreateFrame("Button", _, generalTab, "UIPanelButtonTemplate")
-createNewTabButton:SetSize(100, 40)
-createNewTabButton:SetPoint("BOTTOMRIGHT", generalTab, "BOTTOMRIGHT", -15, 15)
-createNewTabButton:SetText("New tab")
-createNewTabButton:SetScript("OnClick", function()
-	optionFunc.createNewTab()
-end)
-local removeTabButton = CreateFrame("Button", "$parentRemoveTabButton", rotationTab, "UIPanelButtonTemplate")
-removeTabButton:SetSize(100, 40)
-removeTabButton:SetPoint("BOTTOMRIGHT", rotationTab, "BOTTOMRIGHT", -15, 15)
-removeTabButton:SetText("Remove tab")
-removeTabButton:SetScript("OnClick", function() optionFunc.removeTabOnClick() end)
 
 local enableClassSpecButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
 local enableGroupInstanceButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
@@ -403,6 +435,11 @@ SIR.optionFrames = {
     --single frames
     ["container"] = container,
     ["generalTab"] = generalTab,
+    ["greyOutDeadCheckBox"] = greyOutDeadCheckBox,
+    ["greyOutDiscCheckBox"] = greyOutDiscCheckBox,
+    ["greyOutDiffAreaCheckBox"] = greyOutDiffAreaCheckBox,
+    ["createNewTabButton"] = createNewTabButton,
+    ["removeTabButton"] = removeTabButton,
     ["generalTabButton"] = generalTabButton,
     ["rotationTab"] = rotationTab,
     ["leftSideMenu"] = leftSideMenu,
@@ -420,12 +457,13 @@ SIR.optionFrames = {
     ["xOffEditBox"] = xOffEditBox,
     ["yOffEditBox"] = yOffEditBox,
     ["titleEditBox"] = titleEditBox,
-    ["createNewTabButton"] = createNewTabButton,
-    ["removeTabButton"] = removeTabButton,
     ["testButton"] = testButton,
     ["enableGroupInstanceButton"] = enableGroupInstanceButton,
     ["enableClassSpecButton"] = enableClassSpecButton,
     ["whisperToEditBox"] = whisperToEditBox,
+    ["playSoundCheckBox"] = playSoundCheckBox,
+    ["repeatSoundCheckBox"] = repeatSoundCheckBox,
+    ["soundPathEditBox"] = soundPathEditBox,
     -- table with different frames
     ["trackAllOption"] = trackAllOption,
     ["trackRotationOption"] = trackRotationOption,
@@ -438,7 +476,4 @@ SIR.optionFrames = {
     ["sendRotationButtons"] = sendRotationButtons,
     ["sortModeCheckBoxes"] = sortModeCheckBoxes,
     ["enableCheckBoxes"] = enableCheckBoxes,
-    ["playSoundCheckBox"] = playSoundCheckBox,
-    ["repeatSoundCheckBox"] = repeatSoundCheckBox,
-    ["soundPathEditBox"] = soundPathEditBox,
 }
