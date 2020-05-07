@@ -76,6 +76,8 @@ f.PLAYER_LOGIN = function()
 		["COLOUREDNAME"] = SIR.util.getColouredNameByGUID(GUID),
 	}
 	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
+	SIR.tabOptions = SnagiIntRotaSaved.tabOptions or {}
+	SIR.generalOptions = SnagiIntRotaSaved.generalOptions or {}
 	SIR.optionFunc.PLAYER_LOGIN()
 	SIR.groupInfoFunc.PLAYER_LOGIN()
 	SIR.petInfoFunc.PLAYER_LOGIN()
@@ -96,8 +98,9 @@ f.PLAYER_ENTERING_WORLD = function()
 
 end
 f.PLAYER_LOGOUT = function()
+	SnagiIntRotaSaved.tabOptions = SIR.tabOptions
+	SnagiIntRotaSaved.generalOptions = SIR.generalOptions
 end
 f.PLAYER_LEAVING_WORLD = function()
-	SIR.optionFunc.save()
 	SIR.groupInfoFunc.PLAYER_LEAVING_WORLD()
 end

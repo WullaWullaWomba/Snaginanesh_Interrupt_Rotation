@@ -127,6 +127,7 @@ SIR.groupInfoFunc.PLAYER_LOGIN = function()
             ["SPEC"] =  SIR.playerInfo["SPEC"],
             ["TALENTS"] = {},
             ["ALIVE"] = not UnitIsDeadOrGhost("player"),
+            ["CONNECTED"] = true,
             ["ENABLED"] = true,
         },
     }
@@ -240,8 +241,13 @@ SIR.groupInfoFunc.PARTY_MEMBER_ENABLE = function(...)
 end
 SIR.groupInfoFunc.PARTY_MEMBER_DISABLE = function(...)
     local GUID = UnitGUID(...)
+    --local unit = ...
     if GUID and SIR.groupInfo[GUID] then
         SIR.groupInfo[GUID]["CONNECTED"] = UnitIsConnected(...)
+        SIR.util.myPrint("SIR.groupInfoFunc.PARTY_MEMBER_DISABLE", "SIR.groupInfo[GUID][\"CONNECTED\"]",
+            SIR.groupInfo[GUID]["CONNECTED"])
+            --C_Timer.After(2.1, function() SIR.util.myPrint("SIR.groupInfoFunc.PARTY_MEMBER_DISABLE", "SIR.groupInfo[GUID][\"CONNECTED\"]",
+            --    SIR.groupInfo[GUID]["CONNECTED"], UnitIsConnected(unit)) end)
         SIR.groupInfo[GUID]["ENABLED"] = false
         SIR.rotationFunc.updateGreyOutForGUID(GUID)
     end

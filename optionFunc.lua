@@ -375,9 +375,9 @@ local makeTransmissionText = function()
 	return text
 end
 local updateGreyOutCheckBoxes = function()
-	optionFrames.greyOutDeadCheckBox:SetChecked(generalOptions["GREYOUTDEAD"])
-	optionFrames.greyOutDiscCheckBox:SetChecked(generalOptions["GREYOUTDISC"])
-	optionFrames.greyOutDiffAreaCheckBox:SetChecked(generalOptions["GREYOUTDIFFAREA"])
+	optionFrames.greyOutDeadCheckBox:SetChecked(SIR.generalOptions["GREYOUTDEAD"])
+	optionFrames.greyOutDiscCheckBox:SetChecked(SIR.generalOptions["GREYOUTDISC"])
+	optionFrames.greyOutDiffAreaCheckBox:SetChecked(SIR.generalOptions["GREYOUTDIFFAREA"])
 end
 local updateEnableMenu = function()
 	optionFrames.trackAllOption.checkBox:SetChecked(SIR.tabOptions[activeTab]["TRACKALLCHECKED"])
@@ -447,7 +447,6 @@ local updateSoundMenu = function()
 end
 
 optionFunc.PLAYER_LOGIN = function()
-    SIR.tabOptions = SnagiIntRotaSaved.tabOptions or {}
 	for i=1, #SIR.tabOptions do
 		for k, default in pairs(defaultOptions) do
 			if SIR.tabOptions[i][k] == nil then
@@ -461,9 +460,6 @@ optionFunc.GROUP_ROSTER_UPDATE = function()
 	if optionFrames.rotationTab:IsShown() then
 		updateGroupMemberButtons()
 	end
-end
-optionFunc.save = function()
-    SnagiIntRotaSaved.tabOptions = SIR.tabOptions
 end
 optionFunc.rotationTabOnShow = function()
 	updateGroupMemberButtons()
@@ -916,15 +912,15 @@ optionFunc.soundPathEditBoxOnEnterPressed = function(self)
 end
 
 optionFunc.greyOutDeadCheckBoxOnClick = function(self)
-	SIR.generalOptions["GREYOUTDEAD"] = self.getChecked()
+	SIR.generalOptions["GREYOUTDEAD"] = self:GetChecked()
 	SIR.rotationFunc.updateGreyOut()
 end
 optionFunc.greyOutDiscCheckBoxOnClick = function(self)
-	SIR.generalOptions["GREYOUTDISC"] = self.getChecked()
+	SIR.generalOptions["GREYOUTDISC"] = self:GetChecked()
 	SIR.rotationFunc.updateGreyOut()
 end
 optionFunc.greyOutDiffAreaCheckBoxOnClick = function(self)
-	SIR.generalOptions["GREYOUTDIFFAREA"] = self.getChecked()
+	SIR.generalOptions["GREYOUTDIFFAREA"] = self:GetChecked()
 	SIR.rotationFunc.updateGreyOut()
 end
 
