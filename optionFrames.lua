@@ -1,5 +1,5 @@
 --luacheck: globals CreateFrame UIParent UISpecialFrames UIDropDownMenu_SetWidth GetClassInfo CLASS_ICON_TCOORDS
---luacheck: globals GetNumSpecializationsForClassID GetSpecializationInfoByID gsub unpack
+--luacheck: globals GetNumSpecializationsForClassID GetSpecializationInfoByID gsub unpack GameTooltip
 local _, SIR = ...
 
 local frameUtil = SIR.frameUtil
@@ -55,16 +55,33 @@ greyOutLabel:SetText("Grey out: ")
 greyOutLabel:SetTextColor(255,255,255)
 greyOutLabel:SetPoint("TOPLEFT", generalTab, "TOPLEFT", 25, -100)
 
-local greyOutDeadCheckBox = CreateFrame("CheckButton", _, generalTab, "ChatConfigBaseCheckButtonTemplate")
-greyOutDeadCheckBox:SetSize(30, 30)
+local greyOutDeadCheckBox = frameUtil.createFontStringCheckBox("dead", generalTab)
+greyOutDeadCheckBox.tooltipText = "Greys out dead players."
 greyOutDeadCheckBox:SetPoint("LEFT", greyOutLabel, "RIGHT", 25, 0)
 greyOutDeadCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDeadCheckBoxOnClick(self) end)
+greyOutDeadCheckBox:SetHitRectInsets(
+    -greyOutDeadCheckBox.fontString:GetWidth()/2+greyOutDeadCheckBox:GetWidth()/2
+    , -greyOutDeadCheckBox.fontString:GetWidth()/2+greyOutDeadCheckBox:GetWidth()/2
+    , -greyOutDeadCheckBox.fontString:GetHeight()
+    , 0) --l r t b
 
-local greyOutDeadLabel = greyOutDeadCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
-greyOutDeadLabel:SetPoint("BOTTOM", greyOutDeadCheckBox, "TOP", 0, 0)
-greyOutDeadLabel:SetText("dead")
---greyOutDeadCheckBox:Hide()
+greyOutDeadCheckBox.fontString:ClearAllPoints()
+greyOutDeadCheckBox.fontString:SetPoint("BOTTOM", greyOutDeadCheckBox, "TOP", 0, 0)
 
+local greyOutDisabledCheckBox = frameUtil.createFontStringCheckBox("disabled", generalTab)
+greyOutDisabledCheckBox.tooltipText = "Greys out disconnected AND players leaving your area."
+greyOutDisabledCheckBox:SetPoint("LEFT", greyOutDeadCheckBox, "RIGHT", 50, 0)
+greyOutDisabledCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDisabledCheckBoxOnClick(self) end)
+greyOutDisabledCheckBox:SetHitRectInsets(
+    -greyOutDisabledCheckBox.fontString:GetWidth()/2+greyOutDisabledCheckBox:GetWidth()/2
+    , -greyOutDisabledCheckBox.fontString:GetWidth()/2+greyOutDisabledCheckBox:GetWidth()/2
+    , -greyOutDisabledCheckBox.fontString:GetHeight()
+    , 0) --l r t b
+
+greyOutDisabledCheckBox.fontString:ClearAllPoints()
+greyOutDisabledCheckBox.fontString:SetPoint("BOTTOM", greyOutDisabledCheckBox, "TOP", 0, 0)
+
+--[[
 local greyOutDiscCheckBox = CreateFrame("CheckButton", _, generalTab, "ChatConfigBaseCheckButtonTemplate")
 greyOutDiscCheckBox:SetSize(30, 30)
 greyOutDiscCheckBox:SetPoint("LEFT", greyOutDeadCheckBox, "RIGHT", 50, 0)
@@ -73,7 +90,6 @@ greyOutDiscCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDiscCh
 local greyOutDiscLabel = greyOutDiscCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
 greyOutDiscLabel:SetPoint("BOTTOM", greyOutDiscCheckBox, "TOP", 0, 0)
 greyOutDiscLabel:SetText("disconnected")
---greyOutDiscCheckBox:Hide()
 
 local greyOutDiffAreaCheckBox = CreateFrame("CheckButton", _, generalTab, "ChatConfigBaseCheckButtonTemplate")
 greyOutDiffAreaCheckBox:SetSize(30, 30)
@@ -83,9 +99,16 @@ greyOutDiffAreaCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDi
 local greyOutDiffAreaLabel = greyOutDiffAreaCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
 greyOutDiffAreaLabel:SetPoint("BOTTOM", greyOutDiffAreaCheckBox, "TOP", 0, 0)
 greyOutDiffAreaLabel:SetText("different area")
---greyOutDiffAreaCheckBox:Hide()
+]]--
+
+local rotationTab = CreateFrame("Frame", _, container)
+rotationTab:SetAllPoints()
+rotationTab:Hide()
+rotationTab:SetScript("OnShow", function() SIR.optionFunc.rotationTabOnShow() end)
+local rotationTabButtons = {}
 
 local createNewTabButton = CreateFrame("Button", _, generalTab, "UIPanelButtonTemplate")
+createNewTabButton.tooltipText = "Creates a new rotation tab, with it's own options (can have multiple tabs)."
 createNewTabButton:SetSize(100, 40)
 createNewTabButton:SetPoint("BOTTOMRIGHT", generalTab, "BOTTOMRIGHT", -15, 15)
 createNewTabButton:SetText("New tab")
@@ -98,12 +121,6 @@ removeTabButton:SetPoint("BOTTOMRIGHT", rotationTab, "BOTTOMRIGHT", -15, 15)
 removeTabButton:SetText("Remove tab")
 removeTabButton:SetScript("OnClick", function() optionFunc.removeTabOnClick() end)
 
-
-local rotationTab = CreateFrame("Frame", _, container)
-rotationTab:SetAllPoints()
-rotationTab:Hide()
-rotationTab:SetScript("OnShow", function() SIR.optionFunc.rotationTabOnShow() end)
-local rotationTabButtons = {}
 
 local leftSideMenu = CreateFrame("Frame", _ , container)
 leftSideMenu:SetPoint("TOPRIGHT", container, "TOPLEFT", 12, 0)
@@ -166,6 +183,7 @@ transmissionCancelButton:SetText("Cancel")
 transmissionCancelButton:SetScript("OnClick", function() transmissionFrame:Hide() end)
 
 local transmissionOkayButton = CreateFrame("Button", _, transmissionFrame, "UIPanelButtonTemplate")
+transmissionOkayButton.tooltipText = "Save the given rotation in the selected tab."
 transmissionOkayButton:SetSize(60, 30)
 transmissionOkayButton:SetPoint("BOTTOMRIGHT", transmissionCancelButton, "BOTTOMLEFT", -15, 0)
 transmissionOkayButton:SetText("Okay")
@@ -190,7 +208,8 @@ transmissionRotationLabelEditBox:SetPoint("TOPLEFT", transmissionRotationFrame, 
 transmissionRotationLabelEditBox:Disable()
 
 local testButton = CreateFrame("Button", _, container, "UIPanelButtonTemplate")
-testButton.tooltipText = "Generates some example statusbars."
+testButton.tooltipText = "Generates some example statusbars. (NOT WORKING ATM)"
+--todo fix
 testButton:SetSize(100, 40)
 testButton:SetPoint("TOPLEFT", container, "TOPLEFT", 15, -15)
 testButton:SetText("Test")
@@ -203,11 +222,13 @@ local menuButtons = {
     ["SORTING"] = frameUtil.createMenuButton("Sorting", rotationTab),
     ["SOUND"] = frameUtil.createMenuButton("Sound", rotationTab),
 }
-menuButtons["ENABLE"].tooltipText = "Select when & what to track."
+menuButtons["ENABLE"].tooltipText = "Select what to track depending on the current group size."
 menuButtons["ENABLE"]:SetPoint("TOPLEFT", testButton, "BOTTOMLEFT", 0, -5)
-menuButtons["SEND"].tooltipText = "Send your currently selected\124ntab's rotation.\124nThe title must be unique!"
+menuButtons["SEND"].tooltipText = "Send your currently selected tab's rotation."
 menuButtons["SEND"]:SetPoint("TOPLEFT", menuButtons["ENABLE"], "BOTTOMLEFT", 0, -5)
 menuButtons["DISPLAY"]:SetPoint("TOPLEFT", menuButtons["SEND"], "BOTTOMLEFT", 0, -5)
+menuButtons["DISPLAY"].tooltipText = "Change display settings for the current tab."
+    .."\n\nAlternatively drag the tab's frame to change x and y values."
 menuButtons["SORTING"]:SetPoint("TOPLEFT", menuButtons["DISPLAY"], "BOTTOMLEFT", 0, -5)
 menuButtons["SOUND"]:SetPoint("TOPLEFT", menuButtons["SORTING"], "BOTTOMLEFT", 0, -5)
 
@@ -402,23 +423,26 @@ sortModeCheckBoxes["CD"]:SetPoint("TOPLEFT", leftSideMenu, "TOP", 0, -50)
 sortModeCheckBoxes["ROTATION"].value = "ROTATION"
 sortModeCheckBoxes["ROTATION"]:SetPoint("TOP", sortModeCheckBoxes["CD"], "BOTTOM", 0, -5)
 
-local playSoundCheckBox = CreateFrame("CheckButton", _, menuButtons["SOUND"], "ChatConfigBaseCheckButtonTemplate")
-playSoundCheckBox:SetSize(30, 30)
-playSoundCheckBox:SetPoint("RIGHT", leftSideMenu, "CENTER", 0, 0)
-playSoundCheckBox:SetPoint("TOP", leftSideMenu, "TOP", 0, -50)
+local playSoundCheckBox = frameUtil.createFontStringCheckBox("play sound", menuButtons["SOUND"])
+playSoundCheckBox.tooltipText = "Play a sound when it's your turn next."
 playSoundCheckBox:SetScript("OnClick", function(self) optionFunc.playSoundCheckBoxOnClick(self) end)
-local playSoundLabel = playSoundCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
-playSoundLabel:SetPoint("LEFT", playSoundCheckBox, "RIGHT", 10, 0)
-playSoundLabel:SetText("play sound")
+playSoundCheckBox:SetHitRectInsets(0 , -playSoundCheckBox.fontString:GetWidth(), 0, 0) --l r t b
+
+playSoundCheckBox:SetPoint("RIGHT", leftSideMenu, "CENTER", -30, 0)
+playSoundCheckBox:SetPoint("TOP", leftSideMenu, "TOP", 0, -50)
+playSoundCheckBox.fontString:ClearAllPoints()
+playSoundCheckBox.fontString:SetPoint("LEFT", playSoundCheckBox, "RIGHT", 10, 0)
 playSoundCheckBox:Hide()
 
-local repeatSoundCheckBox = CreateFrame("CheckButton", _, menuButtons["SOUND"], "ChatConfigBaseCheckButtonTemplate")
-repeatSoundCheckBox:SetSize(30, 30)
-repeatSoundCheckBox:SetPoint("TOPLEFT", playSoundCheckBox, "BOTTOMLEFT", 0, -10)
+local repeatSoundCheckBox = frameUtil.createFontStringCheckBox("repeat sound", menuButtons["SOUND"])
+repeatSoundCheckBox.tooltipText = "Enabled: plays EVERY time from the tab uses a spell and you're next up."
+.."\n\nDisabled: plays only once until you use your spell."
 repeatSoundCheckBox:SetScript("OnClick", function(self) optionFunc.repeatSoundCheckBoxOnClick(self) end)
-local repeatSoundLabel = repeatSoundCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
-repeatSoundLabel:SetPoint("LEFT", repeatSoundCheckBox, "RIGHT", 10, 0)
-repeatSoundLabel:SetText("repeat sound")
+repeatSoundCheckBox:SetHitRectInsets(0 , -repeatSoundCheckBox.fontString:GetWidth(), 0, 0) --l r t b
+
+repeatSoundCheckBox:SetPoint("TOP", playSoundCheckBox, "BOTTOM", 0, -15)
+repeatSoundCheckBox.fontString:ClearAllPoints()
+repeatSoundCheckBox.fontString:SetPoint("LEFT", repeatSoundCheckBox, "RIGHT", 10, 0)
 repeatSoundCheckBox:Hide()
 
 local soundPathFontString, soundPathEditBox = frameUtil.createFontStringEditBox(menuButtons["SOUND"])
@@ -431,7 +455,7 @@ soundPathFontString:SetPoint("LEFT", leftSideMenu, "CENTER", -soundPathFontStrin
 soundPathEditBox:SetPoint("TOP", soundPathFontString, "BOTTOM", 0, 0)
 soundPathEditBox:SetSize(170, 30)
 
-soundPathEditBox:SetMaxLetters(50)
+soundPathEditBox:SetMaxLetters(100)
 soundPathEditBox:SetScript("OnEnterPressed", function(self) optionFunc.soundPathEditBoxOnEnterPressed(self) end)
 soundPathEditBox:Hide()
 
@@ -440,8 +464,9 @@ SIR.optionFrames = {
     ["container"] = container,
     ["generalTab"] = generalTab,
     ["greyOutDeadCheckBox"] = greyOutDeadCheckBox,
-    ["greyOutDiscCheckBox"] = greyOutDiscCheckBox,
-    ["greyOutDiffAreaCheckBox"] = greyOutDiffAreaCheckBox,
+    ["greyOutDisabledCheckBox"] = greyOutDisabledCheckBox,
+    --["greyOutDiscCheckBox"] = greyOutDiscCheckBox,
+    --["greyOutDiffAreaCheckBox"] = greyOutDiffAreaCheckBox,
     ["createNewTabButton"] = createNewTabButton,
     ["removeTabButton"] = removeTabButton,
     ["generalTabButton"] = generalTabButton,

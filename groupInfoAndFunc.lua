@@ -51,15 +51,13 @@ local setInitialInfo = function(GUID)
         return false
     end
     local _, class, _, _, _, name, server = GetPlayerInfoByGUID(GUID)
-    local alive, connected
+    local alive
     if server then
         if server == "" then
             server = SIR.playerInfo["REALMN"];
             alive = not UnitIsDeadOrGhost(name)
-            connected = UnitIsConnected(name)
         else
             alive = not UnitIsDeadOrGhost(name.."-"..server)
-            connected = UnitIsConnected(name.."-"..server)
         end
     else
         SIR.util.myPrint("setInitialInfo no server")
@@ -234,7 +232,7 @@ SIR.groupInfoFunc.PARTY_MEMBER_ENABLE = function(...)
     local GUID = UnitGUID(...)
     if GUID and SIR.groupInfo[GUID] then
         SIR.groupInfo[GUID]["ENABLED"] = true
-        SIR.groupInfo[GUID]["CONNECTED"] = true
+        --SIR.groupInfo[GUID]["CONNECTED"] = true
         SIR.groupInfo[GUID]["ALIVE"] = not UnitIsDeadOrGhost(...)
         SIR.rotationFunc.updateGreyOutForGUID(GUID)
     end
@@ -243,11 +241,7 @@ SIR.groupInfoFunc.PARTY_MEMBER_DISABLE = function(...)
     local GUID = UnitGUID(...)
     --local unit = ...
     if GUID and SIR.groupInfo[GUID] then
-        SIR.groupInfo[GUID]["CONNECTED"] = UnitIsConnected(...)
-        SIR.util.myPrint("SIR.groupInfoFunc.PARTY_MEMBER_DISABLE", "SIR.groupInfo[GUID][\"CONNECTED\"]",
-            SIR.groupInfo[GUID]["CONNECTED"])
-            --C_Timer.After(2.1, function() SIR.util.myPrint("SIR.groupInfoFunc.PARTY_MEMBER_DISABLE", "SIR.groupInfo[GUID][\"CONNECTED\"]",
-            --    SIR.groupInfo[GUID]["CONNECTED"], UnitIsConnected(unit)) end)
+        --SIR.groupInfo[GUID]["CONNECTED"] = UnitIsConnected(...)
         SIR.groupInfo[GUID]["ENABLED"] = false
         SIR.rotationFunc.updateGreyOutForGUID(GUID)
     end

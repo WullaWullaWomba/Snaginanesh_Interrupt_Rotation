@@ -182,10 +182,14 @@ local getBarColour = function(GUID)
     local colour
     if SIR.generalOptions["GREYOUTDEAD"] and not SIR.groupInfo[GUID]["ALIVE"] then
         colour = {0.3, 0.3, 0.3}
+    elseif SIR.generalOptions["GREYOUTDISABLED"] and not SIR.groupInfo[GUID]["ENABLED"] then
+        colour = {0.3, 0.3, 0.3}
+    --[[
     elseif SIR.generalOptions["GREYOUTDISC"] and not SIR.groupInfo[GUID]["CONNECTED"] then
         colour = {0.3, 0.3, 0.3}
     elseif SIR.generalOptions["GREYOUTDIFFAREA"] and SIR.groupInfo[GUID]["DIFFAREA"] then
         colour = {0.3, 0.3, 0.3}
+    ]]--
     else
         colour = classColorsRGB[SIR.groupInfo[GUID]["CLASS"]]
     end

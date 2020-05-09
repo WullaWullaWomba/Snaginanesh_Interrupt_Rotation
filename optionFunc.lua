@@ -376,8 +376,9 @@ local makeTransmissionText = function()
 end
 local updateGreyOutCheckBoxes = function()
 	optionFrames.greyOutDeadCheckBox:SetChecked(SIR.generalOptions["GREYOUTDEAD"])
-	optionFrames.greyOutDiscCheckBox:SetChecked(SIR.generalOptions["GREYOUTDISC"])
-	optionFrames.greyOutDiffAreaCheckBox:SetChecked(SIR.generalOptions["GREYOUTDIFFAREA"])
+	optionFrames.greyOutDisabledCheckBox:SetChecked(SIR.generalOptions["GREYOUTDISABLED"])
+	--optionFrames.greyOutDiscCheckBox:SetChecked(SIR.generalOptions["GREYOUTDISC"])
+	--optionFrames.greyOutDiffAreaCheckBox:SetChecked(SIR.generalOptions["GREYOUTDIFFAREA"])
 end
 local updateEnableMenu = function()
 	optionFrames.trackAllOption.checkBox:SetChecked(SIR.tabOptions[activeTab]["TRACKALLCHECKED"])
@@ -915,6 +916,11 @@ optionFunc.greyOutDeadCheckBoxOnClick = function(self)
 	SIR.generalOptions["GREYOUTDEAD"] = self:GetChecked()
 	SIR.rotationFunc.updateGreyOut()
 end
+optionFunc.greyOutDisabledCheckBoxOnClick = function(self)
+	SIR.generalOptions["GREYOUTDISABLED"] = self:GetChecked()
+	SIR.rotationFunc.updateGreyOut()
+end
+--[[
 optionFunc.greyOutDiscCheckBoxOnClick = function(self)
 	SIR.generalOptions["GREYOUTDISC"] = self:GetChecked()
 	SIR.rotationFunc.updateGreyOut()
@@ -924,3 +930,4 @@ optionFunc.greyOutDiffAreaCheckBoxOnClick = function(self)
 	SIR.rotationFunc.updateGreyOut()
 end
 
+]]--
