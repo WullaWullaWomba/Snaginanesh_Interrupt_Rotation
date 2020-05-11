@@ -121,8 +121,19 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 bar.currentTime = 0
                 bar.expirationTime = 0
             end
-            -- move bar to correct index if sortmode is by CD
-            if SIR.tabOptions[tab]["SORTMODE"] == "CD" then
+            -- potentially play sound if sortmode is by rotation
+            if SIR.tabOptions[tab]["SORTMODE"] == "ROTATION" and SIR.tabOptions[tab]["PLAYSOUND"] then
+                local j=i+1
+                if not statusBars[tab][j] then
+                    j=1
+                end
+                if statusBars[tab][j].GUID == SIR.playerInfo["GUID"] 
+                    and SIR.tabOptions[tab]["REPEATSOUND"] or not statusBars[tab][j].soundPlayed then
+                    PlaySoundFile(SIR.tabOptions[tab]["SOUNDPATH"])
+                    statusBars[tab][j].soundPlayed = true
+            end
+            -- move bar to correct index if sortmode is by CD and potentially play sound
+            elseif SIR.tabOptions[tab]["SORTMODE"] == "CD" then
                 -- (temporarily) remove bar
                 if statusBars[tab][i+1] then
                     statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
@@ -139,8 +150,6 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 if SIR.tabOptions[tab]["PLAYSOUND"]
                     and statusBars[tab][1].GUID == SIR.playerInfo["GUID"]
                     and (SIR.tabOptions[tab]["REPEATSOUND"] or not statusBars[tab][1].soundPlayed) then
-
-                    SIR.util.myPrint("trying to play sound")
                     PlaySoundFile(SIR.tabOptions[tab]["SOUNDPATH"])
                     statusBars[tab][1].soundPlayed = true
                 end
