@@ -792,7 +792,7 @@ optionFunc.removeMemberOnClick = function(self)
 	removeRotationMember(self:GetParent().GUID)
 end
 optionFunc.testButtonOnClick = function()
-	rotationFunc.test()
+	SIR.rotationFunc.test()
 end
 optionFunc.menuButtonOnClick = function(self)
 	for _, button in pairs(optionFrames.menuButtons) do

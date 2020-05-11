@@ -1,5 +1,5 @@
 --luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID CombatLogGetCurrentEventInfo
---luacheck: globals UnitAura PlaySoundFile
+--luacheck: globals UnitAura PlaySoundFile random time
 local _, SIR = ...
 
 local specInterrupts, classWideInterrupts = SIR.data.specInterrupts, SIR.data.classWideInterrupts
@@ -65,7 +65,7 @@ local insertBar = function(tab, bars, bar)
     end
     SIR.util.myPrint("insertAt", insertAt, bar)
     bar:SetPoint("TOPRIGHT", bars[insertAt-1] or rotationFrames[tab], "BOTTOMRIGHT",
-    0, bars[insertAt-1] and SIR.tabOptions[tab]["SPACE"] or 0)
+    0, bars[insertAt-1] and -SIR.tabOptions[tab]["SPACE"] or 0)
     if bars[insertAt] then
         bars[insertAt]:SetPoint("TOPRIGHT", bar, "BOTTOMRIGHT",
             0, SIR.tabOptions[tab]["SPACE"])
@@ -201,7 +201,6 @@ rotationFunc.test = function()
 		local testClasses = {
 			"DEATHKNIGHT",
 			"DEMONHUNTER",
-			"HUNTER",
 			"MAGE",
 			"ROGUE",
 			"SHAMAN",
@@ -232,10 +231,10 @@ rotationFunc.test = function()
                     current:SetPoint("TOPRIGHT", rotationFrames[tab], "BOTTOMRIGHT")
                 else
                     current:SetPoint("TOPRIGHT", testStatusBars[currentIndex-1]
-                        , "BOTTOMRIGHT",0 , SIR.tabOptions[tab]["SPACE"])
+                        , "BOTTOMRIGHT",0 , -SIR.tabOptions[tab]["SPACE"])
                 end
-                current.expirationTime = time()+15
-                current.currentTime = time()+random(15)
+                current.expirationTime = 15
+                current.currentTime = random(15)
                 current:Show()
                 setBarOnUpdate(current)
                 local class = testClasses[random(#testClasses)]
