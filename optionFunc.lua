@@ -247,15 +247,16 @@ UIDropDownMenu_Initialize(optionFrames.transmissionDropdownMenu, function()--sel
 	for _, tabOptions in ipairs(SIR.tabOptions) do
 		info.text = tabOptions["TITLE"]
 		info.checked = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu) == info.text
-		info.optionFunc = function()
+		info.func = function()
 				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, tabOptions["TITLE"])
 			end
 		UIDropDownMenu_AddButton(info)
 	end
 	info.text = "new tab"
 	info.checked = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu) == info.text
-	info.optionFunc = function()
+	info.func = function()
 		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new tab")
+		SIR.util.myPrint("hihizhih")
 	end
 	UIDropDownMenu_AddButton(info)
 end)
