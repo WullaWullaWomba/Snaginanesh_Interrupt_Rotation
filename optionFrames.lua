@@ -208,8 +208,7 @@ transmissionRotationLabelEditBox:SetPoint("TOPLEFT", transmissionRotationFrame, 
 transmissionRotationLabelEditBox:Disable()
 
 local testButton = CreateFrame("Button", _, container, "UIPanelButtonTemplate")
-testButton.tooltipText = "Generates some example statusbars. (NOT WORKING ATM)"
---todo fix
+testButton.tooltipText = "Generates some example statusbars."
 testButton:SetSize(100, 40)
 testButton:SetPoint("TOPLEFT", container, "TOPLEFT", 15, -15)
 testButton:SetText("Test")

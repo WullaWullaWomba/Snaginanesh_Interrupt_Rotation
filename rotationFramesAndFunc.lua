@@ -10,6 +10,7 @@ local rotationFunc = SIR.rotationFunc
 local contains = SIR.util.contains
 local rotationFrames = {}
 local statusBars = {}
+local testStatusBars = {}
 local trackModes = {}
 local numGroup = -99
 
@@ -178,7 +179,7 @@ local isTrackedGUID = function(tab, GUID)
     end
     return false
 end
-local getBarColour = function(GUID)
+local getBarColor = function(GUID)
     local colour
     if SIR.generalOptions["GREYOUTDEAD"] and not SIR.groupInfo[GUID]["ALIVE"] then
         colour = {0.3, 0.3, 0.3}
@@ -194,6 +195,64 @@ local getBarColour = function(GUID)
         colour = classColorsRGB[SIR.groupInfo[GUID]["CLASS"]]
     end
     return unpack(colour)
+end
+rotationFunc.test = function()
+	if #testStatusBars == 0 then
+		local testClasses = {
+			"DEATHKNIGHT",
+			"DEMONHUNTER",
+			"HUNTER",
+			"MAGE",
+			"ROGUE",
+			"SHAMAN",
+			"WARRIOR",
+        }
+        local testNames = {
+            "Peterpan",
+            "Donaldduck",
+            "Jacktheripper",
+            "Elvis",
+            "Caesar",
+            "Frodo",
+            "Gandalf",
+            "Joe",
+            "Bob",
+            "Rainbowunicorn",
+            "Batman",
+            "Superman",
+        }
+		for tab=1, #statusBars do
+            for j=1, 6 do
+                local currentIndex = #testStatusBars+1
+                local current = SIR.frameUtil.aquireStatusBar()
+                testStatusBars[currentIndex] = current
+                current:SetSize(SIR.tabOptions[tab]["WIDTH"]-SIR.tabOptions[tab]["HEIGHT"]
+                    , SIR.tabOptions[tab]["HEIGHT"])
+                if j==1 then
+                    current:SetPoint("TOPRIGHT", rotationFrames[tab], "BOTTOMRIGHT")
+                else
+                    current:SetPoint("TOPRIGHT", testStatusBars[currentIndex-1]
+                        , "BOTTOMRIGHT",0 , SIR.tabOptions[tab]["SPACE"])
+                end
+                current.expirationTime = time()+15
+                current.currentTime = time()+random(15)
+                current:Show()
+                setBarOnUpdate(current)
+                local class = testClasses[random(#testClasses)]
+                current.icon:SetTexture(select(3, GetSpellInfo(classWideInterrupts[class])))
+                current.icon:SetSize(SIR.tabOptions[tab]["HEIGHT"], SIR.tabOptions[tab]["HEIGHT"])
+                current.leftText:SetText(testNames[random(#testNames)])
+                current:SetStatusBarColor(unpack(classColorsRGB[class]))
+            end
+        end
+    C_Timer.After(5, function()
+        for _, bar in ipairs(testStatusBars) do
+            bar:Hide()
+            SIR.frameUtil.releaseStatusBar(bar)
+        end
+        testStatusBars = {}
+        end)
+	end
 end
 rotationFunc.newRotationTab = function(tab)
     SIR.util.myPrint("rotationFunc.newRotationTab")
@@ -424,7 +483,7 @@ rotationFunc.updateGreyOutForGUID = function(GUID)
     for _, bars in ipairs(statusBars) do
         for _, bar in ipairs(bars) do
             if bar.GUID == GUID then
-                 bar:SetStatusBarColor(getBarColour(GUID))
+                 bar:SetStatusBarColor(getBarColor(GUID))
             end
         end
     end
@@ -433,7 +492,7 @@ end
 SIR.rotationFunc.updateGreyOut = function()
     for _, bars in ipairs(statusBars) do
         for _, bar in ipairs(bars) do
-            bar:SetStatusBarColor(getBarColour(bar.GUID))
+            bar:SetStatusBarColor(getBarColor(bar.GUID))
         end
     end
 end

@@ -792,52 +792,7 @@ optionFunc.removeMemberOnClick = function(self)
 	removeRotationMember(self:GetParent().GUID)
 end
 optionFunc.testButtonOnClick = function()
-	SIR.test = not SIR.test
-	print("SIR.test set to:", SIR.test)
-	print("currently just enables/disables printing(debug) - will show test bars at some point")
-	--[[
-	if #testStatusBars == 0 then
-		local testClasses = {
-			"DEATHKNIGHT",
-			"DEMONHUNTER",
-			"HUNTER",
-			"MAGE",
-			"ROGUE",
-			"SHAMAN",
-			"WARRIOR",
-		}
-		for i=1, numTabs do
-			if rotationFrames[i]:IsShown() then
-				for j=1, 6 do
-					local currentIndex = #testStatusBars+1
-					local current = aquireStatusBar()
-					testStatusBars[currentIndex] = current
-					current:SetSize(widths[i]-heights[i], heights[i])
-					if j==1 then
-						current:SetPoint("TOPRIGHT", rotationFrames[i], "BOTTOMRIGHT")
-					else
-						current:SetPoint("TOPRIGHT", testStatusBars[currentIndex-1], "BOTTOMRIGHT",0 , -spaces[i])
-					end
-					current.expirationTime = time()+15
-					current.currentTime = time()+random(15)
-					current:Show()
-					current:SetMinMaxValues(0, 15)
-					--current:SetValue(time()+random(15))
-					setStatusBarOnUpdate(current)
-					local class = testClasses[random(7)]
-					current.icon:SetTexture(select(3, GetSpellInfo(classWideInterrupts[class])))
-					current.icon:SetSize(heights[i], heights[i])
-					current.leftText:SetText(class)
-					current:SetStatusBarColor(unpack(classColorsRGB[class]))
-					C_Timer.After(5, function()
-						current:Hide()
-						SIR.releaseStatusBar(current)
-					end)
-				end
-			end
-		end
-	end
-	]]--
+	rotationFunc.test()
 end
 optionFunc.menuButtonOnClick = function(self)
 	for _, button in pairs(optionFrames.menuButtons) do
