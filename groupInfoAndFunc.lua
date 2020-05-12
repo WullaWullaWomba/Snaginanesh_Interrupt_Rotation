@@ -54,7 +54,7 @@ local setInitialInfo = function(GUID)
     local alive
     if server then
         if server == "" then
-            server = SIR.playerInfo["REALMN"];
+            server = SIR.playerInfo["REALM"];
             alive = not UnitIsDeadOrGhost(name)
         else
             alive = not UnitIsDeadOrGhost(name.."-"..server)
@@ -120,7 +120,7 @@ SIR.groupInfoFunc.PLAYER_LOGIN = function()
     SIR.groupInfo = {
         [SIR.playerInfo["GUID"]] = {
             ["NAME"] = SIR.playerInfo["NAME"],
-            ["SERVER"] = SIR.playerInfo["REALMN"],
+            ["SERVER"] = SIR.playerInfo["REALM"],
             ["CLASS"] = SIR.playerInfo["CLASS"],
             ["SPEC"] =  SIR.playerInfo["SPEC"],
             ["TALENTS"] = {},

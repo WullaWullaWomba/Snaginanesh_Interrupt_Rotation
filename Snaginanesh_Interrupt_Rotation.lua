@@ -72,7 +72,7 @@ f.PLAYER_LOGIN = function()
 		["CLASS"] = class,
 		["SPEC"] = GetSpecializationInfo(GetSpecialization()),
 		["NAME"] = name,
-		["REALMN"] = GetRealmName(),
+		["REALM"] = GetRealmName(),
 		["COLOUREDNAME"] = SIR.util.getColouredNameByGUID(GUID),
 	}
 	SnagiIntRotaSaved = SnagiIntRotaSaved or {}

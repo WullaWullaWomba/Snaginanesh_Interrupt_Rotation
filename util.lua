@@ -15,12 +15,12 @@ makeCopy = function(input)
     end
 end
 local myToons = {
-    "Addonmsg",
-    "Metestpet",
-    "Trololololoo",
-    "Megokick",
-    "Zoucka",
-    "Inspectmeplz",
+    "Addonmsg-Al'akir",
+    "Metestpet-Aerie Peak",
+    "Trololololoo-Al'akir",
+    "Megokick-Al'akir",
+    "Zoucka-Al'akir",
+    "Inspectmeplz-Aerie Peak",
 }
 SIR.util = {
     ["contains"] = function(table, e)
@@ -53,7 +53,7 @@ SIR.util = {
         end
     end,
     ["myPrint"] = function(...)
-        if SIR.test or SIR.util.contains(myToons, SIR.playerInfo["NAME"]) then
+        if SIR.test or SIR.util.contains(myToons, SIR.playerInfo["NAME"].."-"..SIR.playerInfo["REALM"]) then
             print("__", ...)
         end
     end,
