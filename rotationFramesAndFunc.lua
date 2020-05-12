@@ -1,5 +1,5 @@
 --luacheck: globals GetSpellInfo strsub UIParent unpack setBarOnUpdate GetPlayerInfoByGUID CombatLogGetCurrentEventInfo
---luacheck: globals UnitAura PlaySoundFile random time
+--luacheck: globals UnitAura PlaySoundFile random time C_Timer
 local _, SIR = ...
 
 local specInterrupts, classWideInterrupts = SIR.data.specInterrupts, SIR.data.classWideInterrupts
@@ -127,7 +127,7 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                 if not statusBars[tab][j] then
                     j=1
                 end
-                if statusBars[tab][j].GUID == SIR.playerInfo["GUID"] 
+                if statusBars[tab][j].GUID == SIR.playerInfo["GUID"]
                     and SIR.tabOptions[tab]["REPEATSOUND"] or not statusBars[tab][j].soundPlayed then
                     PlaySoundFile(SIR.tabOptions[tab]["SOUNDPATH"])
                     statusBars[tab][j].soundPlayed = true

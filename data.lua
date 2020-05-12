@@ -232,5 +232,9 @@ SIR.data = {
         [417] = {
             119910,
         },
+        --observer (felhunter glyph)
+        [58964] = {
+            119910
+        }
     },
 }

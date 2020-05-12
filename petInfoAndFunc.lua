@@ -1,5 +1,5 @@
 --luacheck: globals UnitGUID GetNumGroupMembers IsInGroup IsInRaid SlashCmdList SLASH_SIRPETINFO1 GetPlayerInfoByGUID
---luacheck: globals UnitAura
+--luacheck: globals UnitAura C_Timer
 local _, SIR = ...
 
 local getPetID = function(GUID)
@@ -48,7 +48,8 @@ local printPetInfo = function()
 end
 SIR.petInfoFunc.onCombatLogEvent = function(subEvent, sourceGUID)
     if subEvent == "SPELL_AURA_APPLIED" then
-        if getPetID(SIR.masterToPet[sourceGUID]) == 417 then
+        if getPetID(SIR.masterToPet[sourceGUID]) == 417 or getPetID(SIR.masterToPet[sourceGUID]) == 58964 then
+            -- 417 felhunter, 58964 observer (glyph)
             SIR.rotationFunc.replaceSpell(sourceGUID, 119910, 132409)
             --SIR.rotationFunc.addSpellAllTabs(sourceGUID, 132409, SIR.groupInfo[sourceGUID]["CLASS"])
         end
@@ -60,9 +61,12 @@ SIR.petInfoFunc.UNIT_PET = function(unitID)
     -- if old pet ~= new pet
     -- removes bars and info about old pet (if existing)
     -- and adds bars and info about new pet (if existing)
+
     local GUID = UnitGUID(unitID)
     local oldPetGUID = SIR.masterToPet[GUID]
     local newPetGUID = UnitGUID(unitID.."pet")
+    SIR.util.myPrint("SIR.petInfoFunc.UNIT_PET", "unitID", unitID, "oldPetGUID", oldPetGUID
+        , "newPetGUID0", newPetGUID)
     if oldPetGUID == newPetGUID or not GUID then
         return
     end
@@ -77,18 +81,19 @@ SIR.petInfoFunc.UNIT_PET = function(unitID)
     end
 end
 SIR.petInfoFunc.PLAYER_LOGIN = function()
-    SIR.util.iterateGroup(
-        function(unitID)
-            SIR.petInfoFunc.UNIT_PET(unitID)
-            -- todo distinguish between different grimoires on login
-            --[[
-            if hasAura(unitID, 196099) then
-                local GUID = UnitGUID(unitID)
-                SIR.rotationFunc.addSpellAllTabs(GUID, 132409, "WARLOCK")
-            end
-            ]]--
-        end
-    )
+        -- todo distinguish between different grimoires on login
+    --[[
+    if hasAura(unitID, 196099) then
+        local GUID = UnitGUID(unitID)
+        SIR.rotationFunc.addSpellAllTabs(GUID, 132409, "WARLOCK")
+    end
+    ]]--
+    C_Timer.After(5, function()
+        SIR.util.iterateGroup(
+            function(unitID)
+                SIR.petInfoFunc.UNIT_PET(unitID)
+            end)
+        end)
 end
 SIR.petInfoFunc.removePlayerPet = function(GUID)
     SIR.util.myPrint("SIR.petInfoFunc.removePlayerPet", GUID)

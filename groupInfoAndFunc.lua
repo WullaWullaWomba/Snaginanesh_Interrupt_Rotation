@@ -18,7 +18,7 @@ local printGroupInfo = function()
     local count = 0
     for guid, info in pairs(SIR.groupInfo) do
         print(guid, " ", info["NAME"], " ", info["SERVER"], " ", info["CLASS"], " ",
-        info["SPEC"], " ", unpack(info["TALENTS"]))
+        info["SPEC"], " ", unpack(info["TALENTS"]), info["ALIVE"], info["ENABLED"])
         count = count+1
     end
     print("#SIR.groupInfo "..count)
@@ -33,7 +33,7 @@ local printGroupInfo = function()
         print(select(6, GetPlayerInfoByGUID(guid)))
     end
     print(" ")
-    print("toBeInspectedInactive #"..#toBeInitialized..":")
+    print("toBeInitialized #"..#toBeInitialized..":")
     for _, guid in ipairs(toBeInitialized) do
         print(select(6, GetPlayerInfoByGUID(guid)))
     end
@@ -42,7 +42,7 @@ end
 local setInitialInfo = function(GUID)
     SIR.util.myPrint("setInitialInfo", GUID)
     if SIR.groupInfo[GUID] then
-        for i=1, #toBeInitialized do
+        for i=#toBeInitialized, 1, -1 do
             if toBeInitialized[i] == GUID then
                 remove(toBeInitialized, i)
                 break
@@ -150,11 +150,18 @@ SIR.groupInfoFunc.PLAYER_LOGIN = function()
             end
         end
     end
+    -- update alive / enabled for people that were saved
+    -- set others to be initialized
     SIR.util.iterateGroup(
         function(unitID)
-            setInitialInfo(UnitGUID(unitID))
-        end
-    )
+            local GUID = UnitGUID(unitID)
+            if SIR.groupInfo[GUID] then
+                SIR.groupInfo[GUID]["ALIVE"] = not UnitIsDeadOrGhost(unitID)
+                SIR.groupInfo[GUID]["ENABLED"] = true
+            else
+                toBeInitialized[#toBeInitialized+1] = GUID
+            end
+        end)
     SIR.rotationFunc.updateNumGroup(numGroupMembers)
     inspectNext()
 end
