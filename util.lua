@@ -15,11 +15,11 @@ makeCopy = function(input)
     end
 end
 local myToons = {
-    "Addonmsg-Al'akir",
+    "Addonmsg-Al'Akir",
     "Metestpet-Aerie Peak",
-    "Trololololoo-Al'akir",
-    "Megokick-Al'akir",
-    "Zoucka-Al'akir",
+    "Trololololoo-Al'Akir",
+    "Megokick-Al'Akir",
+    "Zoucka-Al'Akir",
     "Inspectmeplz-Aerie Peak",
 }
 SIR.util = {
