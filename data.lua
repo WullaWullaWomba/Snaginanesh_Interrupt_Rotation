@@ -19,13 +19,12 @@ SIR.data = {
         [47528]=15, -- Mind Freeze DK
         [96231]=15, -- Rebuke Paladin
         [6552]=15, -- Pummel
-        [106839]=15, -- Skull Bash
+        [106839]=15, -- Skull Bash Feral/Bear
         [19647]=24, -- Spell Lock
         [119911]=24, -- Optical Blast
         [115781]=24, -- Optical Blast
         [119910]=24, -- Spell Lock (WL with felhunter - source player)
         [132409]=24, -- Spell lock (WL with felhunter sacrificed - source player)
-        -- 196099 felhuner sacced
         [171138]=24, -- Shadow lock
         [171139]=24, -- ^^
         [171140]=24, -- ^^
@@ -236,5 +235,12 @@ SIR.data = {
         [58964] = {
             119910
         }
+    },
+    ["healingCDs"] = {
+        -- Tranq
+        -- Aura Mastery
+        -- Divine Hymn
+        --
+        -- todo spellIDs
     },
 }

@@ -81,19 +81,12 @@ SIR.petInfoFunc.UNIT_PET = function(unitID)
     end
 end
 SIR.petInfoFunc.PLAYER_LOGIN = function()
-        -- todo distinguish between different grimoires on login
-    --[[
-    if hasAura(unitID, 196099) then
-        local GUID = UnitGUID(unitID)
-        SIR.rotationFunc.addSpellAllTabs(GUID, 132409, "WARLOCK")
-    end
-    ]]--
     C_Timer.After(5, function()
         SIR.util.iterateGroup(
-            function(unitID)
-                SIR.petInfoFunc.UNIT_PET(unitID)
-            end)
+        function(unitID)
+            SIR.petInfoFunc.UNIT_PET(unitID)
         end)
+    end)
 end
 SIR.petInfoFunc.removePlayerPet = function(GUID)
     SIR.util.myPrint("SIR.petInfoFunc.removePlayerPet", GUID)
@@ -101,10 +94,7 @@ SIR.petInfoFunc.removePlayerPet = function(GUID)
     if not petGUID then
         return
     end
-    for _, spell in ipairs(SIR.data.petSpellsByID[getPetID(petGUID)] or {}) do
-        SIR.rotationFunc.removeSpellAllTabs(GUID, spell)
-        SIR.rotationFunc.removeSpellAllTabs(petGUID, spell)
-    end
+    removePet(GUID, petGUID)
 end
 
 SLASH_SIRPETINFO1 = "/sirpetinfo"

@@ -39,11 +39,12 @@ f.COMBAT_LOG_EVENT_UNFILTERED = function()
 	-- 196099 (felhunter sac aura spellID)
 	local timestamp, subEvent,_ , sourceGUID, _, _, sourceFlags, destGUID, _, _, _, spellID
 		= CombatLogGetCurrentEventInfo()
-	-- if source not in party return
+	-- if source not in raid/party/player return
 	if sourceFlags%16 > 4 then
 		return
 	end
 	SIR.rotationFunc.onCombatLogEvent(timestamp, subEvent, sourceGUID, spellID)
+	-- sacrifice demon (WL)
 	if spellID == 196099 then
 		SIR.petInfoFunc.onCombatLogEvent(subEvent, sourceGUID)
 	end

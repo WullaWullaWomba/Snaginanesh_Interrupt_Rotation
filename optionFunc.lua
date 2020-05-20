@@ -17,7 +17,6 @@ local frameUtil = SIR.frameUtil
 local optionFrames = SIR.optionFrames
 local optionFunc = SIR.optionFunc
 
-
 local contains, remove= util.contains, util.remove
 SIR.tabOptions = SIR.tabOptions or {}
 ------------------------------------------------------------------------------------------------------------------------

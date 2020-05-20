@@ -9,8 +9,7 @@ local toBeInitialized = {}
 local toBeInspectedActive = {}
 local toBeInspectedInactive = {}
 local recentInspectTimes = {}
-local numGroupMembers = -99
-local numDead = 0
+local numGroupMembers = 0
 
 local printGroupInfo = function()
     print("----------------------------------------")
@@ -38,6 +37,13 @@ local printGroupInfo = function()
         print(select(6, GetPlayerInfoByGUID(guid)))
     end
     print("----------------------------------------")
+end
+local loadGroupInfo = function(GUID)
+    if SnagiIntRotaSaved.groupInfo[GUID] then
+        SIR.groupInfo[GUID] = SnagiIntRotaSaved.groupInfo[GUID]
+        return true
+    end
+    return false
 end
 local setInitialInfo = function(GUID)
     SIR.util.myPrint("setInitialInfo", GUID)
@@ -68,7 +74,7 @@ local setInitialInfo = function(GUID)
         ["NAME"] = name,
         ["SERVER"] = server,
         ["CLASS"] = class,
-        ["TALENTS"] = {},
+        ["TALENTS"] = {0, 0, 0, 0, 0, 0, 0 },
         ["ALIVE"] = alive,
         ["ENABLED"] = true, -- todo if possible actually check (additionally to connected - testing with true for debug)
     }
@@ -117,51 +123,37 @@ inspectNext = function()
     C_Timer.After(2.1, function() inspectNext() end)
 end
 SIR.groupInfoFunc.PLAYER_LOGIN = function()
-    SIR.groupInfo = {
-        [SIR.playerInfo["GUID"]] = {
+    SnagiIntRotaSaved.groupInfo[SIR.playerInfo["GUID"]] = {
             ["NAME"] = SIR.playerInfo["NAME"],
             ["SERVER"] = SIR.playerInfo["REALM"],
             ["CLASS"] = SIR.playerInfo["CLASS"],
             ["SPEC"] =  SIR.playerInfo["SPEC"],
-            ["TALENTS"] = {},
+            ["TALENTS"] = {0, 0, 0, 0, 0, 0, 0 },
             ["ALIVE"] = not UnitIsDeadOrGhost("player"),
-            ["CONNECTED"] = true,
             ["ENABLED"] = true,
-        },
-    }
-    SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"] = {
-        0, 0, 0, 0, 0, 0, 0
     }
     for i=1, 7 do
         for j=1, 3 do
             if select(4, GetTalentInfo(i, j, 1, false)) then
-                SIR.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"][i] = j
+                SnagiIntRotaSaved.groupInfo[SIR.playerInfo["GUID"]]["TALENTS"][i] = j
                 break
             end
         end
     end
-    numGroupMembers = 1
-    if IsInGroup() then
-        for GUID, info in pairs(SnagiIntRotaSaved.groupInfo) do
-            if UnitInParty(info["NAME"]) and GUID ~= SIR.playerInfo["GUID"] then
-                SIR.groupInfo[GUID] = info
-                numGroupMembers = numGroupMembers+1
+
+    SIR.util.iterateGroup(function(unitID)
+        numGroupMembers = numGroupMembers+1
+        local GUID = UnitGUID(unitID)
+        if loadGroupInfo(GUID) then
+            SIR.groupInfo[GUID]["ALIVE"] = not UnitIsDeadOrGhost(unitID)
+            SIR.groupInfo[GUID]["ENABLED"] = true
+            if GUID ~= SIR.playerInfo["GUID"] then
                 toBeInspectedActive[#toBeInspectedActive+1] = GUID
             end
+        else
+            toBeInitialized[#toBeInitialized+1] = GUID
         end
-    end
-    -- update alive / enabled for people that were saved
-    -- set others to be initialized
-    SIR.util.iterateGroup(
-        function(unitID)
-            local GUID = UnitGUID(unitID)
-            if SIR.groupInfo[GUID] then
-                SIR.groupInfo[GUID]["ALIVE"] = not UnitIsDeadOrGhost(unitID)
-                SIR.groupInfo[GUID]["ENABLED"] = true
-            else
-                toBeInitialized[#toBeInitialized+1] = GUID
-            end
-        end)
+    end)
     SIR.rotationFunc.updateNumGroup(numGroupMembers)
     inspectNext()
 end
@@ -257,18 +249,14 @@ SIR.groupInfoFunc.UNIT_HEALTH = function(...)
     local GUID = UnitGUID(...)
     if GUID and SIR.groupInfo[GUID] then
         if SIR.groupInfo[GUID]["ALIVE"] == false then
-            numDead = numDead-1
             SIR.groupInfo[GUID]["ALIVE"] = true
             SIR.rotationFunc.updateGreyOutForGUID(GUID)
         end
     end
-    -- todo unregister UNIT_HEALTH if no one is dead
 end
 SIR.groupInfoFunc.UNIT_DIED = function (GUID)
     if SIR.groupInfo[GUID] then
         SIR.groupInfo[GUID]["ALIVE"] = false
-        numDead = numDead+1
-        -- todo register UNIT_HEALTH
         SIR.rotationFunc.updateGreyOutForGUID(GUID)
     end
 end
