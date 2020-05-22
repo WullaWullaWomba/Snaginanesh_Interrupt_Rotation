@@ -7,6 +7,7 @@ SIR.rotationFrames, SIR.rotationFunc = {}, {}
 SIR.playerInfo = {}
 SIR.groupInfo, SIR.groupInfoFunc = {}, {}
 SIR.petToMaster, SIR.masterToPet, SIR.petInfoFunc = {}, {}, {}
+SIR.transmissionFunc = {}
 SIR.test = false
 
 local f = CreateFrame("Frame")

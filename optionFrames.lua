@@ -7,212 +7,119 @@ local data = SIR.data
 local optionFunc = SIR.optionFunc
 
 local container = CreateFrame("Frame", "SnagiIntRotaContainer", UIParent)
-UISpecialFrames[#UISpecialFrames+1] = container:GetName() -- hide on escape - and maybe more <.<
-container:SetFrameStrata("DIALOG")
-container:Hide()
-container:EnableMouse(true)
-container:SetPoint("CENTER")
-container:SetSize(400,475)
-container:RegisterForDrag("LeftButton")
-container:SetBackdrop({
-	bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-	edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-	tileSize = 32,
-	edgeSize = 32,
-	tile = true,
-	insets = {left="11", right="12", top="12", bottom="11"},
-})
-container:SetMovable(true)
-
-container:SetScript("OnDragStart", function() container:StartMoving() end)
-container:SetScript("OnDragStop", function() container:StopMovingOrSizing() end)
+    UISpecialFrames[#UISpecialFrames+1] = container:GetName() -- hide on escape - and maybe more <.<
+    container:SetFrameStrata("DIALOG")
+    container:Hide()
+    container:EnableMouse(true)
+    container:SetPoint("CENTER")
+    container:SetSize(400,475)
+    container:RegisterForDrag("LeftButton")
+    container:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tileSize = 32,
+        edgeSize = 32,
+        tile = true,
+        insets = {left="11", right="12", top="12", bottom="11"},
+    })
+    container:SetMovable(true)
+    container:SetScript("OnDragStart", function() container:StartMoving() end)
+    container:SetScript("OnDragStop", function() container:StopMovingOrSizing() end)
 local containerHeader = container:CreateTexture("$parentHeader", "ARTWORK")
-containerHeader:SetSize(440, 64)
-containerHeader:SetPoint("TOP", container, "TOP", 0, 25)
-containerHeader:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
+    containerHeader:SetSize(440, 64)
+    containerHeader:SetPoint("TOP", container, "TOP", 0, 25)
+    containerHeader:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
 
 local containerHeaderText = container:CreateFontString("$parentHeaderText", "ARTWORK", "GameFontNormal")
-containerHeaderText:SetPoint("TOP", containerHeader, "TOP", 0, -14)
-containerHeaderText:SetText("Snaginanesh Interrupt Rotation")
+    containerHeaderText:SetPoint("TOP", containerHeader, "TOP", 0, -14)
+    containerHeaderText:SetText("Snaginanesh Interrupt Rotation")
 
 local closeButton = CreateFrame("Button", "$parentRemove", container, "UIPanelCloseButton")
-closeButton:SetScript("OnClick", function() container:Hide() end)
-closeButton:SetPoint("BOTTOMRIGHT", container, "TOPRIGHT", 0, -15)
-closeButton:SetSize(40, 40)
-closeButton:Show()
+    closeButton:SetScript("OnClick", function() container:Hide() end)
+    closeButton:SetPoint("BOTTOMRIGHT", container, "TOPRIGHT", 0, -15)
+    closeButton:SetSize(40, 40)
+    closeButton:Show()
 
 local generalTab = CreateFrame("Frame", _, container)
-generalTab:SetAllPoints()
-generalTab:Show()
+    generalTab:SetAllPoints()
+    generalTab:Show()
 
 local generalTabButton = frameUtil.aquireTabButton(container)
-generalTabButton:SetPoint("TOPLEFT", container, "BOTTOMLEFT", 0, 8)
-generalTabButton:SetText("General")
-generalTabButton:SetScript("OnClick", function(self) optionFunc.generalTabButtonOnClick(self) end)
+    generalTabButton:SetPoint("TOPLEFT", container, "BOTTOMLEFT", 0, 8)
+    generalTabButton:SetText("General")
+    generalTabButton:SetScript("OnClick", function(self) optionFunc.generalTabButtonOnClick(self) end)
 
 local greyOutLabel = generalTab:CreateFontString(_, "ARTWORK", "GameFontNormalLarge")
-greyOutLabel:SetText("Grey out: ")
-greyOutLabel:SetTextColor(255,255,255)
-greyOutLabel:SetPoint("TOPLEFT", generalTab, "TOPLEFT", 25, -100)
+    greyOutLabel:SetText("Grey out: ")
+    greyOutLabel:SetTextColor(255,255,255)
+    greyOutLabel:SetPoint("TOPLEFT", generalTab, "TOPLEFT", 25, -100)
 
 local greyOutDeadCheckBox = frameUtil.createFontStringCheckBox("dead", generalTab)
-greyOutDeadCheckBox.tooltipText = "Greys out dead players."
-greyOutDeadCheckBox:SetPoint("LEFT", greyOutLabel, "RIGHT", 25, 0)
-greyOutDeadCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDeadCheckBoxOnClick(self) end)
-greyOutDeadCheckBox:SetHitRectInsets(
-    -greyOutDeadCheckBox.fontString:GetWidth()/2+greyOutDeadCheckBox:GetWidth()/2
-    , -greyOutDeadCheckBox.fontString:GetWidth()/2+greyOutDeadCheckBox:GetWidth()/2
-    , -greyOutDeadCheckBox.fontString:GetHeight()
-    , 0) --l r t b
+    greyOutDeadCheckBox.tooltipText = "Greys out dead players."
+    greyOutDeadCheckBox:SetPoint("LEFT", greyOutLabel, "RIGHT", 25, 0)
+    greyOutDeadCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDeadCheckBoxOnClick(self) end)
+    greyOutDeadCheckBox:SetHitRectInsets(
+        -greyOutDeadCheckBox.fontString:GetWidth()/2+greyOutDeadCheckBox:GetWidth()/2
+        , -greyOutDeadCheckBox.fontString:GetWidth()/2+greyOutDeadCheckBox:GetWidth()/2
+        , -greyOutDeadCheckBox.fontString:GetHeight()
+        , 0) --l r t b
 
-greyOutDeadCheckBox.fontString:ClearAllPoints()
-greyOutDeadCheckBox.fontString:SetPoint("BOTTOM", greyOutDeadCheckBox, "TOP", 0, 0)
+    greyOutDeadCheckBox.fontString:ClearAllPoints()
+    greyOutDeadCheckBox.fontString:SetPoint("BOTTOM", greyOutDeadCheckBox, "TOP", 0, 0)
 
 local greyOutDisabledCheckBox = frameUtil.createFontStringCheckBox("disabled", generalTab)
-greyOutDisabledCheckBox.tooltipText = "Greys out disconnected AND players leaving your area."
-greyOutDisabledCheckBox:SetPoint("LEFT", greyOutDeadCheckBox, "RIGHT", 50, 0)
-greyOutDisabledCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDisabledCheckBoxOnClick(self) end)
-greyOutDisabledCheckBox:SetHitRectInsets(
-    -greyOutDisabledCheckBox.fontString:GetWidth()/2+greyOutDisabledCheckBox:GetWidth()/2
-    , -greyOutDisabledCheckBox.fontString:GetWidth()/2+greyOutDisabledCheckBox:GetWidth()/2
-    , -greyOutDisabledCheckBox.fontString:GetHeight()
-    , 0) --l r t b
+    greyOutDisabledCheckBox.tooltipText = "Greys out disconnected AND players leaving your area."
+    greyOutDisabledCheckBox:SetPoint("LEFT", greyOutDeadCheckBox, "RIGHT", 50, 0)
+    greyOutDisabledCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDisabledCheckBoxOnClick(self) end)
+    greyOutDisabledCheckBox:SetHitRectInsets(
+        -greyOutDisabledCheckBox.fontString:GetWidth()/2+greyOutDisabledCheckBox:GetWidth()/2
+        , -greyOutDisabledCheckBox.fontString:GetWidth()/2+greyOutDisabledCheckBox:GetWidth()/2
+        , -greyOutDisabledCheckBox.fontString:GetHeight()
+        , 0) --l r t b
 
-greyOutDisabledCheckBox.fontString:ClearAllPoints()
-greyOutDisabledCheckBox.fontString:SetPoint("BOTTOM", greyOutDisabledCheckBox, "TOP", 0, 0)
-
---[[
-local greyOutDiscCheckBox = CreateFrame("CheckButton", _, generalTab, "ChatConfigBaseCheckButtonTemplate")
-greyOutDiscCheckBox:SetSize(30, 30)
-greyOutDiscCheckBox:SetPoint("LEFT", greyOutDeadCheckBox, "RIGHT", 50, 0)
-greyOutDiscCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDiscCheckBoxOnClick(self) end)
-
-local greyOutDiscLabel = greyOutDiscCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
-greyOutDiscLabel:SetPoint("BOTTOM", greyOutDiscCheckBox, "TOP", 0, 0)
-greyOutDiscLabel:SetText("disconnected")
-
-local greyOutDiffAreaCheckBox = CreateFrame("CheckButton", _, generalTab, "ChatConfigBaseCheckButtonTemplate")
-greyOutDiffAreaCheckBox:SetSize(30, 30)
-greyOutDiffAreaCheckBox:SetPoint("LEFT", greyOutDiscCheckBox, "RIGHT", 75, 0)
-greyOutDiffAreaCheckBox:SetScript("OnClick", function(self) optionFunc.greyOutDiffAreaCheckBoxOnClick(self) end)
-
-local greyOutDiffAreaLabel = greyOutDiffAreaCheckBox:CreateFontString(_, "ARTWORK", "GameFontNormal")
-greyOutDiffAreaLabel:SetPoint("BOTTOM", greyOutDiffAreaCheckBox, "TOP", 0, 0)
-greyOutDiffAreaLabel:SetText("different area")
-]]--
+    greyOutDisabledCheckBox.fontString:ClearAllPoints()
+    greyOutDisabledCheckBox.fontString:SetPoint("BOTTOM", greyOutDisabledCheckBox, "TOP", 0, 0)
 
 local rotationTab = CreateFrame("Frame", _, container)
-rotationTab:SetAllPoints()
-rotationTab:Hide()
-rotationTab:SetScript("OnShow", function() SIR.optionFunc.rotationTabOnShow() end)
+    rotationTab:SetAllPoints()
+    rotationTab:Hide()
+    rotationTab:SetScript("OnShow", function() SIR.optionFunc.rotationTabOnShow() end)
 local rotationTabButtons = {}
 
 local createNewTabButton = CreateFrame("Button", _, generalTab, "UIPanelButtonTemplate")
-createNewTabButton.tooltipText = "Creates a new rotation tab, with it's own options (can have multiple tabs)."
-createNewTabButton:SetSize(100, 40)
-createNewTabButton:SetPoint("BOTTOMRIGHT", generalTab, "BOTTOMRIGHT", -15, 15)
-createNewTabButton:SetText("New tab")
-createNewTabButton:SetScript("OnClick", function()
-	optionFunc.createNewTab()
-end)
+    createNewTabButton.tooltipText = "Creates a new rotation tab, with it's own options (can have multiple tabs)."
+    createNewTabButton:SetSize(100, 40)
+    createNewTabButton:SetPoint("BOTTOMRIGHT", generalTab, "BOTTOMRIGHT", -15, 15)
+    createNewTabButton:SetText("New tab")
+    createNewTabButton:SetScript("OnClick", function()
+        optionFunc.createNewTab()
+    end)
 local removeTabButton = CreateFrame("Button", "$parentRemoveTabButton", rotationTab, "UIPanelButtonTemplate")
-removeTabButton:SetSize(100, 40)
-removeTabButton:SetPoint("BOTTOMRIGHT", rotationTab, "BOTTOMRIGHT", -15, 15)
-removeTabButton:SetText("Remove tab")
-removeTabButton:SetScript("OnClick", function() optionFunc.removeTabOnClick() end)
-
+    removeTabButton:SetSize(100, 40)
+    removeTabButton:SetPoint("BOTTOMRIGHT", rotationTab, "BOTTOMRIGHT", -15, 15)
+    removeTabButton:SetText("Remove tab")
+    removeTabButton:SetScript("OnClick", function() optionFunc.removeTabOnClick() end)
 
 local leftSideMenu = CreateFrame("Frame", _ , container)
-leftSideMenu:SetPoint("TOPRIGHT", container, "TOPLEFT", 12, 0)
-leftSideMenu:SetPoint("BOTTOMRIGHT", container, "BOTTOMLEFT", 12, 0)
-leftSideMenu:SetBackdrop({
-	bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-	edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-	tileSize = 32,
-	edgeSize = 32,
-	tile = true,
-	insets = {left="11", right="12", top="12", bottom="11"},
-})
-leftSideMenu:SetWidth(250)
-leftSideMenu:Hide()
-
-local transmissionFrame = CreateFrame("Frame", "SnagiIntRotaTransmissionFrame")
-transmissionFrame:SetSize(310, 180)
-transmissionFrame:SetPoint("CENTER")
-transmissionFrame:EnableMouse(true)
-transmissionFrame:SetMovable(true)
-transmissionFrame:RegisterForDrag("LeftButton")
-transmissionFrame:SetScript("OnDragStart", transmissionFrame.StartMoving)
-transmissionFrame:SetScript("OnDragStop", transmissionFrame.StopMovingOrSizing)
-transmissionFrame:SetBackdrop({
-    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-    edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-    tileSize = 32,
-    edgeSize = 32,
-    tile = true,
-    insets = {left="11", right="12", top="12", bottom="11"},
-})
-UISpecialFrames[#UISpecialFrames+1] = transmissionFrame:GetName()
-transmissionFrame:Hide()
-
-local transmissionRotationFrame = CreateFrame("Frame", _, transmissionFrame)
-transmissionRotationFrame:SetBackdrop({
-    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-    edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-    tileSize = 32,
-    edgeSize = 32,
-    tile = true,
-    insets = {left="11", right="12", top="12", bottom="11"},
-})
-transmissionRotationFrame:SetPoint("TOPLEFT", transmissionFrame, "TOPLEFT")
-transmissionRotationFrame:SetPoint("BOTTOMLEFT", transmissionFrame, "BOTTOMLEFT")
-transmissionRotationFrame:SetWidth(150)
-
-local transmissionRotationEditBox = CreateFrame("EditBox", _ , transmissionRotationFrame)
-transmissionRotationEditBox:SetFontObject("GameFontNormal")
-transmissionRotationEditBox:SetAutoFocus(false)
-transmissionRotationEditBox:SetMultiLine(true)
-transmissionRotationEditBox:SetPoint("TOPLEFT", transmissionRotationFrame, "TOPLEFT", 15, -15)
-transmissionRotationEditBox:SetPoint("BOTTOMRIGHT", transmissionRotationFrame, "BOTTOMRIGHT", -5, 10)
-transmissionRotationEditBox:Disable()
-
-local transmissionCancelButton = CreateFrame("Button", _, transmissionFrame, "UIPanelButtonTemplate")
-transmissionCancelButton:SetSize(60, 30)
-transmissionCancelButton:SetPoint("BOTTOMRIGHT", transmissionFrame, "BOTTOMRIGHT", -15, 15)
-transmissionCancelButton:SetText("Cancel")
-transmissionCancelButton:SetScript("OnClick", function() transmissionFrame:Hide() end)
-
-local transmissionOkayButton = CreateFrame("Button", _, transmissionFrame, "UIPanelButtonTemplate")
-transmissionOkayButton.tooltipText = "Save the given rotation in the selected tab."
-transmissionOkayButton:SetSize(60, 30)
-transmissionOkayButton:SetPoint("BOTTOMRIGHT", transmissionCancelButton, "BOTTOMLEFT", -15, 0)
-transmissionOkayButton:SetText("Okay")
-
-local transmissionDropdownMenu = CreateFrame("Frame", _, transmissionFrame, "UIDropDownMenuTemplate")
-transmissionDropdownMenu:SetPoint("BOTTOMRIGHT", transmissionCancelButton, "TOPRIGHT", 14, 3)
-UIDropDownMenu_SetWidth(transmissionDropdownMenu, 120)
-
-local transmissionDropdownMenuLabel = transmissionDropdownMenu:CreateFontString(_, "ARTWORK", "GameFontNormal")
-transmissionDropdownMenuLabel:SetPoint("BOTTOMLEFT", transmissionDropdownMenu, "TOPLEFT", 0, 5)
-transmissionDropdownMenuLabel:SetPoint("BOTTOMRIGHT", transmissionDropdownMenu, "TOPRIGHT", 0, 5)
-transmissionDropdownMenuLabel:SetText("Place inside:")
-
-local transmissionRotationLabelEditBox = CreateFrame("EditBox", _ , transmissionRotationFrame)
-transmissionRotationLabelEditBox:SetFontObject("GameFontNormal")
-transmissionRotationLabelEditBox:SetAutoFocus(false)
-transmissionRotationLabelEditBox:SetMultiLine(true)
-transmissionRotationLabelEditBox:SetJustifyH("CENTER")
-transmissionRotationLabelEditBox:SetSpacing(5)
-transmissionRotationLabelEditBox:SetSize(140, 20)
-transmissionRotationLabelEditBox:SetPoint("TOPLEFT", transmissionRotationFrame, "TOPRIGHT", 3, -25)
-transmissionRotationLabelEditBox:Disable()
+    leftSideMenu:SetPoint("TOPRIGHT", container, "TOPLEFT", 12, 0)
+    leftSideMenu:SetPoint("BOTTOMRIGHT", container, "BOTTOMLEFT", 12, 0)
+    leftSideMenu:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tileSize = 32,
+        edgeSize = 32,
+        tile = true,
+        insets = {left="11", right="12", top="12", bottom="11"},
+    })
+    leftSideMenu:SetWidth(250)
+    leftSideMenu:Hide()
 
 local testButton = CreateFrame("Button", _, container, "UIPanelButtonTemplate")
-testButton.tooltipText = "Generates some example statusbars for each rotation tab."
-testButton:SetSize(100, 40)
-testButton:SetPoint("TOPLEFT", container, "TOPLEFT", 15, -15)
-testButton:SetText("Test")
-testButton:SetScript("OnClick", function() optionFunc.testButtonOnClick() end)
+    testButton.tooltipText = "Generates some example statusbars for each rotation tab."
+    testButton:SetSize(100, 40)
+    testButton:SetPoint("TOPLEFT", container, "TOPLEFT", 15, -15)
+    testButton:SetText("Test")
+    testButton:SetScript("OnClick", function() optionFunc.testButtonOnClick() end)
 
 local menuButtons = {
     ["ENABLE"] = frameUtil.createMenuButton("Enable", rotationTab),
@@ -232,65 +139,65 @@ menuButtons["SORTING"]:SetPoint("TOPLEFT", menuButtons["DISPLAY"], "BOTTOMLEFT",
 menuButtons["SOUND"]:SetPoint("TOPLEFT", menuButtons["SORTING"], "BOTTOMLEFT", 0, -5)
 
 local widthFontString, widthEditBox = frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
-widthFontString:SetText("width:")
-widthEditBox:SetPoint("TOPLEFT", leftSideMenu, "TOPLEFT", 115, -35)
-widthEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "WIDTH") end)
-widthEditBox:Hide()
+    widthFontString:SetText("width:")
+    widthEditBox:SetPoint("TOPLEFT", leftSideMenu, "TOPLEFT", 115, -35)
+    widthEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "WIDTH") end)
+    widthEditBox:Hide()
 
 local heightFontString, heightEditBox = frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
-heightFontString:SetText("height:")
-heightEditBox:SetPoint("TOP", widthEditBox, "BOTTOM", 0, -6)
-heightEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "HEIGHT") end)
-heightEditBox:Hide()
+    heightFontString:SetText("height:")
+    heightEditBox:SetPoint("TOP", widthEditBox, "BOTTOM", 0, -6)
+    heightEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "HEIGHT") end)
+    heightEditBox:Hide()
 
 local spaceFontString, spaceEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
-spaceFontString:SetText("space:")
-spaceEditBox:SetPoint("TOP", heightEditBox, "BOTTOM", 0, -6)
-spaceEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "SPACE") end)
-spaceEditBox:Hide()
+    spaceFontString:SetText("space:")
+    spaceEditBox:SetPoint("TOP", heightEditBox, "BOTTOM", 0, -6)
+    spaceEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "SPACE") end)
+    spaceEditBox:Hide()
 
 local xOffFontString, xOffEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
-xOffFontString:SetText("x offset:")
-xOffEditBox:SetPoint("TOP", spaceEditBox, "BOTTOM", 0, -6)
-xOffEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "XOFF") end)
-xOffEditBox:Hide()
+    xOffFontString:SetText("x offset:")
+    xOffEditBox:SetPoint("TOP", spaceEditBox, "BOTTOM", 0, -6)
+    xOffEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "XOFF") end)
+    xOffEditBox:Hide()
 
 local yOffFontString, yOffEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["DISPLAY"])
-yOffFontString:SetText("y offset:")
-yOffEditBox:SetPoint("TOP", xOffEditBox, "BOTTOM", 0, -6)
-yOffEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "YOFF") end)
-yOffEditBox:Hide()
+    yOffFontString:SetText("y offset:")
+    yOffEditBox:SetPoint("TOP", xOffEditBox, "BOTTOM", 0, -6)
+    yOffEditBox:SetScript("OnEnterPressed", function(self) optionFunc.displayEditBoxOnEnter(self, "YOFF") end)
+    yOffEditBox:Hide()
 
 local titleFontString, titleEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["SEND"])
-titleEditBox:Hide()
-titleFontString:SetText("Title: ")
-titleFontString:ClearAllPoints()
-titleFontString:SetPoint("BOTTOM", titleEditBox, "TOP", 0, 5)
-titleEditBox:SetWidth(100)
-titleEditBox:SetMaxLetters(11)
-titleEditBox:SetPoint("TOP", leftSideMenu, "TOP", 0, -50)
-titleEditBox:SetScript("OnSpacePressed", function(self)
-    self:SetText(gsub(self:GetText(), "%s","_"))
-end)
-titleEditBox:SetScript("OnEnterPressed", function(self) optionFunc.titleEditBoxOnEnterPressed(self) end)
+    titleEditBox:Hide()
+    titleFontString:SetText("Title: ")
+    titleFontString:ClearAllPoints()
+    titleFontString:SetPoint("BOTTOM", titleEditBox, "TOP", 0, 5)
+    titleEditBox:SetWidth(100)
+    titleEditBox:SetMaxLetters(11)
+    titleEditBox:SetPoint("TOP", leftSideMenu, "TOP", 0, -50)
+    titleEditBox:SetScript("OnSpacePressed", function(self)
+        self:SetText(gsub(self:GetText(), "%s","_"))
+    end)
+    titleEditBox:SetScript("OnEnterPressed", function(self) optionFunc.titleEditBoxOnEnterPressed(self) end)
+
+
+local enableGroupInstanceButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
+    enableGroupInstanceButton.tooltipText = "Select when to track all/none/rotation only interrupts."
+    enableGroupInstanceButton:Hide()
+    enableGroupInstanceButton:SetSize(110, 40)
+    enableGroupInstanceButton:SetText("group/instance")
+    enableGroupInstanceButton:SetPoint("TOPLEFT", leftSideMenu, 23, -15)
+    enableGroupInstanceButton:LockHighlight()
+    enableGroupInstanceButton:SetScript("OnClick", function(self) optionFunc.enableGroupInstanceButtonOnClick(self) end)
 
 local enableClassSpecButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
-local enableGroupInstanceButton = CreateFrame("Button", _, menuButtons["ENABLE"], "UIPanelButtonTemplate")
-
-enableGroupInstanceButton.tooltipText = "Select when to track all/none/rotation only interrupts."
-enableGroupInstanceButton:Hide()
-enableGroupInstanceButton:SetSize(110, 40)
-enableGroupInstanceButton:SetText("group/instance")
-enableGroupInstanceButton:SetPoint("TOPLEFT", leftSideMenu, 23, -15)
-enableGroupInstanceButton:LockHighlight()
-enableGroupInstanceButton:SetScript("OnClick", function(self) optionFunc.enableGroupInstanceButtonOnClick(self) end)
-
-enableClassSpecButton.tooltipText = "Select classes/specs on which to enable tracking."
-enableClassSpecButton:Hide()
-enableClassSpecButton:SetSize(93, 40)
-enableClassSpecButton:SetText("class/spec")
-enableClassSpecButton:SetPoint("LEFT", enableGroupInstanceButton, "RIGHT", 5, 0)
-enableClassSpecButton:SetScript("OnClick", function(self) optionFunc.enableClassSpecButtonOnClick(self) end)
+    enableClassSpecButton.tooltipText = "Select classes/specs on which to enable tracking."
+    enableClassSpecButton:Hide()
+    enableClassSpecButton:SetSize(93, 40)
+    enableClassSpecButton:SetText("class/spec")
+    enableClassSpecButton:SetPoint("LEFT", enableGroupInstanceButton, "RIGHT", 5, 0)
+    enableClassSpecButton:SetScript("OnClick", function(self) optionFunc.enableClassSpecButtonOnClick(self) end)
 
 local enableCheckBoxes = {}
 --Enable class/spec checkBoxes
@@ -342,14 +249,15 @@ for i=1, #enableCheckBoxes do
 end
 
 local trackAllOption = frameUtil.createFromToOption("Track all", "ALL", 0, 40, enableGroupInstanceButton)
+
+    trackAllOption.checkBox:SetPoint("TOP", enableGroupInstanceButton, "BOTTOMRIGHT", -31, -20)
+    trackAllOption.checkBox.tooltipText = "Tracks all interrupts from players in the party\n"..
+                                    "when enabled and within the given groupsize."
 local trackRotationOption = frameUtil.createFromToOption("Rotation", "ROTATION", 0, 40, enableGroupInstanceButton)
-trackAllOption.checkBox:SetPoint("TOP", enableGroupInstanceButton, "BOTTOMRIGHT", -31, -20)
-trackAllOption.checkBox.tooltipText = "Tracks all interrupts from players in the party\n"..
-								"when enabled and within the given groupsize."
-trackRotationOption.checkBox:SetPoint("TOP", trackAllOption.checkBox, "BOTTOMRIGHT", -14, -80)
-trackRotationOption.checkBox.tooltipText = "Tracks the given players in the rotation"..
-								"\nwhen enabled and within the given groupsize."..
-								"\n\nNOTE - If track all is active, tihs will be overruled. "
+    trackRotationOption.checkBox:SetPoint("TOP", trackAllOption.checkBox, "BOTTOMRIGHT", -14, -80)
+    trackRotationOption.checkBox.tooltipText = "Tracks the given players in the rotation"..
+                                    "\nwhen enabled and within the given groupsize."..
+                                    "\n\nNOTE - If track all is active, tihs will be overruled. "
 --Enable trackall / track rotation frames
 
 local sendRotationButtons = {}
@@ -363,24 +271,22 @@ for i=1, 4 do
 end
 
 local sendRotationFontString, whisperToEditBox = SIR.frameUtil.createFontStringEditBox(menuButtons["SEND"])
-whisperToEditBox:Hide()
-sendRotationFontString:SetText("Link in:")
-sendRotationFontString:SetSize(76, 30)
-sendRotationFontString:ClearAllPoints()
-sendRotationFontString:SetPoint("TOP", titleEditBox, "BOTTOM", 0, -15)
-
+    sendRotationFontString:SetText("Link in:")
+    sendRotationFontString:SetSize(76, 30)
+    sendRotationFontString:ClearAllPoints()
+    sendRotationFontString:SetPoint("TOP", titleEditBox, "BOTTOM", 0, -15)
+    whisperToEditBox:SetWidth(140)
+    whisperToEditBox:SetMaxLetters(30)
+    whisperToEditBox:SetText("\124cFF606060whisper-target\124r")
+    whisperToEditBox:Hide()
+    whisperToEditBox:SetScript("OnEnterPressed", function() whisperToEditBox:ClearFocus() end)
 sendRotationButtons[1]:SetPoint("RIGHT", sendRotationButtons[2], "LEFT", -5, 0)
 sendRotationButtons[2]:SetPoint("TOP", sendRotationFontString, "BOTTOM")
 sendRotationButtons[3]:SetPoint("LEFT", sendRotationButtons[2], "RIGHT", 5, 0)
-
 whisperToEditBox:SetPoint("TOP", sendRotationButtons[2], "BOTTOM", 0, -40)
 sendRotationButtons[4]:SetPoint("TOP", whisperToEditBox, "BOTTOM", 0, -5)
 sendRotationButtons[4]:SetWidth(80)
 
-whisperToEditBox:SetWidth(140)
-whisperToEditBox:SetMaxLetters(30)
-whisperToEditBox:SetText("\124cFF606060whisper-target\124r")
-whisperToEditBox:SetScript("OnEnterPressed", function() whisperToEditBox:ClearFocus() end)
 
 local groupMemberButtons = {}
 for i=1, 40 do
@@ -423,40 +329,36 @@ sortModeCheckBoxes["ROTATION"].value = "ROTATION"
 sortModeCheckBoxes["ROTATION"]:SetPoint("TOP", sortModeCheckBoxes["CD"], "BOTTOM", 0, -5)
 
 local playSoundCheckBox = frameUtil.createFontStringCheckBox("play sound", menuButtons["SOUND"])
-playSoundCheckBox.tooltipText = "Play a sound when it's your turn next."
-playSoundCheckBox:SetScript("OnClick", function(self) optionFunc.playSoundCheckBoxOnClick(self) end)
-playSoundCheckBox:SetHitRectInsets(0 , -playSoundCheckBox.fontString:GetWidth(), 0, 0) --l r t b
-
-playSoundCheckBox:SetPoint("RIGHT", leftSideMenu, "CENTER", -30, 0)
-playSoundCheckBox:SetPoint("TOP", leftSideMenu, "TOP", 0, -50)
-playSoundCheckBox.fontString:ClearAllPoints()
-playSoundCheckBox.fontString:SetPoint("LEFT", playSoundCheckBox, "RIGHT", 10, 0)
-playSoundCheckBox:Hide()
+    playSoundCheckBox.tooltipText = "Play a sound when it's your turn next."
+    playSoundCheckBox:SetScript("OnClick", function(self) optionFunc.playSoundCheckBoxOnClick(self) end)
+    playSoundCheckBox:SetHitRectInsets(0 , -playSoundCheckBox.fontString:GetWidth(), 0, 0) --l r t b
+    playSoundCheckBox:SetPoint("RIGHT", leftSideMenu, "CENTER", -30, 0)
+    playSoundCheckBox:SetPoint("TOP", leftSideMenu, "TOP", 0, -50)
+    playSoundCheckBox.fontString:ClearAllPoints()
+    playSoundCheckBox.fontString:SetPoint("LEFT", playSoundCheckBox, "RIGHT", 10, 0)
+    playSoundCheckBox:Hide()
 
 local repeatSoundCheckBox = frameUtil.createFontStringCheckBox("repeat sound", menuButtons["SOUND"])
-repeatSoundCheckBox.tooltipText = "Enabled: plays EVERY time from the tab uses a spell and you're next up."
-.."\n\nDisabled: plays only once until you use your spell."
-repeatSoundCheckBox:SetScript("OnClick", function(self) optionFunc.repeatSoundCheckBoxOnClick(self) end)
-repeatSoundCheckBox:SetHitRectInsets(0 , -repeatSoundCheckBox.fontString:GetWidth(), 0, 0) --l r t b
-
-repeatSoundCheckBox:SetPoint("TOP", playSoundCheckBox, "BOTTOM", 0, -15)
-repeatSoundCheckBox.fontString:ClearAllPoints()
-repeatSoundCheckBox.fontString:SetPoint("LEFT", repeatSoundCheckBox, "RIGHT", 10, 0)
-repeatSoundCheckBox:Hide()
+    repeatSoundCheckBox.tooltipText = "Enabled: plays EVERY time from the tab uses a spell and you're next up."
+    .."\n\nDisabled: plays only once until you use your spell."
+    repeatSoundCheckBox:SetScript("OnClick", function(self) optionFunc.repeatSoundCheckBoxOnClick(self) end)
+    repeatSoundCheckBox:SetHitRectInsets(0 , -repeatSoundCheckBox.fontString:GetWidth(), 0, 0) --l r t b
+    repeatSoundCheckBox:SetPoint("TOP", playSoundCheckBox, "BOTTOM", 0, -15)
+    repeatSoundCheckBox.fontString:ClearAllPoints()
+    repeatSoundCheckBox.fontString:SetPoint("LEFT", repeatSoundCheckBox, "RIGHT", 10, 0)
+    repeatSoundCheckBox:Hide()
 
 local soundPathFontString, soundPathEditBox = frameUtil.createFontStringEditBox(menuButtons["SOUND"])
-soundPathFontString:SetText("Sound path:")
-soundPathFontString:SetSize(120, 30)
-soundPathFontString:ClearAllPoints()
-soundPathFontString:SetPoint("TOP", repeatSoundCheckBox, "BOTTOM", 0, -15)
-soundPathFontString:SetPoint("LEFT", leftSideMenu, "CENTER", -soundPathFontString:GetWidth()/2, 0)
-
-soundPathEditBox:SetPoint("TOP", soundPathFontString, "BOTTOM", 0, 0)
-soundPathEditBox:SetSize(170, 30)
-
-soundPathEditBox:SetMaxLetters(100)
-soundPathEditBox:SetScript("OnEnterPressed", function(self) optionFunc.soundPathEditBoxOnEnterPressed(self) end)
-soundPathEditBox:Hide()
+    soundPathFontString:SetText("Sound path:")
+    soundPathFontString:SetSize(120, 30)
+    soundPathFontString:ClearAllPoints()
+    soundPathFontString:SetPoint("TOP", repeatSoundCheckBox, "BOTTOM", 0, -15)
+    soundPathFontString:SetPoint("LEFT", leftSideMenu, "CENTER", -soundPathFontString:GetWidth()/2, 0)
+    soundPathEditBox:SetPoint("TOP", soundPathFontString, "BOTTOM", 0, 0)
+    soundPathEditBox:SetSize(170, 30)
+    soundPathEditBox:SetMaxLetters(100)
+    soundPathEditBox:SetScript("OnEnterPressed", function(self) optionFunc.soundPathEditBoxOnEnterPressed(self) end)
+    soundPathEditBox:Hide()
 
 SIR.optionFrames = {
     --single frames
@@ -464,21 +366,11 @@ SIR.optionFrames = {
     ["generalTab"] = generalTab,
     ["greyOutDeadCheckBox"] = greyOutDeadCheckBox,
     ["greyOutDisabledCheckBox"] = greyOutDisabledCheckBox,
-    --["greyOutDiscCheckBox"] = greyOutDiscCheckBox,
-    --["greyOutDiffAreaCheckBox"] = greyOutDiffAreaCheckBox,
     ["createNewTabButton"] = createNewTabButton,
     ["removeTabButton"] = removeTabButton,
     ["generalTabButton"] = generalTabButton,
     ["rotationTab"] = rotationTab,
     ["leftSideMenu"] = leftSideMenu,
-    ["transmissionFrame"] = transmissionFrame,
-    ["transmissionRotationFrame"] = transmissionRotationFrame,
-    ["transmissionRotationEditBox"] = transmissionRotationEditBox,
-    ["transmissionCancelButton"] = transmissionCancelButton,
-    ["transmissionOkayButton"] = transmissionOkayButton,
-    ["transmissionDropdownMenu"] = transmissionDropdownMenu,
-    ["transmissionDropdownMenuLabel"] = transmissionDropdownMenuLabel,
-    ["transmissionRotationLabelEditBox"] = transmissionRotationLabelEditBox,
     ["widthEditBox"] = widthEditBox,
     ["heightEditBox"] = heightEditBox,
     ["spaceEditBox"] = spaceEditBox,

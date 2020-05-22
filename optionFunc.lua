@@ -3,13 +3,9 @@ local _, SIR = ...
 --luacheck: globals GetNumGroupMembers SnagiIntRotaSaved GameTooltip GetPlayerInfoByGUID IsInGroup IsInRaid UnitGUID
 --luacheck: globals StaticPopup_Hide UIParent StaticPopupDialogs StaticPopup_Show SlashCmdList C_Timer GetClassInfo
 --luacheck: globals random _ UISpecialFrames GetSpellInfo min max floor tremove ItemRefTooltip ConsoleAddMessage
---luacheck: globals ChatFrame_AddMessageEventFilter C_ChatInfo gmatch strfind SLASH_SIRINTERRUPTDUMP1 UIParentLoadAddOn
---luacheck: globals SendChatMessage UIDropDownMenu_SetWidth UIDropDownMenu_Initialize UIDropDownMenu_CreateInfo
---luacheck: globals  UIDropDownMenu_AddButton UIDropDownMenu_SetText UIDropDownMenu_GetText gsub CLASS_ICON_TCOORDS
---luacheck: globals GetNumSpecializationsForClassID GetSpecializationInfoByID GetSpecializationInfo GetSpecialization
+--luacheck: globals gmatch strfind SLASH_SIRINTERRUPTDUMP1 UIParentLoadAddOn SendChatMessage
+--luacheck: globals CLASS_ICON_TCOORDS GetTime GetInspectSpecialization GetTalentInfo
 --luacheck: globals UnitClass time IsInInstance sort UnitInParty UnitInRaid UnitName
---luacheck: globals CanInspect UnitIsConnected NotifyInspect GetTime GetInspectSpecialization GetTalentInfo
---_, _ = ...
 
 local classSpecIDs = SIR.data.classSpecIDs
 local util = SIR.util
@@ -145,126 +141,7 @@ SLASH_SIRINTERRUPT1, SLASH_SIRINTERRUPT2 = "/sir", "/sirinterrupt"
 SlashCmdList["SIRINTERRUPT"] = function(msg)
 	toggleOptions(msg)
 end
-------------------------------------------------------------------------------------------------------------------------
 
--- DATA
-
-------------------------------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------------------------------
-
--- Transmission
-
-------------------------------------------------------------------------------------------------------------------------
-C_ChatInfo.RegisterAddonMessagePrefix("SnagiIntRotaSend")
-C_ChatInfo.RegisterAddonMessagePrefix("SnagiIntRotaReq")
-
-local OriginalSetHyperlink = ItemRefTooltip.SetHyperlink
-function ItemRefTooltip:SetHyperlink(link, ...)
-	if(link and link:sub(1, 14) == "SnagiIntRota: ") then
-		local text = link:sub(15)
-
-		local i, j = text:find("%S*")
-		local source = text:sub(i, j)
-
-		text = text:sub(j+2)
-		i, j = text:find("%S*")
-		local title = text:sub(i, j)
-		text = text:sub(j+1)
-
-		local rotation = {}
-		for GUID in gmatch(text, "%w*-%w*-%w*") do
-			rotation[#rotation+1] = GUID
-		end
-		optionFrames.transmissionOkayButton.rotation = rotation
-		local rotationText = ""
-		for k=1, #rotation do
-			rotationText = rotationText..k..". "..util.getColouredNameByGUID(rotation[k])
-		end
-		optionFrames.transmissionRotationEditBox:SetText(rotationText)
-
-		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new tab")
-		for _, options in ipairs(SIR.tabOptions) do
-			if options["TITLE"] == title then
-				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, title)
-				break
-			end
-		end
-
-		optionFrames.transmissionRotationLabelEditBox:SetText(title.."\n"..util.getColouredNameByGUID(source))
-		optionFrames.transmissionFrame:Show()
-		return
-	end
-	return OriginalSetHyperlink(self, link, ...);
-end
-
-local filterFunc = function(_, _, msg, ...)
-	-- example msg [SnagiIntRota:] TITLE
-	if msg:sub(1, 16) == "[SnagiIntRota:] " then
-		local sourceGUID = select(11, ...)
-		local i, j = strfind((msg:sub(17)), "%S*")
-		local title = strsub(msg, i+16, j+16)
-		local newMsg = "\124HSnagiIntRota: "..sourceGUID.." "..strsub(msg, 17).."\124h[SIR - \124cFFFAD201"
-			..title.."\124r]\124h"
-		return false, newMsg, ...
-	end
-	return false
-end
-
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", filterFunc)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", filterFunc)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", filterFunc)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", filterFunc)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", filterFunc)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", filterFunc)
-
-optionFrames.transmissionOkayButton:SetScript("OnClick", function(self)
-	local text = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu)
-	if not text then
-		return
-	elseif text == "new tab" then
-		optionFrames.createNewTabButton:Click()
-		SIR.tabOptions[numTabs]["ROTATION"] = self.rotation
-		SIR.tabOptions[numTabs]["TITLE"] = "new_tab"
-		optionFrames.rotationTabButtons[numTabs]:SetText(SIR.tabOptions[numTabs]["TITLE"])
-		optionFrames.container:Show()
-		optionFrames.rotationTabButtons[numTabs]:Click()
-	else
-		for i, tabOptions in ipairs(SIR.tabOptions) do
-			if tabOptions["TITLE"] == text then
-				tabOptions["ROTATION"] = self.rotation
-				optionFrames.container:Show()
-				optionFrames.rotationTabButtons[i]:Click()
-				break
-			end
-		end
-	end
-	optionFrames.transmissionFrame:Hide()
-end)
-UIDropDownMenu_Initialize(optionFrames.transmissionDropdownMenu, function()--self, level, menuList)
-	local info = UIDropDownMenu_CreateInfo()
-	for _, tabOptions in ipairs(SIR.tabOptions) do
-		info.text = tabOptions["TITLE"]
-		info.checked = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu) == info.text
-		info.func = function()
-				UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, tabOptions["TITLE"])
-			end
-		UIDropDownMenu_AddButton(info)
-	end
-	info.text = "new tab"
-	info.checked = UIDropDownMenu_GetText(optionFrames.transmissionDropdownMenu) == info.text
-	info.func = function()
-		UIDropDownMenu_SetText(optionFrames.transmissionDropdownMenu, "new tab")
-		SIR.util.myPrint("hihizhih")
-	end
-	UIDropDownMenu_AddButton(info)
-end)
-
-------------------------------------------------------------------------------------------------------------------------
-
--- ADDON FUNCTIONS
-
-------------------------------------------------------------------------------------------------------------------------
 local loadTab = function(title)
 	numTabs = numTabs+1
 	optionFrames.rotationTabButtons[numTabs] = frameUtil.aquireTabButton(optionFrames.container)
@@ -290,8 +167,6 @@ local updateRotationButtons = function()
 		optionFrames.rotationButtons[i]:Show()
 	end
 end
-
-
 
 local updateGroupMemberButtons = function()
 	--done?!!
@@ -366,13 +241,6 @@ local removeRotationMember = function(GUID)
 		end
 	end
 	SIR.rotationFunc.removeRotationMember(activeTab, GUID)
-end
-local makeTransmissionText = function()
-	local text = "[SnagiIntRota:] "..optionFrames.titleEditBox:GetText().." "
-	for _, member in ipairs(SIR.tabOptions[activeTab]["ROTATION"]) do
-		text = text..member.." "
-	end
-	return text
 end
 local updateGreyOutCheckBoxes = function()
 	optionFrames.greyOutDeadCheckBox:SetChecked(SIR.generalOptions["GREYOUTDEAD"])
@@ -854,8 +722,7 @@ optionFunc.titleEditBoxOnEnterPressed = function(self)
 	self:ClearFocus()
 end
 optionFunc.sendRotationOnClick = function(self)
-	SendChatMessage(makeTransmissionText(), self.value, _,
-		optionFrames.whisperToEditBox:GetText())
+	SIR.transmissionFunc.send(activeTab, self.value)
 end
 optionFunc.playSoundCheckBoxOnClick = function(self)
 	SIR.tabOptions[activeTab]["PLAYSOUND"] = self:GetChecked()
@@ -875,14 +742,3 @@ optionFunc.greyOutDisabledCheckBoxOnClick = function(self)
 	SIR.generalOptions["GREYOUTDISABLED"] = self:GetChecked()
 	SIR.rotationFunc.updateGreyOut()
 end
---[[
-optionFunc.greyOutDiscCheckBoxOnClick = function(self)
-	SIR.generalOptions["GREYOUTDISC"] = self:GetChecked()
-	SIR.rotationFunc.updateGreyOut()
-end
-optionFunc.greyOutDiffAreaCheckBoxOnClick = function(self)
-	SIR.generalOptions["GREYOUTDIFFAREA"] = self:GetChecked()
-	SIR.rotationFunc.updateGreyOut()
-end
-
-]]--
