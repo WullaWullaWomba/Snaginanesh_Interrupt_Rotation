@@ -15,11 +15,7 @@ local optionFunc = SIR.optionFunc
 
 local contains, remove= util.contains, util.remove
 SIR.tabOptions = SIR.tabOptions or {}
-------------------------------------------------------------------------------------------------------------------------
 
--- LOCALS!
-
-------------------------------------------------------------------------------------------------------------------------
 local numTabs = 0
 local activeTab = "GENERAL"
 local defaultOptions = {
@@ -117,9 +113,9 @@ local defaultOptions = {
 		[577] = true, -- Havoc
 		[581] = true, -- Vengeance
 	},
-	["TRACKROTATIONCHECKED"] = false,
+	["TRACKROTATIONCHECKED"] = true,
 	["TRACKALLCHECKED"] = true,
-	["TRACKROTATIONFROM"] = 0,
+	["TRACKROTATIONFROM"] = 6,
 	["TRACKROTATIONTO"] = 40,
 	["TRACKALLFROM"] = 2,
 	["TRACKALLTO"] = 5,
@@ -136,7 +132,6 @@ local toggleOptions = function()
 		optionFrames.container:Show()
 	end
 end
---SLASH COMMAND
 SLASH_SIRINTERRUPT1, SLASH_SIRINTERRUPT2 = "/sir", "/sirinterrupt"
 SlashCmdList["SIRINTERRUPT"] = function(msg)
 	toggleOptions(msg)
@@ -167,7 +162,6 @@ local updateRotationButtons = function()
 		optionFrames.rotationButtons[i]:Show()
 	end
 end
-
 local updateGroupMemberButtons = function()
 	--done?!!
 	SIR.util.myPrint("updateGroupMemberButtons")
@@ -733,7 +727,6 @@ end
 optionFunc.soundPathEditBoxOnEnterPressed = function(self)
 	SIR.tabOptions[activeTab]["SOUNDPATH"] = self:GetText() or ""
 end
-
 optionFunc.greyOutDeadCheckBoxOnClick = function(self)
 	SIR.generalOptions["GREYOUTDEAD"] = self:GetChecked()
 	SIR.rotationFunc.updateGreyOut()

@@ -1,7 +1,7 @@
 ## Interface: 80300
 ## Title: Snaginanesh Interrupt Rotation
 ## Author: Lahm
-## Version: 0.2
+## Version: 1.03
 ## SavedVariables: SnagiIntRotaSaved
 
 Snaginanesh_Interrupt_Rotation.lua
