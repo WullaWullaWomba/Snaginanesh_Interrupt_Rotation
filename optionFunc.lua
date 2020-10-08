@@ -309,7 +309,7 @@ local updateSoundMenu = function()
 	optionFrames.soundPathEditBox:SetText(SIR.tabOptions[activeTab]["SOUNDPATH"])
 end
 
-optionFunc.PLAYER_LOGIN = function()
+optionFunc.initialize = function()
 	for i=1, #SIR.tabOptions do
 		for k, default in pairs(defaultOptions) do
 			if SIR.tabOptions[i][k] == nil then

@@ -80,7 +80,7 @@ SIR.petInfoFunc.UNIT_PET = function(unitID)
         SIR.masterToPet[GUID] = nil
     end
 end
-SIR.petInfoFunc.PLAYER_LOGIN = function()
+SIR.petInfoFunc.initialize = function()
     C_Timer.After(5, function()
         SIR.util.iterateGroup(
         function(unitID)

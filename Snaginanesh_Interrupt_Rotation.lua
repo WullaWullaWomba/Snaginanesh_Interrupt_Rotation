@@ -1,6 +1,7 @@
 --luacheck: globals CreateFrame UnitGUID GetSpecializationInfo GetSpecialization UnitClass IsInGroup
 --luacheck: globals CombatLogGetCurrentEventInfo SnagiIntRotaSaved GetRealmName GetPlayerInfoByGUID
 local _, SIR = ...
+local addonLoaded, playerLoggedIn = false, false
 SIR.data, SIR.util, SIR.frameUtil = {}, {}, {}
 SIR.optionFrames, SIR.optionFunc, SIR.tabOptions, SIR.generalOptions = {}, {}, {}, {}
 SIR.rotationFrames, SIR.rotationFunc = {}, {}
@@ -12,6 +13,7 @@ SIR.test = false
 
 local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(_, event, ...) f[event](...) end)
+f:RegisterEvent("ADDON_LOADED")
 f:RegisterEvent("PLAYER_LOGIN")
 
 f.PARTY_MEMBER_ENABLE = function(...)
@@ -66,7 +68,26 @@ end
 f.INSPECT_READY = function(...)
 	SIR.groupInfoFunc.INSPECT_READY(...)
 end
-f.PLAYER_LOGIN = function()
+
+f.ADDON_LOADED = function (addonName)
+	if addonName ~= "Snaginanesh_Interrupt_Rotation" then
+		return
+	end
+	addonLoaded = true
+	if playerLoggedIn then
+		initialize()
+	end
+end
+
+f.PLAYER_LOGIN = function ()
+	playerLoggedIn = true
+	if addonLoaded then
+		initialize()
+	end
+end
+initialize = function()
+	-- addon has both loaded & player logged in
+	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
 	local GUID = UnitGUID("player")
 	local _, class, _, _, _, name = GetPlayerInfoByGUID(GUID)
 	SIR.playerInfo = {
@@ -77,12 +98,11 @@ f.PLAYER_LOGIN = function()
 		["REALM"] = GetRealmName(),
 		["COLOUREDNAME"] = SIR.util.getColouredNameByGUID(GUID),
 	}
-	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
 	SIR.tabOptions = SnagiIntRotaSaved.tabOptions or {}
 	SIR.generalOptions = SnagiIntRotaSaved.generalOptions or {}
-	SIR.optionFunc.PLAYER_LOGIN()
-	SIR.groupInfoFunc.PLAYER_LOGIN()
-	SIR.petInfoFunc.PLAYER_LOGIN()
+	SIR.optionFunc.initialize()
+	SIR.groupInfoFunc.initialize()
+	SIR.petInfoFunc.initialize()
 	SIR.optionFrames.generalTabButton:Click()
 	f:RegisterEvent("UNIT_PET")
 	f:RegisterEvent("PLAYER_LOGOUT")

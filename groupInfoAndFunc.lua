@@ -122,7 +122,8 @@ inspectNext = function()
     end
     C_Timer.After(2.1, function() inspectNext() end)
 end
-SIR.groupInfoFunc.PLAYER_LOGIN = function()
+SIR.groupInfoFunc.initialize = function()
+    SnagiIntRotaSaved.groupInfo = SnagiIntRotaSaved.groupInfo or {}
     SnagiIntRotaSaved.groupInfo[SIR.playerInfo["GUID"]] = {
             ["NAME"] = SIR.playerInfo["NAME"],
             ["SERVER"] = SIR.playerInfo["REALM"],
