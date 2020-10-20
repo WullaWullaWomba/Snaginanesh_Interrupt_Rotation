@@ -6,7 +6,7 @@ local frameUtil = SIR.frameUtil
 local data = SIR.data
 local optionFunc = SIR.optionFunc
 
-local container = CreateFrame("Frame", "SnagiIntRotaContainer", UIParent)
+local container = CreateFrame("Frame", "SnagiIntRotaContainer", UIParent, "BackdropTemplate")
     UISpecialFrames[#UISpecialFrames+1] = container:GetName() -- hide on escape - and maybe more <.<
     container:SetFrameStrata("DIALOG")
     container:Hide()
@@ -100,7 +100,7 @@ local removeTabButton = CreateFrame("Button", "$parentRemoveTabButton", rotation
     removeTabButton:SetText("Remove tab")
     removeTabButton:SetScript("OnClick", function() optionFunc.removeTabOnClick() end)
 
-local leftSideMenu = CreateFrame("Frame", _ , container)
+local leftSideMenu = CreateFrame("Frame", _ , container, "BackdropTemplate")
     leftSideMenu:SetPoint("TOPRIGHT", container, "TOPLEFT", 12, 0)
     leftSideMenu:SetPoint("BOTTOMRIGHT", container, "BOTTOMLEFT", 12, 0)
     leftSideMenu:SetBackdrop({

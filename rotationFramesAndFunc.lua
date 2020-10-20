@@ -267,10 +267,13 @@ rotationFunc.newRotationTab = function(tab)
     local rotationFrame = SIR.frameUtil.aquireRotationFrame(SIR.optionFrames.container, tab)
     rotationFrame:ClearAllPoints()
     rotationFrame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT",
+
         SIR.tabOptions[tab]["XOFF"], SIR.tabOptions[tab]["YOFF"])
+
     rotationFrame:SetSize(SIR.tabOptions[tab]["WIDTH"], SIR.tabOptions[tab]["HEIGHT"])
     rotationFrame.fontString:SetText(SIR.tabOptions[tab]["TITLE"])
     rotationFrames[tab] = rotationFrame
+    rotationFrames[tab]:SetScale(1)
     trackModes[tab] = "NONE"
     statusBars[tab] = {}
     rotationFunc.updateTrackMode(tab)

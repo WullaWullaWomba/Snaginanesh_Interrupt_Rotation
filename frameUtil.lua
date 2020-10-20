@@ -47,7 +47,7 @@ SIR.frameUtil = {
 			tremove(rotationFramePool, #rotationFramePool)
 			rotationFrame:ClearAllPoints()
 		else
-			rotationFrame = CreateFrame("Frame", _, parent)
+			rotationFrame = CreateFrame("Frame", _, parent, "BackdropTemplate")
 			rotationFrame:SetBackdrop({
 				bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
 				tileSize = 32,
@@ -82,7 +82,7 @@ SIR.frameUtil = {
 		if sb then
 			tremove(statusBarPool, #statusBarPool)
 		else
-			sb = CreateFrame("StatusBar")
+			sb = CreateFrame("StatusBar", _, UIParent, "BackdropTemplate")
 			sb.icon = sb:CreateTexture()
 			sb.icon:SetPoint("TOPRIGHT", sb, "TOPLEFT")
 			sb.icon:SetPoint("BOTTOMRIGHT", sb, "BOTTOMLEFT")

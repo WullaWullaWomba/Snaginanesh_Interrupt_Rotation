@@ -17,7 +17,7 @@ SIR.transmissionFunc.send = function(tab, chatType)
     SIR.optionFrames.whisperToEditBox:GetText())
 end
 
-local transmissionFrame = CreateFrame("Frame", "SnagiIntRotaTransmissionFrame")
+local transmissionFrame = CreateFrame("Frame", "SnagiIntRotaTransmissionFrame", UIParent, "BackdropTemplate")
     transmissionFrame:SetSize(330, 180)
     transmissionFrame:SetPoint("CENTER")
     transmissionFrame:EnableMouse(true)
@@ -35,7 +35,7 @@ local transmissionFrame = CreateFrame("Frame", "SnagiIntRotaTransmissionFrame")
     })
     transmissionFrame:Hide()
 UISpecialFrames[#UISpecialFrames+1] = transmissionFrame:GetName()
-local transmissionRotationFrame = CreateFrame("Frame", _, transmissionFrame)
+local transmissionRotationFrame = CreateFrame("Frame", _, transmissionFrame, "BackdropTemplate")
     transmissionRotationFrame:SetBackdrop({
         bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",

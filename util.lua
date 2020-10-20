@@ -22,6 +22,25 @@ local myToons = {
     "Zoucka-Al'Akir",
     "Inspectmeplz-Aerie Peak",
 }
+local applyDefaultTable
+applyDefaultTable = function(default, actual)
+    -- applies defaults from a (sub-) default table to the actual (sub-) table
+    -- remove remnants
+    if type(actual) ~= "table" then
+        actual = {}
+    end
+    for k, v in pairs(default) do
+        if type(v) == "table" then
+            applyDefaultTable(v, actual[k])
+        --overwrite actual value if it's
+        -- nil or "wrong" type
+        elseif actual[k] == nil or type(actual[k]) ~= type(v) then
+            actual[k] = v
+        end
+    end
+    return actual
+end
+
 SIR.util = {
     ["contains"] = function(table, e)
         for i=1, #table do
@@ -83,6 +102,7 @@ SIR.util = {
         end
     end,
     ["makeCopy"] = makeCopy,
+    ["applyDefaultTable"] = applyDefaultTable,
     ["reverseTable"] = function(table)
         local i, j = 1, #table
         while i < j do

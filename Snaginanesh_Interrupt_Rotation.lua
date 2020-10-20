@@ -15,7 +15,38 @@ local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(_, event, ...) f[event](...) end)
 f:RegisterEvent("ADDON_LOADED")
 f:RegisterEvent("PLAYER_LOGIN")
-
+local initialize = function()
+	
+	-- addon has both loaded & player logged in
+	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
+	local GUID = UnitGUID("player")
+	local _, class, _, _, _, name = GetPlayerInfoByGUID(GUID)
+	SIR.playerInfo = {
+		["GUID"] = GUID,
+		["CLASS"] = class,
+		["SPEC"] = GetSpecializationInfo(GetSpecialization()),
+		["NAME"] = name,
+		["REALM"] = GetRealmName(),
+		["COLOUREDNAME"] = SIR.util.getColouredNameByGUID(GUID),
+	}
+	SIR.tabOptions = SnagiIntRotaSaved.tabOptions or {}
+	SIR.generalOptions = SnagiIntRotaSaved.generalOptions or {}
+	SIR.optionFunc.initialize()
+	SIR.groupInfoFunc.initialize()
+	SIR.petInfoFunc.initialize()
+	SIR.optionFrames.generalTabButton:Click()
+	f:RegisterEvent("UNIT_PET")
+	f:RegisterEvent("PLAYER_LOGOUT")
+	f:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	f:RegisterEvent("GROUP_ROSTER_UPDATE")
+	f:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	f:RegisterEvent("PLAYER_ENTERING_WORLD")
+	f:RegisterEvent("PLAYER_LEAVING_WORLD")
+	f:RegisterEvent("INSPECT_READY")
+	f:RegisterEvent("PARTY_MEMBER_ENABLE")
+	f:RegisterEvent("PARTY_MEMBER_DISABLE")
+	f:RegisterEvent("UNIT_HEALTH")
+end
 f.PARTY_MEMBER_ENABLE = function(...)
 	SIR.util.myPrint("PARTY_MEMBER_ENABLE", ...)
 	SIR.groupInfoFunc.PARTY_MEMBER_ENABLE(...)
@@ -85,37 +116,7 @@ f.PLAYER_LOGIN = function ()
 		initialize()
 	end
 end
-initialize = function()
-	-- addon has both loaded & player logged in
-	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
-	local GUID = UnitGUID("player")
-	local _, class, _, _, _, name = GetPlayerInfoByGUID(GUID)
-	SIR.playerInfo = {
-		["GUID"] = GUID,
-		["CLASS"] = class,
-		["SPEC"] = GetSpecializationInfo(GetSpecialization()),
-		["NAME"] = name,
-		["REALM"] = GetRealmName(),
-		["COLOUREDNAME"] = SIR.util.getColouredNameByGUID(GUID),
-	}
-	SIR.tabOptions = SnagiIntRotaSaved.tabOptions or {}
-	SIR.generalOptions = SnagiIntRotaSaved.generalOptions or {}
-	SIR.optionFunc.initialize()
-	SIR.groupInfoFunc.initialize()
-	SIR.petInfoFunc.initialize()
-	SIR.optionFrames.generalTabButton:Click()
-	f:RegisterEvent("UNIT_PET")
-	f:RegisterEvent("PLAYER_LOGOUT")
-	f:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	f:RegisterEvent("GROUP_ROSTER_UPDATE")
-	f:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-	f:RegisterEvent("PLAYER_ENTERING_WORLD")
-	f:RegisterEvent("PLAYER_LEAVING_WORLD")
-	f:RegisterEvent("INSPECT_READY")
-	f:RegisterEvent("PARTY_MEMBER_ENABLE")
-	f:RegisterEvent("PARTY_MEMBER_DISABLE")
-	f:RegisterEvent("UNIT_HEALTH")
-end
+
 f.PLAYER_ENTERING_WORLD = function()
 
 end

@@ -310,12 +310,9 @@ local updateSoundMenu = function()
 end
 
 optionFunc.initialize = function()
+	numTabs = 0
 	for i=1, #SIR.tabOptions do
-		for k, default in pairs(defaultOptions) do
-			if SIR.tabOptions[i][k] == nil then
-				SIR.tabOptions[i][k] = default
-			end
-		end
+		SIR.tabOptions[i] = SIR.util.applyDefaultTable(defaultOptions, SIR.tabOptions[i])
         loadTab(SIR.tabOptions[i]["TITLE"])
     end
 end
