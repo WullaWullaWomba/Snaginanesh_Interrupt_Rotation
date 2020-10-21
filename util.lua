@@ -31,7 +31,7 @@ applyDefaultTable = function(default, actual)
     end
     for k, v in pairs(default) do
         if type(v) == "table" then
-            applyDefaultTable(v, actual[k])
+			actual[k] = applyDefaultTable(v, actual[k])
         --overwrite actual value if it's
         -- nil or "wrong" type
         elseif actual[k] == nil or type(actual[k]) ~= type(v) then
