@@ -21,6 +21,7 @@ local myToons = {
     "Megokick-Al'Akir",
     "Zoucka-Al'Akir",
     "Inspectmeplz-Aerie Peak",
+    "Whymesocool-Draenor"
 }
 local applyDefaultTable
 applyDefaultTable = function(default, actual)
@@ -72,7 +73,7 @@ SIR.util = {
         end
     end,
     ["myPrint"] = function(...)
-        if SIR.test or SIR.util.contains(myToons, SIR.playerInfo["NAME"].."-"..SIR.playerInfo["REALM"]) then
+        if SIR.test and SIR.util.contains(myToons, SIR.playerInfo["NAME"].."-"..SIR.playerInfo["REALM"]) then
             print("__", ...)
         end
     end,

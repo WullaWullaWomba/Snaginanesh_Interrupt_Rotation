@@ -24,6 +24,7 @@ SIR.data = {
         [119911]=24, -- Optical Blast
         [115781]=24, -- Optical Blast
         [119910]=24, -- Spell Lock (WL with felhunter - source player)
+        [119914]=30, -- Axe Toss ("WL with felguard")
         [132409]=24, -- Spell lock (WL with felhunter sacrificed - source player)
         [171138]=24, -- Shadow lock
         [171139]=24, -- ^^
@@ -227,14 +228,15 @@ SIR.data = {
         [12] = {577, 581,}, -- Havoc Vengeance
     },
     ["petSpellsByID"] = {
-        --felhunter
-        [417] = {
+        [417] = { --felhunter
             119910,
         },
-        --observer (felhunter glyph)
-        [58964] = {
+        [58964] = { --observer (felhunter glyph)
             119910
-        }
+        },
+        [17252] = { -- felguard
+            119914 -- axe toss
+        },
     },
     ["healingCDs"] = {
         -- Tranq

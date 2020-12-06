@@ -52,6 +52,7 @@ SIR.petInfoFunc.onCombatLogEvent = function(subEvent, sourceGUID)
             -- 417 felhunter, 58964 observer (glyph)
             SIR.rotationFunc.replaceSpell(sourceGUID, 119910, 132409)
             --SIR.rotationFunc.addSpellAllTabs(sourceGUID, 132409, SIR.groupInfo[sourceGUID]["CLASS"])
+            -- sacrificed demon interrupt ability
         end
     elseif subEvent == "SPELL_AURA_REMOVED" then
         SIR.rotationFunc.removeSpellAllTabs(sourceGUID, 132409)
