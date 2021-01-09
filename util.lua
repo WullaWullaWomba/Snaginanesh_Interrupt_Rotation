@@ -21,7 +21,9 @@ local myToons = {
     "Megokick-Al'Akir",
     "Zoucka-Al'Akir",
     "Inspectmeplz-Aerie Peak",
-    "Whymesocool-Draenor"
+    "Whymesocool-Draenor",
+    "Whymesosmart-Draenor",
+    "Whymesogreat-Draenor"
 }
 local applyDefaultTable
 applyDefaultTable = function(default, actual)

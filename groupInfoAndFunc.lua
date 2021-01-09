@@ -10,14 +10,20 @@ local toBeInspectedActive = {}
 local toBeInspectedInactive = {}
 local recentInspectTimes = {}
 local numGroupMembers = 0
-
+local inspectNextStarted = false
 local printGroupInfo = function()
     print("----------------------------------------")
     print("SIR.groupInfo :")
     local count = 0
     for guid, info in pairs(SIR.groupInfo) do
+        local talents = ""
+        if info["TALENTS"] then
+            for i=1, 7 do
+                talents = talents..info["TALENTS"][i] or ""
+            end
+        end
         print(guid, " ", info["NAME"], " ", info["SERVER"], " ", info["CLASS"], " ",
-        info["SPEC"], " ", unpack(info["TALENTS"]), info["ALIVE"], info["ENABLED"])
+        info["SPEC"], " ", talents, info["ALIVE"], info["ENABLED"])
         count = count+1
     end
     print("#SIR.groupInfo "..count)
@@ -84,6 +90,10 @@ local setInitialInfo = function(GUID)
 end
 local inspectNext
 inspectNext = function()
+    if not SIR.enabled then
+        C_Timer.After(2.1, function() inspectNext() end)
+        return
+    end
 	for i = #recentInspectTimes, 1, -1 do
 		if (recentInspectTimes[i] < (GetTime()-11)) then
 			recentInspectTimes[i] = nil
@@ -156,7 +166,10 @@ SIR.groupInfoFunc.initialize = function()
         end
     end)
     SIR.rotationFunc.updateNumGroup(numGroupMembers)
-    inspectNext()
+    if not inspectNextStarted then
+        inspectNextStarted = true
+        inspectNext()
+    end
 end
 SIR.groupInfoFunc.PLAYER_LEAVING_WORLD = function()
     SnagiIntRotaSaved.groupInfo = SIR.groupInfo

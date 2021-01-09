@@ -111,12 +111,12 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
         if bar.GUID == GUID and bar.spellID == spellID then
             if timestamp then
                 bar.currentTime = timestamp
+                bar.expirationTime = timestamp+cds[spellID]
                 if spellID == 15487 and SIR.groupInfo[GUID]["TALENTS"][4] == 1 then
-                    bar.expirationTime = timestamp+30
-                else
-                    bar.expirationTime = timestamp+cds[spellID]
-                    setBarOnUpdate(bar)
+                    -- Priest Last Word Talent (-15s CD for silence)
+                    bar.expirationTime = bar.expirationTime-15
                 end
+                setBarOnUpdate(bar)
             else
                 bar.currentTime = 0
                 bar.expirationTime = 0
@@ -550,5 +550,10 @@ rotationFunc.removeByGUID = function(GUID)
                 removeStatusBar(tab, bar)
             end
         end
+    end
+end
+SIR.rotationFunc.disable = function()
+    for i=1, #rotationFrames do
+        removeAllStatusBars(i)
     end
 end

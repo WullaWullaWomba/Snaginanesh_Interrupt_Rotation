@@ -10,13 +10,13 @@ SIR.groupInfo, SIR.groupInfoFunc = {}, {}
 SIR.petToMaster, SIR.masterToPet, SIR.petInfoFunc = {}, {}, {}
 SIR.transmissionFunc = {}
 SIR.test = false
+SIR.enabled = true
 
 local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(_, event, ...) f[event](...) end)
 f:RegisterEvent("ADDON_LOADED")
 f:RegisterEvent("PLAYER_LOGIN")
 local initialize = function()
-	
 	-- addon has both loaded & player logged in
 	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
 	local GUID = UnitGUID("player")
@@ -118,6 +118,22 @@ f.PLAYER_LOGIN = function ()
 end
 
 f.PLAYER_ENTERING_WORLD = function()
+	local _, instanceType = GetInstanceInfo()
+	if instanceType == "pvp" or instanceType == "arena" then
+		if SIR.enabled then
+			SIR.util.myPrint("disabling")
+			SIR.enabled = false
+			f:UnregisterAllEvents()
+			f:RegisterEvent("PLAYER_ENTERING_WORLD")
+			SIR.rotationFunc.disable()
+		end
+	else
+		if not SIR.enabled then
+			SIR.util.myPrint("enabling")
+			initialize()
+			SIR.enabled = true
+		end
+	end
 
 end
 f.PLAYER_LOGOUT = function()

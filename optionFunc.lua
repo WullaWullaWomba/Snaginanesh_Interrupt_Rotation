@@ -132,10 +132,6 @@ local toggleOptions = function()
 		optionFrames.container:Show()
 	end
 end
-SLASH_SIRINTERRUPT1, SLASH_SIRINTERRUPT2 = "/sir", "/sirinterrupt"
-SlashCmdList["SIRINTERRUPT"] = function(msg)
-	toggleOptions(msg)
-end
 
 local loadTab = function(title)
 	numTabs = numTabs+1
@@ -314,7 +310,11 @@ optionFunc.initialize = function()
 	for i=1, #SIR.tabOptions do
 		SIR.tabOptions[i] = SIR.util.applyDefaultTable(defaultOptions, SIR.tabOptions[i])
         loadTab(SIR.tabOptions[i]["TITLE"])
-    end
+	end
+	SLASH_SIRINTERRUPT1, SLASH_SIRINTERRUPT2 = "/sir", "/sirinterrupt"
+	SlashCmdList["SIRINTERRUPT"] = function(msg)
+		toggleOptions(msg)
+	end
 end
 optionFunc.GROUP_ROSTER_UPDATE = function()
 	if optionFrames.rotationTab:IsShown() then

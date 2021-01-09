@@ -12,7 +12,10 @@ local addPet = function(GUID, petGUID)
     SIR.masterToPet[GUID] = petGUID
     for _, spell in ipairs(SIR.data.petSpellsByID[getPetID(petGUID)] or {}) do
         -- todo potential "danger", if gorupinfo for the guid hasn't been added yet/removed already?
-        SIR.rotationFunc.addSpellAllTabs(GUID, spell, SIR.groupInfo[GUID]["CLASS"])
+        if SIR.groupInfo[GUID] then
+            SIR.rotationFunc.addSpellAllTabs(GUID, spell, SIR.groupInfo[GUID]["CLASS"])
+            -- todo try again once groupinfo has been initialized
+        end
     end
 end
 local removePet = function(GUID, petGUID)
