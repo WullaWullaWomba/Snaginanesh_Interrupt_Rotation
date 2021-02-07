@@ -91,7 +91,7 @@ end
 local inspectNext
 inspectNext = function()
     if not SIR.enabled then
-        C_Timer.After(2.1, function() inspectNext() end)
+        C_Timer.After(5, function() inspectNext() end)
         return
     end
 	for i = #recentInspectTimes, 1, -1 do
@@ -268,7 +268,7 @@ SIR.groupInfoFunc.UNIT_HEALTH = function(...)
         end
     end
 end
-SIR.groupInfoFunc.UNIT_DIED = function (GUID)
+SIR.groupInfoFunc.UNIT_DIED = function(GUID)
     if SIR.groupInfo[GUID] then
         SIR.groupInfo[GUID]["ALIVE"] = false
         SIR.rotationFunc.updateGreyOutForGUID(GUID)
