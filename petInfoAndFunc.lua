@@ -10,12 +10,16 @@ end
 local addPet = function(GUID, petGUID)
     SIR.petToMaster[petGUID] = GUID
     SIR.masterToPet[GUID] = petGUID
+
+    --Todo make sure groupinfo has been set before
+    local class
+    if SIR.groupInfo[GUID] then
+        class = SIR.groupInfo[GUID]["CLASS"]
+    else
+        _, class = GetPlayerInfoByGUID(GUID)
+    end
     for _, spell in ipairs(SIR.data.petSpellsByID[getPetID(petGUID)] or {}) do
-        -- todo potential "danger", if gorupinfo for the guid hasn't been added yet/removed already?
-        if SIR.groupInfo[GUID] then
-            SIR.rotationFunc.addSpellAllTabs(GUID, spell, SIR.groupInfo[GUID]["CLASS"])
-            -- todo try again once groupinfo has been initialized
-        end
+        SIR.rotationFunc.addSpellAllTabs(GUID, spell, class)
     end
 end
 local removePet = function(GUID, petGUID)
@@ -91,6 +95,10 @@ SIR.petInfoFunc.initialize = function()
             SIR.petInfoFunc.UNIT_PET(unitID)
         end)
     end)
+end
+SIR.petInfoFunc.disable = function()
+    SIR.petToMaster = {}
+    SIR.masterToPet = {}
 end
 SIR.petInfoFunc.removePlayerPet = function(GUID)
     SIR.util.myPrint("SIR.petInfoFunc.removePlayerPet", GUID)

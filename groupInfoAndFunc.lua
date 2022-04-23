@@ -171,6 +171,12 @@ SIR.groupInfoFunc.initialize = function()
         inspectNext()
     end
 end
+SIR.groupInfoFunc.disable = function()
+    toBeInitialized = {}
+    toBeInspectedActive = {}
+    toBeInspectedInactive = {}
+    SIR.groupInfo = {}
+end
 SIR.groupInfoFunc.PLAYER_LEAVING_WORLD = function()
     SnagiIntRotaSaved.groupInfo = SIR.groupInfo
 end

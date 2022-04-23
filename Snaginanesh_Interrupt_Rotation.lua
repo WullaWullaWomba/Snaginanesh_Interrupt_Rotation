@@ -47,6 +47,15 @@ local initialize = function()
 	f:RegisterEvent("PARTY_MEMBER_DISABLE")
 	f:RegisterEvent("UNIT_HEALTH")
 end
+local disable = function()
+	SIR.util.myPrint("disabling")
+	SIR.enabled = false
+	f:UnregisterAllEvents()
+	f:RegisterEvent("PLAYER_ENTERING_WORLD")
+	SIR.groupInfoFunc.disable()
+	SIR.petInfoFunc.disable()
+	SIR.rotationFunc.disable()
+end
 f.PARTY_MEMBER_ENABLE = function(...)
 	SIR.util.myPrint("PARTY_MEMBER_ENABLE", ...)
 	SIR.groupInfoFunc.PARTY_MEMBER_ENABLE(...)
@@ -121,11 +130,7 @@ f.PLAYER_ENTERING_WORLD = function()
 	local _, instanceType = GetInstanceInfo()
 	if instanceType == "pvp" or instanceType == "arena" then
 		if SIR.enabled then
-			SIR.util.myPrint("disabling")
-			SIR.enabled = false
-			f:UnregisterAllEvents()
-			f:RegisterEvent("PLAYER_ENTERING_WORLD")
-			SIR.rotationFunc.disable()
+			disable()
 		end
 	else
 		if not SIR.enabled then

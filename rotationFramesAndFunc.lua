@@ -131,13 +131,14 @@ local updateOrAddStatusBar = function(tab, GUID, spellID, class, timestamp)
                     and SIR.tabOptions[tab]["REPEATSOUND"] or not statusBars[tab][j].soundPlayed then
                     PlaySoundFile(SIR.tabOptions[tab]["SOUNDPATH"])
                     statusBars[tab][j].soundPlayed = true
-            end
+                end
             -- move bar to correct index if sortmode is by CD and potentially play sound
             elseif SIR.tabOptions[tab]["SORTMODE"] == "CD" then
-                -- (temporarily) remove bar
+                -- adjust anchor for the following bar
                 if statusBars[tab][i+1] then
                     statusBars[tab][i+1]:SetPoint(bar:GetPoint(1))
                 end
+                -- (temporarily) remove bar
                 for j=i, #statusBars[tab] do
                     statusBars[tab][j] = statusBars[tab][j+1]
                 end

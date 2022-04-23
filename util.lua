@@ -17,6 +17,7 @@ end
 local myToons = {
     "Addonmsg-Al'Akir",
     "Metestpet-Aerie Peak",
+    "Metestpet-Al'Akir",
     "Trololololoo-Al'Akir",
     "Megokick-Al'Akir",
     "Zoucka-Al'Akir",
@@ -75,7 +76,7 @@ SIR.util = {
         end
     end,
     ["myPrint"] = function(...)
-        if SIR.test and SIR.util.contains(myToons, SIR.playerInfo["NAME"].."-"..SIR.playerInfo["REALM"]) then
+        if SIR.test and SIR.util.contains(myToons, (SIR.playerInfo["NAME"] or "").."-"..(SIR.playerInfo["REALM"] or "")) then
             print("__", ...)
         end
     end,
