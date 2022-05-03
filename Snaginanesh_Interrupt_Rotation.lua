@@ -20,7 +20,8 @@ local initialize = function()
 	-- addon has both loaded & player logged in
 	SnagiIntRotaSaved = SnagiIntRotaSaved or {}
 	local GUID = UnitGUID("player")
-	local _, class, _, _, _, name = GetPlayerInfoByGUID(GUID)
+	local _, class = UnitClass("player")
+	local name = UnitName("player")
 	SIR.playerInfo = {
 		["GUID"] = GUID,
 		["CLASS"] = class,
@@ -128,7 +129,7 @@ end
 
 f.PLAYER_ENTERING_WORLD = function()
 	local _, instanceType = GetInstanceInfo()
-	if instanceType == "pvp" or instanceType == "arena" then
+	if (instanceType == "pvp") or (instanceType == "arena") then
 		if SIR.enabled then
 			disable()
 		end

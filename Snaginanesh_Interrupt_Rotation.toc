@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90200
 ## Title: Snaginanesh Interrupt Rotation
 ## Author: Lahm
 ## Version: 1.07

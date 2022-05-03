@@ -16,6 +16,7 @@ makeCopy = function(input)
 end
 local myToons = {
     "Addonmsg-Al'Akir",
+    "Test-Al'Akir",
     "Metestpet-Aerie Peak",
     "Metestpet-Al'Akir",
     "Trololololoo-Al'Akir",
